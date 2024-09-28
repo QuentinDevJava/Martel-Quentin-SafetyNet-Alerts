@@ -35,7 +35,7 @@ public class FirestationServiceImpl implements FirestationService {
 	public Firestation updateFirestation(String address, Firestation firestation) {
 		List<Firestation> firestations = getAllFirestations();
 		for (int i = 0; i < firestations.size(); i++) {
-			if (firestations.get(i).getAddress().equals(address)) {
+			if (firestations.get(i).address().equals(address)) {
 				firestations.set(i, firestation);
 				saveFirestations(firestations);
 				return firestation;
@@ -46,7 +46,7 @@ public class FirestationServiceImpl implements FirestationService {
 
 	public void deleteFirestation(String address) {
 		List<Firestation> firestations = getAllFirestations();
-		firestations.removeIf(f -> f.getAddress().equals(address));
+		firestations.removeIf(f -> f.address().equals(address));
 		saveFirestations(firestations);
 	}
 

@@ -35,7 +35,7 @@ public class PersonServiceImpl implements PersonService {
 	public Person updatePerson(String firstName, String lastName, Person person) {
 		List<Person> persons = getAllPersons();
 		for (int i = 0; i < persons.size(); i++) {
-			if (persons.get(i).getFirstName().equals(firstName) && persons.get(i).getLastName().equals(lastName)) {
+			if (persons.get(i).firstName().equals(firstName) && persons.get(i).lastName().equals(lastName)) {
 				persons.set(i, person);
 				break;
 			}
@@ -46,7 +46,7 @@ public class PersonServiceImpl implements PersonService {
 
 	public void deletePerson(String firstName, String lastName) {
 		List<Person> persons = getAllPersons();
-		persons.removeIf(p -> p.getFirstName().equals(firstName) && p.getLastName().equals(lastName));
+		persons.removeIf(p -> p.firstName().equals(firstName) && p.lastName().equals(lastName));
 		savePersons(persons);
 	}
 

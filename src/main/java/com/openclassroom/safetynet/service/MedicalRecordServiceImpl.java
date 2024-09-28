@@ -35,8 +35,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	public MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord) {
 		List<MedicalRecord> medicalRecords = getAllMedicalRecords();
 		for (int i = 0; i < medicalRecords.size(); i++) {
-			if (medicalRecords.get(i).getFirstName().equals(firstName)
-					&& medicalRecords.get(i).getLastName().equals(lastName)) {
+			if (medicalRecords.get(i).firstName().equals(firstName)
+					&& medicalRecords.get(i).lastName().equals(lastName)) {
 				medicalRecords.set(i, medicalRecord);
 				saveMedicalRecords(medicalRecords);
 				return medicalRecord;
@@ -47,7 +47,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
 	public void deleteMedicalRecord(String firstName, String lastName) {
 		List<MedicalRecord> medicalRecords = getAllMedicalRecords();
-		medicalRecords.removeIf(mr -> mr.getFirstName().equals(firstName) && mr.getLastName().equals(lastName));
+		medicalRecords.removeIf(mr -> mr.firstName().equals(firstName) && mr.lastName().equals(lastName));
 		saveMedicalRecords(medicalRecords);
 	}
 
