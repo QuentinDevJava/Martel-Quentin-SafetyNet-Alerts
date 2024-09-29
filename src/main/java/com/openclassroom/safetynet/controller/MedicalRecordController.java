@@ -2,6 +2,8 @@ package com.openclassroom.safetynet.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +22,8 @@ import com.openclassroom.safetynet.service.MedicalRecordService;
 @RequestMapping("/medicalrecord")
 public class MedicalRecordController {
 
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	private final MedicalRecordService medicalRecordService;
 
 	public MedicalRecordController(MedicalRecordService medicalRecordService) {
@@ -28,28 +32,51 @@ public class MedicalRecordController {
 
 	@GetMapping
 	public ResponseEntity<List<MedicalRecord>> getAllMedicalRecords() {
+		logger.info("GET request received for /medicalrecord.");
 		List<MedicalRecord> medicalRecords = medicalRecordService.getAllMedicalRecords();
+		logger.info("Successfully retrieved {} medical records.", medicalRecords.size());
 		return new ResponseEntity<>(medicalRecords, HttpStatus.OK);
 	}
 
 	@PostMapping
 	public ResponseEntity<MedicalRecord> createMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
-		MedicalRecord createdMedicalRecord = medicalRecordService.createMedicalRecord(medicalRecord);
-		return new ResponseEntity<>(createdMedicalRecord, HttpStatus.CREATED);
+		logger.info("POST request received for /medicalrecord, adding medical record: {}", medicalRecord);
+		try {
+			MedicalRecord createdMedicalRecord = medicalRecordService.createMedicalRecord(medicalRecord);
+			logger.info("Medical record successfully created: {}", createdMedicalRecord);
+			return new ResponseEntity<>(createdMedicalRecord, HttpStatus.CREATED);
+		} catch (Exception e) {
+			logger.error("Error creating medical record: {}", medicalRecord, e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
 	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable String firstName,
 			@PathVariable String lastName, @RequestBody MedicalRecord medicalRecord) {
-		MedicalRecord updatedMedicalRecord = medicalRecordService.updateMedicalRecord(firstName, lastName,
+		logger.info("PUT request received for /medicalrecord/{}/{} updating medical record: {}", firstName, lastName,
 				medicalRecord);
-		return new ResponseEntity<>(updatedMedicalRecord, HttpStatus.OK);
+		try {
+			MedicalRecord updatedMedicalRecord = medicalRecordService.updateMedicalRecord(firstName, lastName,
+					medicalRecord);
+			logger.info("Medical record successfully updated: {}", updatedMedicalRecord);
+			return new ResponseEntity<>(updatedMedicalRecord, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("Error updating medical record with first name: {} and last name: {}", firstName, lastName, e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@DeleteMapping("/{firstName}/{lastName}")
 	public ResponseEntity<Void> deleteMedicalRecord(@PathVariable String firstName, @PathVariable String lastName) {
-		medicalRecordService.deleteMedicalRecord(firstName, lastName);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		logger.info("DELETE request received for /medicalrecord/{}/{}", firstName, lastName);
+		try {
+			medicalRecordService.deleteMedicalRecord(firstName, lastName);
+			logger.info("Medical record successfully deleted: {} {}", firstName, lastName);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			logger.error("Error deleting medical record with first name: {} and last name: {}", firstName, lastName, e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
-
 }

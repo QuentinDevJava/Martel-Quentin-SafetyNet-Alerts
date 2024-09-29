@@ -2,6 +2,8 @@ package com.openclassroom.safetynet.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,34 +22,58 @@ import com.openclassroom.safetynet.service.FirestationService;
 @RequestMapping("/firestation")
 public class FirestationController {
 
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final FirestationService firestationService;
 
 	public FirestationController(FirestationService firestationService) {
 		this.firestationService = firestationService;
 	}
 
+	@GetMapping
+	public ResponseEntity<List<Firestation>> getAllFirestations() {
+		logger.info("GET request received for /firestation.");
+		List<Firestation> firestations = firestationService.getAllFirestations();
+		logger.info("Successfully retrieved {} firestations.", firestations.size());
+		return new ResponseEntity<>(firestations, HttpStatus.OK);
+	}
+
 	@PostMapping
 	public ResponseEntity<Firestation> createFirestation(@RequestBody Firestation firestation) {
-		Firestation createdFirestation = firestationService.createFirestation(firestation);
-		return new ResponseEntity<>(createdFirestation, HttpStatus.CREATED);
+		logger.info("POST request received for /firestation, adding firestation: {}", firestation);
+		try {
+			Firestation createdFirestation = firestationService.createFirestation(firestation);
+			logger.info("Firestation successfully created: {}", createdFirestation);
+			return new ResponseEntity<>(createdFirestation, HttpStatus.CREATED);
+		} catch (Exception e) {
+			logger.error("Error creating firestation: {}", firestation, e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PutMapping("/{address}")
 	public ResponseEntity<Firestation> updateFirestation(@PathVariable String address,
 			@RequestBody Firestation firestation) {
-		Firestation updatedFirestation = firestationService.updateFirestation(address, firestation);
-		return new ResponseEntity<>(updatedFirestation, HttpStatus.OK);
+		logger.info("PUT request received for /firestation/{} updating firestation: {}", address, firestation);
+		try {
+			Firestation updatedFirestation = firestationService.updateFirestation(address, firestation);
+			logger.info("Firestation successfully updated: {}", updatedFirestation);
+			return new ResponseEntity<>(updatedFirestation, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("Error updating firestation with address: {}", address, e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@DeleteMapping("/{address}")
 	public ResponseEntity<Void> deleteFirestation(@PathVariable String address) {
-		firestationService.deleteFirestation(address);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-	@GetMapping
-	public ResponseEntity<List<Firestation>> getAllFirestations() {
-		List<Firestation> firestations = firestationService.getAllFirestations();
-		return new ResponseEntity<>(firestations, HttpStatus.OK);
+		logger.info("DELETE request received for /firestation/{}", address);
+		try {
+			firestationService.deleteFirestation(address);
+			logger.info("Firestation successfully deleted: {}", address);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			logger.error("Error deleting firestation with address: {}", address, e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
