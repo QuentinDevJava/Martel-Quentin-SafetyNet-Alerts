@@ -1,10 +1,12 @@
-package com.openclassroom.safetynet.model;
+package com.openclassroom.safetynet.repository;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -13,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.JsonPath;
 import com.openclassroom.safetynet.constants.TypeOfData;
 
+@Repository
 public class DataRepository {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
