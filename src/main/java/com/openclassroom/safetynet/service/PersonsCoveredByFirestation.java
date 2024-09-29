@@ -16,9 +16,14 @@ public class PersonsCoveredByFirestation {
 
 	public PersonsCoveredByFirestation(List<Person> persons, MedicalRecordService medicalRecordService) {
 		this.personsInfo = persons.stream().map(PersonInfo::extractBasicInfo).collect(Collectors.toList());
-
 		this.adultCount = calculateAgeCount(persons, medicalRecordService, IS_ADULT);
 		this.childCount = calculateAgeCount(persons, medicalRecordService, IS_CHILD);
+	}
+
+	@Override
+	public String toString() {
+		return "PersonsCoveredByFirestation [personsInfo=" + personsInfo + ", adultCount=" + adultCount
+				+ ", childCount=" + childCount + "]";
 	}
 
 	private int calculateAgeCount(List<Person> persons, MedicalRecordService medicalRecordService,

@@ -49,7 +49,7 @@ public class FirestationServiceImpl implements FirestationService {
 			saveFirestations(firestations);
 			return firestation;
 		} else {
-			throw new FirestationNotFoundException("Firestation not found for address: " + address);
+			throw new FirestationNotFoundException("Fire station not found for address: " + address);
 		}
 	}
 
@@ -60,7 +60,7 @@ public class FirestationServiceImpl implements FirestationService {
 			firestations.remove(firestation);
 			saveFirestations(firestations);
 		} else {
-			throw new FirestationNotFoundException("Firestation not found for address: " + address);
+			throw new FirestationNotFoundException("Fire station not found for address: " + address);
 		}
 	}
 
@@ -84,6 +84,10 @@ public class FirestationServiceImpl implements FirestationService {
 			if (firestation.station().equals(stationNumber)) {
 				matchingFirestations.add(firestation);
 			}
+		}
+		if (matchingFirestations.isEmpty()) {
+			throw new FirestationNotFoundException("Fire station N° {} not found" + stationNumber);
+
 		}
 
 		return matchingFirestations;
