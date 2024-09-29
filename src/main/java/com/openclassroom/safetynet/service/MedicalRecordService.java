@@ -9,6 +9,8 @@ public interface MedicalRecordService {
 
 	MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord);
 
+	MedicalRecord getMedicalRecordByFullName(String firstName, String lastName);
+
 	void deleteMedicalRecord(String firstName, String lastName);
 
 	List<MedicalRecord> getAllMedicalRecords();

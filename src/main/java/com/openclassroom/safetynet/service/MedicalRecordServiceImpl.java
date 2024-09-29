@@ -95,5 +95,4 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		}
 		return null;
 	}
-
 }

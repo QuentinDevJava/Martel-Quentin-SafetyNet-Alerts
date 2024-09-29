@@ -12,4 +12,7 @@ public interface FirestationService {
 	void deleteFirestation(String address);
 
 	List<Firestation> getAllFirestations();
+
+	List<Firestation> getFirestationByStationNumber(String stationNumber);
+
 }
