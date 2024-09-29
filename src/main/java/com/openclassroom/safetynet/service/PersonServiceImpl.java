@@ -1,14 +1,10 @@
 package com.openclassroom.safetynet.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +17,6 @@ import com.openclassroom.safetynet.repository.DataRepository;
 @Service
 public class PersonServiceImpl implements PersonService {
 
-	private final Logger logger = LoggerFactory.getLogger(PersonServiceImpl.class);
 	private final DataRepository dataRepository;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -81,21 +76,13 @@ public class PersonServiceImpl implements PersonService {
 		for (Person personObj : listOfPersons) {
 			personData.add(objectMapper.convertValue(personObj, Person.class));
 		}
-		try {
-			dataRepository.saveData(TypeOfData.persons, personData);
-		} catch (IOException e) {
-			logger.error("Error saving data: {} ", e.getMessage());
-		}
+		dataRepository.saveData(TypeOfData.persons, personData);
 	}
 
 	public List<Person> getPeopleByStationAddress(List<Firestation> firestation) {
 		List<Person> persons = getAllPersons();
-		List<Person> matchingPersons = new ArrayList<>();
-
-		for (Firestation f : firestation) {
-			matchingPersons.addAll(persons.stream().filter(person -> person.address().equals(f.address()))
-					.collect(Collectors.toList()));
-		}
-		return matchingPersons;
+		return firestation.stream()
+				.flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream())
+				.toList();
 	}
 }

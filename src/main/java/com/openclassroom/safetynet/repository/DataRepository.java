@@ -8,15 +8,19 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.JsonPath;
 import com.openclassroom.safetynet.constants.TypeOfData;
+import com.openclassroom.safetynet.exceptions.DataLoadingException;
+import com.openclassroom.safetynet.exceptions.DataSavingException;
 
 @Repository
 public class DataRepository {
+
+	// private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	// TODO voir s'il faut faire les étapes avec des debug et info et verifier la
+	// gistion des erreurs
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -24,8 +28,7 @@ public class DataRepository {
 		this.objectMapper = new ObjectMapper();
 	}
 
-	public void saveData(TypeOfData typeOfData, List<Object> data)
-			throws StreamWriteException, DatabindException, IOException {
+	public void saveData(TypeOfData typeOfData, List<Object> data) {
 		Map<String, List<Object>> jsonData = LoadData();
 
 		switch (typeOfData) {
@@ -34,18 +37,19 @@ public class DataRepository {
 		case medicalrecords -> jsonData.put("medicalrecords", data);
 		default -> throw new IllegalArgumentException("Error : Type of data not found");
 		}
-		objectMapper.writeValue(new File(JsonPath.JSONPATH), jsonData);
+		try {
+			objectMapper.writeValue(new File(JsonPath.JSONPATH), jsonData);
+		} catch (IOException e) {
+			throw new DataSavingException("Error saving data: " + e.getMessage());
+		}
 	}
 
 	public Map<String, List<Object>> LoadData() {
 		try {
-			Map<String, List<Object>> jsonData = objectMapper.readValue(new File(JsonPath.JSONPATH),
-					new TypeReference<Map<String, List<Object>>>() {
-					});
-			return jsonData;
+			return objectMapper.readValue(new File(JsonPath.JSONPATH), new TypeReference<Map<String, List<Object>>>() {
+			});
 		} catch (Exception e) {
-			System.err.println("Error loading data : " + e.getMessage());
-			return null;
+			throw new DataLoadingException("Error loading data: " + e.getMessage());
 		}
 	}
 

@@ -1,11 +1,8 @@
 package com.openclassroom.safetynet.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,13 +14,8 @@ import com.openclassroom.safetynet.repository.DataRepository;
 @Service
 public class MedicalRecordServiceImpl implements MedicalRecordService {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final DataRepository dataRepository;
+	private final DataRepository dataRepository = new DataRepository();
 	private final ObjectMapper objectMapper = new ObjectMapper();
-
-	public MedicalRecordServiceImpl(DataRepository dataRepository) {
-		this.dataRepository = dataRepository;
-	}
 
 	public List<MedicalRecord> getAllMedicalRecords() {
 		List<Object> medicalRecordData = dataRepository.SelectTypeOfData(TypeOfData.medicalrecords);
@@ -49,7 +41,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 			saveMedicalRecords(medicalRecords);
 			return medicalRecord;
 		} else {
-			throw new MedicalRecordNotFoundException("Medical record not found for " + firstName + " " + lastName);
+			throw new MedicalRecordNotFoundException(
+					"Medical record not updated beacause is not found for " + firstName + " " + lastName);
 		}
 	}
 
@@ -60,7 +53,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 			medicalRecords.remove(medicalRecord);
 			saveMedicalRecords(medicalRecords);
 		} else {
-			throw new MedicalRecordNotFoundException("Medical record not found for " + firstName + " " + lastName);
+			throw new MedicalRecordNotFoundException(
+					"Medical record not deleted beacause is not found for " + firstName + " " + lastName);
 		}
 	}
 
@@ -69,11 +63,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		for (MedicalRecord medicalRecordObj : listOfMedicalRecords) {
 			medicalRecordData.add(objectMapper.convertValue(medicalRecordObj, MedicalRecord.class));
 		}
-		try {
-			dataRepository.saveData(TypeOfData.medicalrecords, medicalRecordData);
-		} catch (IOException e) {
-			logger.error("Error while saving data : {} " + e.getMessage());
-		}
+		dataRepository.saveData(TypeOfData.medicalrecords, medicalRecordData);
 	}
 
 	public MedicalRecord getMedicalRecordByFullName(String firstName, String lastName) {
