@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.service.FirestationService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
+@Slf4j
 @RequestMapping("/firestation")
 public class FirestationController {
-
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final FirestationService firestationService;
 
@@ -31,6 +33,7 @@ public class FirestationController {
 
 	@GetMapping
 	public ResponseEntity<List<Firestation>> getAllFirestations() {
+
 		logger.info("GET request received for /firestation.");
 		List<Firestation> firestations = firestationService.getAllFirestations();
 		logger.info("Successfully retrieved {} firestations.", firestations.size());
@@ -51,8 +54,7 @@ public class FirestationController {
 	}
 
 	@PutMapping("/{address}")
-	public ResponseEntity<Firestation> updateFirestation(@PathVariable String address,
-			@RequestBody Firestation firestation) {
+	public ResponseEntity<Firestation> updateFirestation(@PathVariable String address, @RequestBody Firestation firestation) {
 		logger.info("PUT request received for /firestation/{} updating firestation: {}", address, firestation);
 		try {
 			Firestation updatedFirestation = firestationService.updateFirestation(address, firestation);

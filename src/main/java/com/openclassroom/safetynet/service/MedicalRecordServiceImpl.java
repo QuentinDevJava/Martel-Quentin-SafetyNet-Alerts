@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.exceptions.MedicalRecordNotFoundException;
 import com.openclassroom.safetynet.model.MedicalRecord;
+import com.openclassroom.safetynet.model.MedicalRecordInfo;
+import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.repository.DataRepository;
 
 @Service
@@ -41,8 +43,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 			saveMedicalRecords(medicalRecords);
 			return medicalRecord;
 		} else {
-			throw new MedicalRecordNotFoundException(
-					"Medical record not updated beacause is not found for " + firstName + " " + lastName);
+			throw new MedicalRecordNotFoundException("Medical record not updated beacause is not found for " + firstName + " " + lastName);
 		}
 	}
 
@@ -53,8 +54,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 			medicalRecords.remove(medicalRecord);
 			saveMedicalRecords(medicalRecords);
 		} else {
-			throw new MedicalRecordNotFoundException(
-					"Medical record not deleted beacause is not found for " + firstName + " " + lastName);
+			throw new MedicalRecordNotFoundException("Medical record not deleted beacause is not found for " + firstName + " " + lastName);
 		}
 	}
 
@@ -78,11 +78,38 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	private MedicalRecord findMedicalRecordByFullName(String firstName, String lastName) {
 		List<MedicalRecord> medicalRecords = getAllMedicalRecords();
 		for (int i = 0; i < medicalRecords.size(); i++) {
-			if (medicalRecords.get(i).firstName().equals(firstName)
-					&& medicalRecords.get(i).lastName().equals(lastName)) {
+			if (medicalRecords.get(i).firstName().equals(firstName) && medicalRecords.get(i).lastName().equals(lastName)) {
 				return medicalRecords.get(i);
 			}
 		}
 		return null;
 	}
+
+	public MedicalRecord findMedicalRecordByLastName(String lastName) {
+		List<MedicalRecord> medicalRecords = getAllMedicalRecords();
+		for (int i = 0; i < medicalRecords.size(); i++) {
+			if (medicalRecords.get(i).lastName().equals(lastName)) {
+				return medicalRecords.get(i);
+			}
+		}
+		return null;
+	}
+
+	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons, MedicalRecordService medicalRecordService, PersonService personService) {
+		List<MedicalRecordInfo> medicalRecordInfos = new ArrayList<>();
+		for (Person person : persons) {
+			medicalRecordInfos.add(extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()), medicalRecordService, personService));
+		}
+		return medicalRecordInfos;
+	}
+
+	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord, MedicalRecordService medicalRecordService, PersonService personService) {
+		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), personService.getPersonAge(person, medicalRecordService), medicalRecord.medications(), medicalRecord.allergies());
+
+	}
+
+	public MedicalRecordInfo getMedicalRecordInfosByPerson(Person person, MedicalRecordService medicalRecordService, PersonService personService) {
+		return extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()), medicalRecordService, personService);
+	}
+
 }

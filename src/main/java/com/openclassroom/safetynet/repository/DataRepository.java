@@ -24,10 +24,6 @@ public class DataRepository {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
-	public DataRepository() {
-		this.objectMapper = new ObjectMapper();
-	}
-
 	public void saveData(TypeOfData typeOfData, List<Object> data) {
 		Map<String, List<Object>> jsonData = LoadData();
 
