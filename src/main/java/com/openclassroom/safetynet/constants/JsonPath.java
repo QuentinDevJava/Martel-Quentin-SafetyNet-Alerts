@@ -6,6 +6,5 @@ public class JsonPath {
 		super();
 	}
 
-	public static final String JSONPATH = "C:\\Users\\martel\\Desktop\\1-dev java\\P5\\safetynet\\src\\main\\resources\\data.json";
-
+	public static final String JSONFILEPATH = "src/main/resources/data.json";
 }

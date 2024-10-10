@@ -18,44 +18,40 @@ import com.openclassroom.safetynet.exceptions.DataSavingException;
 @Repository
 public class DataRepository {
 
-	// private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	// TODO voir s'il faut faire les étapes avec des debug et info et verifier la
-	// gistion des erreurs
-
 	private ObjectMapper objectMapper = new ObjectMapper();
 
 	public void saveData(TypeOfData typeOfData, List<Object> data) {
-		Map<String, List<Object>> jsonData = LoadData();
+		Map<String, List<Object>> jsonData = loadJsonData();
 
 		switch (typeOfData) {
-		case persons -> jsonData.put("persons", data);
-		case firestations -> jsonData.put("firestations", data);
-		case medicalrecords -> jsonData.put("medicalrecords", data);
+		case PERSONS -> jsonData.put("persons", data);
+		case FIRESTATIONS -> jsonData.put("firestations", data);
+		case MEDICALRECORDS -> jsonData.put("medicalrecords", data);
 		default -> throw new IllegalArgumentException("Error : Type of data not found");
 		}
 		try {
-			objectMapper.writeValue(new File(JsonPath.JSONPATH), jsonData);
+			objectMapper.writeValue(new File(JsonPath.JSONFILEPATH), jsonData);
 		} catch (IOException e) {
 			throw new DataSavingException("Error saving data: " + e.getMessage());
 		}
 	}
 
-	public Map<String, List<Object>> LoadData() {
+	public Map<String, List<Object>> loadJsonData() {
 		try {
-			return objectMapper.readValue(new File(JsonPath.JSONPATH), new TypeReference<Map<String, List<Object>>>() {
+			return objectMapper.readValue(new File(JsonPath.JSONFILEPATH), new TypeReference<Map<String, List<Object>>>() {
 			});
 		} catch (Exception e) {
 			throw new DataLoadingException("Error loading data: " + e.getMessage());
 		}
 	}
 
-	public List<Object> SelectTypeOfData(TypeOfData typeOfData) {
-		Map<String, List<Object>> data = LoadData();
+	public List<Object> selectTypeOfData(TypeOfData typeOfData) {
+		Map<String, List<Object>> data = loadJsonData();
 
 		return switch (typeOfData) {
-		case persons -> data.getOrDefault("persons", new ArrayList<>());
-		case firestations -> data.getOrDefault("firestations", new ArrayList<>());
-		case medicalrecords -> data.getOrDefault("medicalrecords", new ArrayList<>());
+		case PERSONS -> data.getOrDefault("persons", new ArrayList<>());
+		case FIRESTATIONS -> data.getOrDefault("firestations", new ArrayList<>());
+		case MEDICALRECORDS -> data.getOrDefault("medicalrecords", new ArrayList<>());
 		default -> throw new IllegalArgumentException("Error : Type of data no found");
 		};
 	}

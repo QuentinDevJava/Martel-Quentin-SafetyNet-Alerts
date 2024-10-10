@@ -14,7 +14,6 @@ public class FloodService {
 	private final PersonService personService;
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
-	private Map<String, List<MedicalRecordInfo>> resultByAddress = new HashMap<>();
 
 	public FloodService(PersonService personService, MedicalRecordService medicalRecordService, FirestationService firestationService) {
 		this.personService = personService;
@@ -23,23 +22,20 @@ public class FloodService {
 	}
 
 	public Map<String, List<MedicalRecordInfo>> listOfPersonsByAddressByStationNumber(List<Firestation> firestations) {
+		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = new HashMap<>();
 		for (Firestation firestation : firestations) {
 			List<Person> persons = new ArrayList<>();
 			persons.addAll(personService.getPersonsByAddress(firestation.address()));
-			List<MedicalRecordInfo> medicalRecordInfo = new ArrayList<>();
-			for (Person person : persons) {
-				medicalRecordInfo.add(medicalRecordService.getMedicalRecordInfosByPerson(person, medicalRecordService, personService));
-			}
-			resultByAddress.put(firestation.address(), medicalRecordInfo);
-
+			List<MedicalRecordInfo> medicalRecordInfos = persons.stream().map(person -> medicalRecordService.getMedicalRecordInfosByPerson(person, medicalRecordService, personService)).toList();
+			medicalRecordsByAddress.put(firestation.address(), medicalRecordInfos);
 		}
-		return resultByAddress;
+		return medicalRecordsByAddress;
 	}
 
 	public FloodInfo floodInfo(List<String> stationNumber) {
 		List<Firestation> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
-		Map<String, List<MedicalRecordInfo>> ResultMapOfmedicalRecordInfo = listOfPersonsByAddressByStationNumber(firestations);
+		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = listOfPersonsByAddressByStationNumber(firestations);
 
-		return new FloodInfo(ResultMapOfmedicalRecordInfo);
+		return new FloodInfo(medicalRecordsByAddress);
 	}
 }

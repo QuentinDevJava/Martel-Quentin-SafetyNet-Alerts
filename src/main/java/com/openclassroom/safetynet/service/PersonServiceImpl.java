@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,16 +29,17 @@ public class PersonServiceImpl implements PersonService {
 	private final DataRepository dataRepository;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
-
+	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
 
-	public PersonServiceImpl(DataRepository dataRepository, FirestationService firestationService) {
+	public PersonServiceImpl(DataRepository dataRepository, FirestationService firestationService, MedicalRecordService medicalRecordService) {
 		this.dataRepository = dataRepository;
+		this.medicalRecordService = medicalRecordService;
 		this.firestationService = firestationService;
 	}
 
 	public List<Person> getAllPersons() {
-		List<Object> personData = dataRepository.SelectTypeOfData(TypeOfData.persons);
+		List<Object> personData = dataRepository.selectTypeOfData(TypeOfData.PERSONS);
 		List<Person> persons = new ArrayList<>();
 		for (Object personObj : personData) {
 			persons.add(objectMapper.convertValue(personObj, Person.class));
@@ -85,7 +87,7 @@ public class PersonServiceImpl implements PersonService {
 		for (Person personObj : listOfPersons) {
 			personData.add(objectMapper.convertValue(personObj, Person.class));
 		}
-		dataRepository.saveData(TypeOfData.persons, personData);
+		dataRepository.saveData(TypeOfData.PERSONS, personData);
 	}
 
 	public List<Person> getPersonsByStationAddress(List<Firestation> firestation) {
@@ -94,16 +96,7 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	public List<Person> getPersonsByAddress(String address) {
-		List<Person> persons = getAllPersons();
-		List<Person> personByAddress = new ArrayList<>();
-
-		for (int i = 0; i < persons.size(); i++) {
-			if (persons.get(i).address().equals(address)) {
-				personByAddress.add(persons.get(i));
-			}
-		}
-		return personByAddress;
-
+		return getAllPersons().stream().filter(person -> person.address().equals(address)).toList();
 	}
 
 	public PersonsLastNameInfo extractNameAddressAgeEmailInfo(Person person, MedicalRecord medicalRecord) {
@@ -112,16 +105,9 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	public PersonEmail personEmails(String city) {
-		List<Person> Persons = getAllPersons();
-		List<String> Email = new ArrayList<>();
-		for (Person person : Persons) {
-			if (person.city().equals(city)) {
-				Email.add(person.email());
-			}
 
-		}
-		return new PersonEmail(Email);
-
+		List<String> emails = getAllPersons().stream().filter(person -> person.city().equals(city)).map(Person::email).toList();
+		return new PersonEmail(emails);
 	}
 
 	public PersonInfo extractNameAddressPhoneInfo(Person person) {
@@ -146,17 +132,16 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	public List<String> getPhoneNumbersByStation(String stationNumber) {
-		List<Person> persons = getPersonsByStation(stationNumber);
-		List<String> phoneNumbers = new ArrayList<>();
-		for (Person person : persons) {
-			phoneNumbers.add(person.phone());
-		}
-		return phoneNumbers;
+		return getPersonsByStation(stationNumber).stream().map(Person::phone).toList();
 	}
 
 	public List<Person> getPersonsByStation(String stationNumber) {
 		List<Firestation> firestation = firestationService.getFirestationByStationNumber(stationNumber);
 		return getPersonsByStationAddress(firestation);
+	}
+
+	public int calculateAgeCount(List<Person> persons, Predicate<Integer> predicate) {
+		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
 	}
 
 }

@@ -7,12 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.model.Firestation;
@@ -22,7 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-@RequestMapping("/firestation")
+
+//@RequestMapping("/firestation")
+
 public class FirestationController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final FirestationService firestationService;
@@ -31,7 +31,7 @@ public class FirestationController {
 		this.firestationService = firestationService;
 	}
 
-	@GetMapping
+	// @GetMapping("/firestation")
 	public ResponseEntity<List<Firestation>> getAllFirestations() {
 
 		logger.info("GET request received for /firestation.");
@@ -40,7 +40,7 @@ public class FirestationController {
 		return new ResponseEntity<>(firestations, HttpStatus.OK);
 	}
 
-	@PostMapping
+	@PostMapping("/firestation")
 	public ResponseEntity<Firestation> createFirestation(@RequestBody Firestation firestation) {
 		logger.info("POST request received for /firestation, adding firestation: {}", firestation);
 		try {
@@ -53,7 +53,7 @@ public class FirestationController {
 		}
 	}
 
-	@PutMapping("/{address}")
+	@PutMapping("/firestation/{address}")
 	public ResponseEntity<Firestation> updateFirestation(@PathVariable String address, @RequestBody Firestation firestation) {
 		logger.info("PUT request received for /firestation/{} updating firestation: {}", address, firestation);
 		try {
@@ -66,7 +66,7 @@ public class FirestationController {
 		}
 	}
 
-	@DeleteMapping("/{address}")
+	@DeleteMapping("/firestation/{address}")
 	public ResponseEntity<Void> deleteFirestation(@PathVariable String address) {
 		logger.info("DELETE request received for /firestation/{}", address);
 		try {

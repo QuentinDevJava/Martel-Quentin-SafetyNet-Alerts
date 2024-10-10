@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,39 +20,52 @@ import com.openclassroom.safetynet.service.ChildService;
 import com.openclassroom.safetynet.service.FirestationService;
 import com.openclassroom.safetynet.service.FloodService;
 import com.openclassroom.safetynet.service.MedicalRecordService;
+import com.openclassroom.safetynet.service.PersonCoveredByStationDTO;
 import com.openclassroom.safetynet.service.PersonService;
 import com.openclassroom.safetynet.service.PersonsAndStationInfoService;
-import com.openclassroom.safetynet.service.PersonsCoveredByFirestationService;
 import com.openclassroom.safetynet.service.PersonsInfoWithLastNameService;
 
+/**
+ * Endpoint qui permet de faire la recherche
+ *
+ */
+
 @RestController
-public class URLController {
+//@RequiredArgsConstructor
+public class SearchController {
+
+//TODO SLF4J
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final FirestationService firestationService;
 	private final MedicalRecordService medicalRecordService;
-	private PersonService personService;
+	private final PersonService personService;
 
-	URLController(PersonService personService, MedicalRecordService medicalRecordService, FirestationService firestationService) {
+	SearchController(PersonService personService, MedicalRecordService medicalRecordService, FirestationService firestationService) {
 		this.personService = personService;
 		this.medicalRecordService = medicalRecordService;
 		this.firestationService = firestationService;
 
 	}
 
-	@GetMapping("/firestation/{stationNumber}")
-	public ResponseEntity<PersonsCoveredByFirestationService> getPersonsByStationNumber(@PathVariable String stationNumber) {
-		logger.info("GET request received for /firestation/{}.", stationNumber);
+	@GetMapping("/firestation")
+	public ResponseEntity<PersonCoveredByStationDTO> getPersonsByStationNumber(@RequestParam String stationNumber) {
+		logger.info("recherche des personne couverte par la caserne de pompier : {}.", stationNumber); // trad
 		try {
 			List<Person> persons = personService.getPersonsByStation(stationNumber);
 			logger.debug("Result of getPersonsByStation for fire station N°{} = {} ", stationNumber, persons);
-			PersonsCoveredByFirestationService personsCoveredByFirestation = new PersonsCoveredByFirestationService(personService, persons, medicalRecordService);
-			logger.info("Successful retrieval of the list of persons : {}", personsCoveredByFirestation);
-			return new ResponseEntity<>(personsCoveredByFirestation, HttpStatus.OK);
+
+			PersonCoveredByStationDTO personsCovered = new PersonCoveredByStationDTO(persons, personService);
+
+			logger.info("Successful retrieval of the list of persons : {}", personsCovered);
+			// return new ResponseEntity<>(personsCovered, HttpStatus.OK);
+			return ResponseEntity.ok(personsCovered);
+
 		} catch (Exception e) {
 			logger.error("Error fire station N°{} is not found.", stationNumber, e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			// return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return ResponseEntity.notFound().build();
 		}
 	}
 

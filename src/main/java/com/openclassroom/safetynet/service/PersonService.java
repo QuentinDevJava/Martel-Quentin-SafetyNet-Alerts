@@ -1,6 +1,7 @@
 package com.openclassroom.safetynet.service;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.openclassroom.safetynet.model.ChildInfo;
 import com.openclassroom.safetynet.model.Firestation;
@@ -123,4 +124,6 @@ public interface PersonService {
 	 *         addresses.
 	 */
 	PersonEmail personEmails(String city);
+
+	public int calculateAgeCount(List<Person> persons, Predicate<Integer> predicate);
 }

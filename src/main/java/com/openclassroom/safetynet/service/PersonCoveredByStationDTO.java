@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonInfo;
 
-public class PersonsCoveredByFirestationService {
+public class PersonCoveredByStationDTO {
 
 	private final PersonService personService;
 	private final List<PersonInfo> personsInfo;
@@ -16,18 +16,14 @@ public class PersonsCoveredByFirestationService {
 	private static final Predicate<Integer> IS_ADULT = age -> age > 18;
 	private static final Predicate<Integer> IS_CHILD = age -> age <= 18;
 
-	public PersonsCoveredByFirestationService(PersonService personService, List<Person> persons, MedicalRecordService medicalRecordService) {
+	public PersonCoveredByStationDTO(List<Person> persons, PersonService personService) {
 		this.personService = personService;
 		this.personsInfo = new ArrayList<>();
 		for (Person person : persons) {
 			this.personsInfo.add(personService.extractNameAddressPhoneInfo(person));
 		}
-		this.adultCount = calculateAgeCount(persons, medicalRecordService, IS_ADULT);
-		this.childCount = calculateAgeCount(persons, medicalRecordService, IS_CHILD);
-	}
-
-	private int calculateAgeCount(List<Person> persons, MedicalRecordService medicalRecordService, Predicate<Integer> predicate) {
-		return (int) persons.stream().map(person -> personService.getPersonAge(person, medicalRecordService)).filter(predicate).count();
+		this.adultCount = personService.calculateAgeCount(persons, IS_ADULT);
+		this.childCount = personService.calculateAgeCount(persons, IS_CHILD);
 	}
 
 	@Override
