@@ -54,12 +54,9 @@ public class SearchController {
 		try {
 			List<Person> persons = personService.getPersonsByStation(stationNumber);
 			logger.debug("Result of getPersonsByStation for fire station N°{} = {} ", stationNumber, persons);
-
 			PersonCoveredByStationDTO personsCovered = new PersonCoveredByStationDTO(persons, personService);
-
 			logger.info("Successful retrieval of the list of persons : {}", personsCovered);
 			return ResponseEntity.ok(personsCovered);
-
 		} catch (Exception e) {
 			logger.error("Error fire station N°{} is not found.", stationNumber, e);
 			return ResponseEntity.notFound().build();
@@ -75,7 +72,6 @@ public class SearchController {
 			ChildService listOfChild = new ChildService(personsByAddress, medicalRecordService, personService);
 			logger.info("Successful retrieval of the children's list : {}", listOfChild);
 			return ResponseEntity.ok(listOfChild);
-
 		} catch (Exception e) {
 			logger.error("Error children's list not found for this address : {}", address, e);
 			return ResponseEntity.notFound().build();

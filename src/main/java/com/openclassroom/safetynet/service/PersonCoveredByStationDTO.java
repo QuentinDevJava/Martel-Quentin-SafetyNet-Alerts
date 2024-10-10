@@ -22,8 +22,8 @@ public class PersonCoveredByStationDTO {
 		for (Person person : persons) {
 			this.personsInfo.add(personService.extractNameAddressPhoneInfo(person));
 		}
-		this.adultCount = personService.calculateAgeCount(persons, IS_ADULT);
-		this.childCount = personService.calculateAgeCount(persons, IS_CHILD);
+		this.adultCount = personService.CountsNumberOfChildrenAndAdults(persons, IS_ADULT);
+		this.childCount = personService.CountsNumberOfChildrenAndAdults(persons, IS_CHILD);
 	}
 
 	@Override

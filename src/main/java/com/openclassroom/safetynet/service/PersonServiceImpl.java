@@ -90,18 +90,12 @@ public class PersonServiceImpl implements PersonService {
 		dataRepository.saveData(TypeOfData.PERSONS, personData);
 	}
 
-	public List<Person> getPersonsByStationAddress(List<Firestation> firestation) {
-		List<Person> persons = getAllPersons();
-		return firestation.stream().flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream()).toList();
-	}
-
 	public List<Person> getPersonsByAddress(String address) {
 		return getAllPersons().stream().filter(person -> person.address().equals(address)).toList();
 	}
 
 	public PersonsLastNameInfo extractNameAddressAgeEmailInfo(Person person, MedicalRecord medicalRecord) {
-		MedicalRecordService medicalRecordService = new MedicalRecordServiceImpl();
-		return new PersonsLastNameInfo(person.lastName(), person.firstName(), person.address(), getPersonAge(person, medicalRecordService), person.email(), medicalRecord.medications(), medicalRecord.allergies());
+		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), getPersonAge(person, medicalRecordService), person.email(), medicalRecord.medications(), medicalRecord.allergies());
 	}
 
 	public PersonEmail personEmails(String city) {
@@ -119,6 +113,10 @@ public class PersonServiceImpl implements PersonService {
 		return new ChildInfo(person.firstName(), person.lastName(), person.address(), person.phone(), personService.getPersonAge(person, medicalRecordService));
 	}
 
+	public int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate) {
+		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
+	}
+
 	public int getPersonAge(Person person, MedicalRecordService medicalRecordService) {
 		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
 		if (medicalRecord != null) {
@@ -131,6 +129,11 @@ public class PersonServiceImpl implements PersonService {
 		return 0;
 	}
 
+	public List<Person> getPersonsByStationAddress(List<Firestation> firestation) {
+		List<Person> persons = getAllPersons();
+		return firestation.stream().flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream()).toList();
+	}
+
 	public List<String> getPhoneNumbersByStation(String stationNumber) {
 		return getPersonsByStation(stationNumber).stream().map(Person::phone).toList();
 	}
@@ -138,10 +141,6 @@ public class PersonServiceImpl implements PersonService {
 	public List<Person> getPersonsByStation(String stationNumber) {
 		List<Firestation> firestation = firestationService.getFirestationByStationNumber(stationNumber);
 		return getPersonsByStationAddress(firestation);
-	}
-
-	public int calculateAgeCount(List<Person> persons, Predicate<Integer> predicate) {
-		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
 	}
 
 }

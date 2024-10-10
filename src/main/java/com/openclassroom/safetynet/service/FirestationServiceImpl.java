@@ -67,10 +67,6 @@ public class FirestationServiceImpl implements FirestationService {
 		dataRepository.saveData(TypeOfData.FIRESTATIONS, firestations.stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList()));
 	}
 
-//	public List<Firestation> getFirestationByStationNumber(String stationNumber) {
-//		List<String> stationNumbers = List.of(stationNumber);
-//		return getFirestationByListStationNumber(stationNumbers);
-//	}
 	public List<Firestation> getFirestationByStationNumber(String stationNumber) {
 		List<Firestation> firestations = getAllFirestations();
 		List<Firestation> matchingFirestations = new ArrayList<>();
