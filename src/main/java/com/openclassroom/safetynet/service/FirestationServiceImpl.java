@@ -1,8 +1,11 @@
 package com.openclassroom.safetynet.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,10 +25,15 @@ public class FirestationServiceImpl implements FirestationService {
 	}
 
 	public List<Firestation> getAllFirestations() {
-		return dataRepository.SelectTypeOfData(TypeOfData.firestations).stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList());
+		return dataRepository.selectTypeOfData(TypeOfData.FIRESTATIONS).stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList());
 	}
 
 	public Firestation createFirestation(Firestation firestation) {
+		for (String field : new String[] { firestation.station(), firestation.address() }) {
+			if (Optional.ofNullable(field).map(StringUtils::isBlank).orElse(true)) {
+				throw new IllegalArgumentException("All fields of the person must be filled.");
+			}
+		}
 		List<Firestation> firestations = getAllFirestations();
 		firestations.add(firestation);
 		saveFirestations(firestations);
@@ -56,16 +64,30 @@ public class FirestationServiceImpl implements FirestationService {
 	}
 
 	private void saveFirestations(List<Firestation> firestations) {
-		dataRepository.saveData(TypeOfData.firestations, firestations.stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList()));
+		dataRepository.saveData(TypeOfData.FIRESTATIONS, firestations.stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList()));
 	}
 
+//	public List<Firestation> getFirestationByStationNumber(String stationNumber) {
+//		List<String> stationNumbers = List.of(stationNumber);
+//		return getFirestationByListStationNumber(stationNumbers);
+//	}
 	public List<Firestation> getFirestationByStationNumber(String stationNumber) {
-		List<String> stationNumbers = List.of(stationNumber);
-		return getFirestationByListStationNumber(stationNumbers);
+		List<Firestation> firestations = getAllFirestations();
+		List<Firestation> matchingFirestations = new ArrayList<>();
+		for (Firestation firestation : firestations) {
+			if (firestation.station().equals(stationNumber)) {
+				matchingFirestations.add(firestation);
+			}
+		}
+		if (matchingFirestations.isEmpty()) {
+			throw new FirestationNotFoundException("Fire station N° {} not found" + stationNumber);
+		}
+
+		return matchingFirestations;
 	}
 
 	public List<Firestation> getFirestationByListStationNumber(List<String> stationNumbers) {
-		return getAllFirestations().stream().filter(firestation -> stationNumbers.contains(firestation.station())).collect(Collectors.toList());
+		return getAllFirestations().stream().filter(firestation -> stationNumbers.contains(firestation.station())).toList();
 	}
 
 	public Firestation getFirestationByAddress(String address) {
