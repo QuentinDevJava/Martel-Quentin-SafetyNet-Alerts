@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,7 +25,7 @@ import com.openclassroom.safetynet.service.PersonsAndStationInfoService;
 import com.openclassroom.safetynet.service.PersonsInfoWithLastNameService;
 
 /**
- * Endpoint qui permet de faire la recherche
+ * Endpoints, which enables searches
  *
  */
 
@@ -51,7 +50,7 @@ public class SearchController {
 
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonCoveredByStationDTO> getPersonsByStationNumber(@RequestParam String stationNumber) {
-		logger.info("recherche des personne couverte par la caserne de pompier : {}.", stationNumber); // trad
+		logger.info("Search for people covered by the fire station N° {}.", stationNumber);
 		try {
 			List<Person> persons = personService.getPersonsByStation(stationNumber);
 			logger.debug("Result of getPersonsByStation for fire station N°{} = {} ", stationNumber, persons);
@@ -59,97 +58,96 @@ public class SearchController {
 			PersonCoveredByStationDTO personsCovered = new PersonCoveredByStationDTO(persons, personService);
 
 			logger.info("Successful retrieval of the list of persons : {}", personsCovered);
-			// return new ResponseEntity<>(personsCovered, HttpStatus.OK);
 			return ResponseEntity.ok(personsCovered);
 
 		} catch (Exception e) {
 			logger.error("Error fire station N°{} is not found.", stationNumber, e);
-			// return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			return ResponseEntity.notFound().build();
 		}
 	}
 
 	@GetMapping("/childAlert")
 	public ResponseEntity<ChildService> getAllChild(@RequestParam String address) {
-		logger.info("GET request received for /childAlert?address={}.", address);
+		logger.info("Search for children by address : {} ", address);
 		try {
 			List<Person> personsByAddress = personService.getPersonsByAddress(address);
 			logger.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
 			ChildService listOfChild = new ChildService(personsByAddress, medicalRecordService, personService);
 			logger.info("Successful retrieval of the children's list : {}", listOfChild);
-			return new ResponseEntity<>(listOfChild, HttpStatus.OK);
+			return ResponseEntity.ok(listOfChild);
+
 		} catch (Exception e) {
 			logger.error("Error children's list not found for this address : {}", address, e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return ResponseEntity.notFound().build();
 		}
 	}
 
 	@GetMapping("/phoneAlert")
 	public ResponseEntity<List<String>> getPersonsPhoneNumbersByStationNumber(@RequestParam("firestation") String stationNumber) {
-		logger.info("GET request received for /phoneAlert?firestation={}.", stationNumber);
+		logger.info("Search phone numbers by fire station N° {}", stationNumber);
 		try {
 			List<String> phoneNumbers = personService.getPhoneNumbersByStation(stationNumber);
 			logger.info("Successful retrieval of the phone number list : {}", phoneNumbers);
-			return new ResponseEntity<>(phoneNumbers, HttpStatus.OK);
+			return ResponseEntity.ok(phoneNumbers);
 		} catch (Exception e) {
 			logger.error("Error of the phone number list for fire station N°{} is not found.", stationNumber, e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return ResponseEntity.notFound().build();
 		}
 	}
 
 	@GetMapping("/fire")
 	public ResponseEntity<PersonsAndStationInfo> getListOfPersonsInfoAndStationNumberByAddress(@RequestParam String address) {
-		logger.info("GET request received for /fire?address={}.", address);
+		logger.info("Search for resident information and fire station number by address : {}", address);
 		try {
 			PersonsAndStationInfoService personsAndStationInfoService = new PersonsAndStationInfoService(personService, medicalRecordService, firestationService);
 			PersonsAndStationInfo personsAndStationInfo = personsAndStationInfoService.getPersonsAndStationInfoByAddress(address);
 			logger.info("Successful retrieval of the list of persons, their medical records and the number of the fire station for address : {} = {}", address, personsAndStationInfo);
-			return new ResponseEntity<>(personsAndStationInfo, HttpStatus.OK);
+			return ResponseEntity.ok(personsAndStationInfo);
 		} catch (Exception e) {
 			logger.error("Error in returning list of persons, their medical records and fire station number for address : {}.", address, e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return ResponseEntity.notFound().build();
 		}
 	}
 
 	@GetMapping("/flood/stations")
 	public ResponseEntity<FloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(@RequestParam("stations") List<String> stationNumber) {
-		logger.info("GET request received for /flood/stations?stations={}.", stationNumber);
+		logger.info("Search for resident information by list of station number : {}.", stationNumber);
 		try {
 			FloodService floodService = new FloodService(personService, medicalRecordService, firestationService);
 			FloodInfo floodInfo = floodService.floodInfo(stationNumber);
 			logger.info("Successful retrieval of the list of persons and their medical records for List of station number : {} = {}", stationNumber, floodInfo);
-			return new ResponseEntity<>(floodInfo, HttpStatus.OK);
+			return ResponseEntity.ok(floodInfo);
 		} catch (Exception e) {
 			logger.error("Error fire station N°{} is not found.", stationNumber, e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return ResponseEntity.notFound().build();
 		}
 	}
 
 	@GetMapping("/personInfolastName")
 	public ResponseEntity<PersonInfoWithLastName> getPersonsFullInfoWithLastName(@RequestParam String lastName) {
-		logger.info("GET request received for /personInfolastName?lastName={}.", lastName);
+		logger.info("Search for resident information by last name : {}.", lastName);
 		try {
 			PersonsInfoWithLastNameService listOfPersonsInfoWithLastName = new PersonsInfoWithLastNameService(personService, medicalRecordService);
 			List<PersonsLastNameInfo> personsLastNameInfos = listOfPersonsInfoWithLastName.listOfPersonsFullInfo(lastName);
 			PersonInfoWithLastName personInfoWithLastName = new PersonInfoWithLastName(personsLastNameInfos);
 			logger.info("Successful retrieval of list of persons and their medical records for last name : {} = {}", lastName, personInfoWithLastName);
-			return new ResponseEntity<>(personInfoWithLastName, HttpStatus.OK);
+			return ResponseEntity.ok(personInfoWithLastName);
 		} catch (Exception e) {
 			logger.error("Error the list of persons for the last name = {} is not found.", lastName, e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return ResponseEntity.notFound().build();
 		}
 	}
 
 	@GetMapping("/communityEmail")
 	public ResponseEntity<PersonEmail> getMailByCity(@RequestParam String city) {
-		logger.info("GET request received for /communityEmail?city={}.", city);
+		logger.info("Search for residents' e-mail addresses by city : {}", city);
 		try {
 			PersonEmail communityEmail = personService.personEmails(city);
 			logger.info("Successful retrieval of the list of Email for city : {} = {}", city, communityEmail);
-			return new ResponseEntity<>(communityEmail, HttpStatus.OK);
+			return ResponseEntity.ok(communityEmail);
 		} catch (Exception e) {
 			logger.error("Error the list of person's Email for city {} is not found.", city, e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return ResponseEntity.notFound().build();
 		}
 	}
 
