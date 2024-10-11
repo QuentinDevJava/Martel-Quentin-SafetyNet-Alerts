@@ -125,5 +125,5 @@ public interface PersonService {
 	 */
 	PersonEmail personEmails(String city);
 
-	public int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate);
+	int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate);
 }

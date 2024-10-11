@@ -117,6 +117,10 @@ public class PersonServiceImpl implements PersonService {
 		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
 	}
 
+	public int getPersonAge(Person person, MedicalRecord medicalRecord) {
+
+	}
+
 	public int getPersonAge(Person person, MedicalRecordService medicalRecordService) {
 		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
 		if (medicalRecord != null) {

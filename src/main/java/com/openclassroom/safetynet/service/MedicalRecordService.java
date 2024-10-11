@@ -96,4 +96,6 @@ public interface MedicalRecordService {
 	 * @return The medical record for the specified person.
 	 */
 	MedicalRecord findMedicalRecordByLastName(String lastName);
+
+	List<MedicalRecord> getPersonMedicalRecords(List<Person> persons);
 }

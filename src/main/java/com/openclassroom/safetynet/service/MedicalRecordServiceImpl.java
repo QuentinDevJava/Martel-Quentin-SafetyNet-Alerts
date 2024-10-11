@@ -1,7 +1,11 @@
 package com.openclassroom.safetynet.service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -83,6 +87,13 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
 	public MedicalRecord findMedicalRecordByLastName(String lastName) {
 		return getAllMedicalRecords().stream().filter(medicalRecord -> medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
+	}
+
+	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {
+		return persons.stream()
+				.map(p -> getMedicalRecordByFullName(p.firstName(), p.lastName()))
+				.filter(Objects::nonNull)
+				.toList();
 	}
 
 	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons, MedicalRecordService medicalRecordService, PersonService personService) {

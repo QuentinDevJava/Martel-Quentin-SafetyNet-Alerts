@@ -20,24 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-
-//@RequestMapping("/firestation")
-
 public class FirestationController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final FirestationService firestationService;
 
 	public FirestationController(FirestationService firestationService) {
 		this.firestationService = firestationService;
-	}
-
-	// @GetMapping("/firestation")
-	public ResponseEntity<List<Firestation>> getAllFirestations() {
-
-		logger.info("GET request received for /firestation.");
-		List<Firestation> firestations = firestationService.getAllFirestations();
-		logger.info("Successfully retrieved {} firestations.", firestations.size());
-		return new ResponseEntity<>(firestations, HttpStatus.OK);
 	}
 
 	@PostMapping("/firestation")
