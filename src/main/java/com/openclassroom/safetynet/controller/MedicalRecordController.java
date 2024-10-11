@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
+@Slf4j
 @RequestMapping("/medicalrecord")
 public class MedicalRecordController {
 
@@ -35,7 +38,7 @@ public class MedicalRecordController {
 		logger.info("GET request received for /medicalrecord.");
 		List<MedicalRecord> medicalRecords = medicalRecordService.getAllMedicalRecords();
 		logger.info("Successfully retrieved {} medical records.", medicalRecords.size());
-		return new ResponseEntity<>(medicalRecords, HttpStatus.OK);
+		return ResponseEntity.ok(medicalRecords);
 	}
 
 	@PostMapping
@@ -52,13 +55,10 @@ public class MedicalRecordController {
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
-	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable String firstName,
-			@PathVariable String lastName, @RequestBody MedicalRecord medicalRecord) {
-		logger.info("PUT request received for /medicalrecord/{}/{} updating medical record: {}", firstName, lastName,
-				medicalRecord);
+	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable String firstName, @PathVariable String lastName, @RequestBody MedicalRecord medicalRecord) {
+		logger.info("PUT request received for /medicalrecord/{}/{} updating medical record: {}", firstName, lastName, medicalRecord);
 		try {
-			MedicalRecord updatedMedicalRecord = medicalRecordService.updateMedicalRecord(firstName, lastName,
-					medicalRecord);
+			MedicalRecord updatedMedicalRecord = medicalRecordService.updateMedicalRecord(firstName, lastName, medicalRecord);
 			logger.info("Medical record successfully updated: {}", updatedMedicalRecord);
 			return new ResponseEntity<>(updatedMedicalRecord, HttpStatus.OK);
 		} catch (Exception e) {
@@ -71,9 +71,14 @@ public class MedicalRecordController {
 	public ResponseEntity<Void> deleteMedicalRecord(@PathVariable String firstName, @PathVariable String lastName) {
 		logger.info("DELETE request received for /medicalrecord/{}/{}", firstName, lastName);
 		try {
-			medicalRecordService.deleteMedicalRecord(firstName, lastName);
-			logger.info("Medical record successfully deleted: {} {}", firstName, lastName);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			Boolean medicalRecordDeleted = medicalRecordService.deleteMedicalRecord(firstName, lastName);
+			if (Boolean.TRUE.equals(medicalRecordDeleted)) {
+				logger.info("Medical record successfully deleted: {} {}", firstName, lastName);
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			} else {
+				logger.error("Medical record not found: firstName: {}, lastName: {}", firstName, lastName);
+				return ResponseEntity.notFound().build();
+			}
 		} catch (Exception e) {
 			logger.error("Error deleting medical record with first name: {} and last name: {}", firstName, lastName, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

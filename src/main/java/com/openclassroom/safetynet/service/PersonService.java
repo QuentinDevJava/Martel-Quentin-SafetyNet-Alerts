@@ -89,6 +89,14 @@ public interface PersonService {
 	int getPersonAge(Person person, MedicalRecordService medicalRecordService);
 
 	/**
+	 * Calculates the age of a person based on their birthdate.
+	 *
+	 * @param medicalRecord The medical record.
+	 * @return The age of the person for medical record.
+	 */
+	int getPersonAge(MedicalRecord medicalRecord); // TODO
+
+	/**
 	 * Extracts basic information from a person, including name, address, and phone
 	 * number.
 	 *
@@ -96,6 +104,15 @@ public interface PersonService {
 	 * @return A PersonInfo object containing the extracted information.
 	 */
 	PersonInfo extractNameAddressPhoneInfo(Person person);
+
+	/**
+	 * Extracts basic information from a person, including name, address, and phone
+	 * number.
+	 *
+	 * @param List of person The persons to extract information from.
+	 * @return A list of PersonInfo object containing the extracted information.
+	 */
+	List<PersonInfo> extractPersonInfos(List<Person> persons);
 
 	/**
 	 * Extracts child information from a person.
@@ -125,5 +142,5 @@ public interface PersonService {
 	 */
 	PersonEmail personEmails(String city);
 
-	public int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate);
+	int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate);
 }

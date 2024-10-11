@@ -52,12 +52,12 @@ public class FirestationServiceImpl implements FirestationService {
 		}
 	}
 
-	public void deleteFirestation(String address) {
+	public Boolean deleteFirestation(String address) {
 		List<Firestation> firestations = getAllFirestations();
-		Firestation firestation = getFirestationByAddress(address);
-		if (firestation != null) {
-			firestations.remove(firestation);
+		boolean firestationsDeleted = firestations.removeIf(f -> f.address().equals(address));
+		if (firestationsDeleted) {
 			saveFirestations(firestations);
+			return true;
 		} else {
 			throw new FirestationNotFoundException("Fire station not found for address: " + address);
 		}

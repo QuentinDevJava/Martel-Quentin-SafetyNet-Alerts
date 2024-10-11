@@ -42,8 +42,9 @@ public interface MedicalRecordService {
 	 *
 	 * @param firstName The first name of the person.
 	 * @param lastName  The last name of the person.
+	 * @return True if the medical record was deleted successfully, false otherwise.
 	 */
-	void deleteMedicalRecord(String firstName, String lastName);
+	Boolean deleteMedicalRecord(String firstName, String lastName);
 
 	/**
 	 * Retrieves all medical records.
@@ -96,4 +97,6 @@ public interface MedicalRecordService {
 	 * @return The medical record for the specified person.
 	 */
 	MedicalRecord findMedicalRecordByLastName(String lastName);
+
+	List<MedicalRecord> getPersonMedicalRecords(List<Person> persons);
 }

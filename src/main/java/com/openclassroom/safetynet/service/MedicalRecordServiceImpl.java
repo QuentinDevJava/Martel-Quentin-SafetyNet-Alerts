@@ -2,6 +2,7 @@ package com.openclassroom.safetynet.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -49,12 +50,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		}
 	}
 
-	public void deleteMedicalRecord(String firstName, String lastName) {
-		MedicalRecord medicalRecord = findMedicalRecordByFullName(firstName, lastName);
-		if (medicalRecord != null) {
-			List<MedicalRecord> medicalRecords = getAllMedicalRecords();
-			medicalRecords.remove(medicalRecord);
+	public Boolean deleteMedicalRecord(String firstName, String lastName) {
+		List<MedicalRecord> medicalRecords = getAllMedicalRecords();
+		boolean medicalRecordDeleted = medicalRecords.removeIf(m -> m.firstName().equals(firstName) && m.lastName().equals(lastName));
+		if (medicalRecordDeleted) {
 			saveMedicalRecords(medicalRecords);
+			return true;
 		} else {
 			throw new MedicalRecordNotFoundException("Medical record not deleted beacause is not found for " + firstName + " " + lastName);
 		}
@@ -83,6 +84,10 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
 	public MedicalRecord findMedicalRecordByLastName(String lastName) {
 		return getAllMedicalRecords().stream().filter(medicalRecord -> medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
+	}
+
+	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {
+		return persons.stream().map(p -> getMedicalRecordByFullName(p.firstName(), p.lastName())).filter(Objects::nonNull).toList();
 	}
 
 	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons, MedicalRecordService medicalRecordService, PersonService personService) {

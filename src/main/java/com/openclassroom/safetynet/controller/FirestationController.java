@@ -1,7 +1,5 @@
 package com.openclassroom.safetynet.controller;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -11,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.model.Firestation;
@@ -20,24 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-
-//@RequestMapping("/firestation")
-
+@RequestMapping("/firestation")
 public class FirestationController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final FirestationService firestationService;
 
 	public FirestationController(FirestationService firestationService) {
 		this.firestationService = firestationService;
-	}
-
-	// @GetMapping("/firestation")
-	public ResponseEntity<List<Firestation>> getAllFirestations() {
-
-		logger.info("GET request received for /firestation.");
-		List<Firestation> firestations = firestationService.getAllFirestations();
-		logger.info("Successfully retrieved {} firestations.", firestations.size());
-		return new ResponseEntity<>(firestations, HttpStatus.OK);
 	}
 
 	@PostMapping("/firestation")
@@ -70,9 +58,14 @@ public class FirestationController {
 	public ResponseEntity<Void> deleteFirestation(@PathVariable String address) {
 		logger.info("DELETE request received for /firestation/{}", address);
 		try {
-			firestationService.deleteFirestation(address);
-			logger.info("Firestation successfully deleted: {}", address);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			Boolean firestationsDeleted = firestationService.deleteFirestation(address);
+			if (Boolean.TRUE.equals(firestationsDeleted)) {
+				logger.info("Firestation successfully deleted: {}", address);
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			} else {
+				logger.error("Firestation not found: address: {}", address);
+				return ResponseEntity.notFound().build();
+			}
 		} catch (Exception e) {
 			logger.error("Error deleting firestation with address: {}", address, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

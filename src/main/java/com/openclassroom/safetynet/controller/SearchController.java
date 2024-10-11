@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.model.FloodInfo;
+import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonEmail;
+import com.openclassroom.safetynet.model.PersonInfo;
 import com.openclassroom.safetynet.model.PersonInfoWithLastName;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
@@ -33,8 +35,7 @@ import com.openclassroom.safetynet.service.PersonsInfoWithLastNameService;
 //@RequiredArgsConstructor
 public class SearchController {
 
-//TODO SLF4J
-
+	// TODO SLF4J
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final FirestationService firestationService;
@@ -54,7 +55,10 @@ public class SearchController {
 		try {
 			List<Person> persons = personService.getPersonsByStation(stationNumber);
 			logger.debug("Result of getPersonsByStation for fire station N°{} = {} ", stationNumber, persons);
-			PersonCoveredByStationDTO personsCovered = new PersonCoveredByStationDTO(persons, personService);
+			List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(persons);
+			List<PersonInfo> personInfos = personService.extractPersonInfos(persons);
+			PersonCoveredByStationDTO personsCovered = new PersonCoveredByStationDTO(personInfos, medicalRecords);
+			// TODO decompte des adultes et enfants
 			logger.info("Successful retrieval of the list of persons : {}", personsCovered);
 			return ResponseEntity.ok(personsCovered);
 		} catch (Exception e) {

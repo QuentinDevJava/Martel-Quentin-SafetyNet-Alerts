@@ -27,8 +27,9 @@ public interface FirestationService {
 	 * Deletes an existing fire station.
 	 *
 	 * @param address The address of the station to delete.
+	 * @return True if the fire station was deleted successfully, false otherwise.
 	 */
-	void deleteFirestation(String address);
+	Boolean deleteFirestation(String address);
 
 	/**
 	 * Returns the list of all fire stations.

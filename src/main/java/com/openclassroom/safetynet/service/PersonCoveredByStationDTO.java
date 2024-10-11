@@ -1,46 +1,36 @@
 package com.openclassroom.safetynet.service;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Map;
 
-import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.PersonInfo;
 
 public class PersonCoveredByStationDTO {
 
-	private final PersonService personService;
-	private final List<PersonInfo> personsInfo;
-	private final int adultCount;
-	private final int childCount;
-	private static final Predicate<Integer> IS_ADULT = age -> age > 18;
-	private static final Predicate<Integer> IS_CHILD = age -> age <= 18;
+	private final Map<PersonInfo, MedicalRecord> personInfoAndMedicalRecords;
 
-	public PersonCoveredByStationDTO(List<Person> persons, PersonService personService) {
-		this.personService = personService;
-		this.personsInfo = new ArrayList<>();
-		for (Person person : persons) {
-			this.personsInfo.add(personService.extractNameAddressPhoneInfo(person));
+	// il manquera le decompte des enfants et des adultes
+
+	public PersonCoveredByStationDTO(List<PersonInfo> personInfos, List<MedicalRecord> medicalRecords) {
+		this.personInfoAndMedicalRecords = matchPersonInfoAndMedicalRecords(personInfos, medicalRecords);
+	}
+
+	// faire une verification ici pour etre sur qu'il sagit de la bonne personne
+	public Map<PersonInfo, MedicalRecord> matchPersonInfoAndMedicalRecords(List<PersonInfo> personInfos, List<MedicalRecord> medicalRecords) {
+		Map<PersonInfo, MedicalRecord> result = new HashMap<PersonInfo, MedicalRecord>();
+		for (PersonInfo personInfo : personInfos) {
+			for (MedicalRecord medicalRecord : medicalRecords) {
+				if (personInfo.firstName().equals(medicalRecord.firstName()) && personInfo.lastName().equals(medicalRecord.lastName())) {
+					result.put(personInfo, medicalRecord);
+				}
+			}
 		}
-		this.adultCount = personService.CountsNumberOfChildrenAndAdults(persons, IS_ADULT);
-		this.childCount = personService.CountsNumberOfChildrenAndAdults(persons, IS_CHILD);
+		return result;
 	}
 
-	@Override
-	public String toString() {
-		return "PersonsCoveredByFirestation [personsInfo=" + personsInfo + ", adultCount=" + adultCount + ", childCount=" + childCount + "]";
+	public Map<PersonInfo, MedicalRecord> getPersonInfoAndMedicalRecords() {
+		return personInfoAndMedicalRecords;
 	}
-
-	public List<PersonInfo> getPersonsInfo() {
-		return personsInfo;
-	}
-
-	public int getAdultCount() {
-		return adultCount;
-	}
-
-	public int getChildCount() {
-		return childCount;
-	}
-
 }

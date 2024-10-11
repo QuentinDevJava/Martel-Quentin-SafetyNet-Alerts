@@ -109,12 +109,24 @@ public class PersonServiceImpl implements PersonService {
 
 	}
 
+	public List<PersonInfo> extractPersonInfos(List<Person> persons) {
+		return persons.stream().map(this::extractNameAddressPhoneInfo).toList();
+	}
+
 	public ChildInfo extractChildInfo(Person person, MedicalRecordService medicalRecordService, PersonService personService) {
 		return new ChildInfo(person.firstName(), person.lastName(), person.address(), person.phone(), personService.getPersonAge(person, medicalRecordService));
 	}
 
 	public int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate) {
 		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
+	}
+
+	public int getPersonAge(MedicalRecord medicalRecord) { // TODO methode implementé mais non utilisée
+		String dateString = medicalRecord.birthdate();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		LocalDate birthdate = LocalDate.parse(dateString, formatter);
+		LocalDate today = LocalDate.now();
+		return Period.between(birthdate, today).getYears();
 	}
 
 	public int getPersonAge(Person person, MedicalRecordService medicalRecordService) {

@@ -54,8 +54,7 @@ public class PersonController {
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
-	public ResponseEntity<Person> updatePerson(@PathVariable String firstName, @PathVariable String lastName,
-			@RequestBody Person person) {
+	public ResponseEntity<Person> updatePerson(@PathVariable String firstName, @PathVariable String lastName, @RequestBody Person person) {
 		logger.info("PUT request received for /person/{}/{}", firstName, lastName);
 		logger.info("Updating person with details: {}", person);
 		try {
@@ -75,12 +74,12 @@ public class PersonController {
 		try {
 			boolean personDeleted = personService.deletePerson(firstName, lastName);
 
-			if (personDeleted) {
+			if (Boolean.TRUE.equals(personDeleted)) {
 				logger.info("Person successfully deleted: firstName: {}, lastName: {}", firstName, lastName);
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			} else {
 				logger.error("Person not found: firstName: {}, lastName: {}", firstName, lastName);
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return ResponseEntity.notFound().build();
 			}
 
 		} catch (Exception e) {
