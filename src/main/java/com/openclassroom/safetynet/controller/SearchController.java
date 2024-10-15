@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.openclassroom.safetynet.model.ChildInfo;
 import com.openclassroom.safetynet.model.FloodInfo;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
@@ -14,7 +15,6 @@ import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonInfoWithLastName;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
-import com.openclassroom.safetynet.service.ChildService;
 import com.openclassroom.safetynet.service.FirestationService;
 import com.openclassroom.safetynet.service.FloodService;
 import com.openclassroom.safetynet.service.MedicalRecordService;
@@ -55,14 +55,15 @@ public class SearchController {
 	}
 
 	@GetMapping("/childAlert")
-	public ResponseEntity<ChildService> getAllChild(@RequestParam String address) {
+	public ResponseEntity<List<ChildInfo>> getAllChild(@RequestParam String address) {
 		log.info("Search for children by address : {} ", address);
 		try {
 			List<Person> personsByAddress = personService.getPersonsByAddress(address);
 			log.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
-			ChildService listOfChild = new ChildService(personsByAddress, medicalRecordService, personService);
-			log.info("Successful retrieval of the children's list : {}", listOfChild);
-			return ResponseEntity.ok(listOfChild);
+
+			List<ChildInfo> listOfChilds = personService.listOfChild(personsByAddress);
+			log.info("Successful retrieval of the children's list : {}", listOfChilds);
+			return ResponseEntity.ok(listOfChilds);
 		} catch (Exception e) {
 			log.error("Error children's list not found for this address : {}", address, e);
 			return ResponseEntity.notFound().build();

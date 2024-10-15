@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -116,14 +115,14 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	@Override
-	public ChildInfo extractChildInfo(Person person, MedicalRecordService medicalRecordService, PersonService personService) {
-		return new ChildInfo(person.firstName(), person.lastName(), person.address(), person.phone(), personService.getPersonAge(person, medicalRecordService));
+	public ChildInfo extractChildInfo(Person person) {
+		return new ChildInfo(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person, medicalRecordService));
 	}
 
-	@Override
-	public int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate) {
-		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
-	}
+//	@Override
+//	public int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate) {
+//		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
+//	}
 
 	@Override
 	public int getPersonAge(Person person, MedicalRecordService medicalRecordService) {
@@ -169,4 +168,12 @@ public class PersonServiceImpl implements PersonService {
 
 	}
 
+	@Override
+	public List<ChildInfo> listOfChild(List<Person> personsByAddress) {
+		return personsByAddress.stream().filter(this::isChild).map(this::extractChildInfo).collect(Collectors.toList());
+	}
+
+	private boolean isChild(Person person) {
+		return getPersonAge(person, medicalRecordService) < 18;
+	}
 }

@@ -1,7 +1,6 @@
 package com.openclassroom.safetynet.service;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.springframework.stereotype.Service;
 
@@ -110,7 +109,7 @@ public interface PersonService {
 	 * @param personService        The person service.
 	 * @return A ChildInfo object containing the extracted child information.
 	 */
-	ChildInfo extractChildInfo(Person person, MedicalRecordService medicalRecordService, PersonService personService);
+	ChildInfo extractChildInfo(Person person);
 
 	/**
 	 * Extracts name, address, age, and email information from a person.
@@ -130,7 +129,7 @@ public interface PersonService {
 	 */
 	PersonEmail personEmails(String city);
 
-	int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate);
-
 	List<PersonsLastNameInfo> listOfPersonsFullInfo(String lastName);
+
+	List<ChildInfo> listOfChild(List<Person> personsByAddress);
 }
