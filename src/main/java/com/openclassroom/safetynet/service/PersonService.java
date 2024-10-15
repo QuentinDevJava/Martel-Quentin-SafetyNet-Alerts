@@ -44,13 +44,6 @@ public interface PersonService {
 	boolean deletePerson(String firstName, String lastName);
 
 	/**
-	 * Retrieves all persons.
-	 *
-	 * @return A list of all persons.
-	 */
-	List<Person> allPersons();
-
-	/**
 	 * Retrieves persons associated with a specific fire station.
 	 *
 	 * @param firestation The fire station to retrieve persons for.
@@ -138,4 +131,6 @@ public interface PersonService {
 	PersonEmail personEmails(String city);
 
 	int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate);
+
+	List<PersonsLastNameInfo> listOfPersonsFullInfo(String lastName);
 }

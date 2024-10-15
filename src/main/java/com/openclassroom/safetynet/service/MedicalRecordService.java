@@ -41,13 +41,6 @@ public interface MedicalRecordService {
 	Boolean deleteMedicalRecord(String firstName, String lastName);
 
 	/**
-	 * Retrieves all medical records.
-	 *
-	 * @return A list of all medical records.
-	 */
-	List<MedicalRecord> allMedicalRecords();
-
-	/**
 	 * Extracts basic information from a person's medical record.
 	 *
 	 * @param person               The person whose medical record to extract

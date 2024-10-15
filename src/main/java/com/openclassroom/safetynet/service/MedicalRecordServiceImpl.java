@@ -26,10 +26,11 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	private final JsonRepository repository;
 	private final ObjectMapper objectMapper;
 
-	public List<MedicalRecord> allMedicalRecords() {
+	private List<MedicalRecord> allMedicalRecords() {
 		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream().map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).collect(Collectors.toList());
 	}
 
+	@Override
 	public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord) {
 		for (String field : new String[] { medicalRecord.firstName(), medicalRecord.firstName(), medicalRecord.birthdate() }) {
 			if (Optional.ofNullable(field).map(StringUtils::isBlank).orElse(true)) {
@@ -42,6 +43,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		return medicalRecord;
 	}
 
+	@Override
 	public MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord) {
 		MedicalRecord existingMedicalRecord = getMedicalRecordByFullName(firstName, lastName);
 		if (existingMedicalRecord != null) {
@@ -54,6 +56,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		}
 	}
 
+	@Override
 	public Boolean deleteMedicalRecord(String firstName, String lastName) {
 		List<MedicalRecord> medicalRecords = allMedicalRecords();
 		boolean medicalRecordDeleted = medicalRecords.removeIf(m -> m.firstName().equals(firstName) && m.lastName().equals(lastName));
@@ -73,18 +76,22 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		repository.saveData(TypeOfData.MEDICALRECORDS, medicalRecordData);
 	}
 
+	@Override
 	public MedicalRecord getMedicalRecordByFullName(String firstName, String lastName) {
 		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.firstName().equals(firstName) && medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
 	}
 
+	@Override
 	public MedicalRecord findPersonsMedicalRecords(String lastName) {
 		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
 	}
 
+	@Override
 	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {
 		return persons.stream().map(p -> getMedicalRecordByFullName(p.firstName(), p.lastName())).filter(Objects::nonNull).toList();
 	}
 
+	@Override
 	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons, MedicalRecordService medicalRecordService, PersonService personService) {
 		List<MedicalRecordInfo> medicalRecordInfos = new ArrayList<>();
 		for (Person person : persons) {
@@ -93,11 +100,13 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		return medicalRecordInfos;
 	}
 
+	@Override
 	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord, MedicalRecordService medicalRecordService, PersonService personService) {
 		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), personService.getPersonAge(person, medicalRecordService), medicalRecord.medications(), medicalRecord.allergies());
 
 	}
 
+	@Override
 	public MedicalRecordInfo getMedicalRecordInfosByPerson(Person person, MedicalRecordService medicalRecordService, PersonService personService) {
 		return extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()), medicalRecordService, personService);
 	}

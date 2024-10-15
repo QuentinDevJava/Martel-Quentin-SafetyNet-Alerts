@@ -36,7 +36,7 @@ public class PersonServiceImpl implements PersonService {
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
 
-	public List<Person> allPersons() {
+	private List<Person> allPersons() {
 		List<Object> personData = repository.loadTypeOfData(TypeOfData.PERSONS);
 		List<Person> persons = new ArrayList<>();
 		for (Object personObj : personData) {
@@ -45,6 +45,7 @@ public class PersonServiceImpl implements PersonService {
 		return persons;
 	}
 
+	@Override
 	public Person createPerson(Person person) {
 		for (String field : new String[] { person.firstName(), person.firstName(), person.address(), person.city(), person.zip(), person.phone(), person.email() }) {
 			if (Optional.ofNullable(field).map(StringUtils::isBlank).orElse(true)) {
@@ -57,6 +58,7 @@ public class PersonServiceImpl implements PersonService {
 		return person;
 	}
 
+	@Override
 	public Person updatePerson(String firstName, String lastName, Person person) {
 		List<Person> persons = allPersons();
 		for (int i = 0; i < persons.size(); i++) {
@@ -69,6 +71,7 @@ public class PersonServiceImpl implements PersonService {
 		throw new PersonNotFoundException("Person with first name '" + firstName + "' and last name '" + lastName + "' not found.");
 	}
 
+	@Override
 	public boolean deletePerson(String firstName, String lastName) {
 		List<Person> persons = allPersons();
 		boolean personDeleted = persons.removeIf(p -> p.firstName().equals(firstName) && p.lastName().equals(lastName));
@@ -86,37 +89,43 @@ public class PersonServiceImpl implements PersonService {
 		repository.saveData(TypeOfData.PERSONS, personData);
 	}
 
+	@Override
 	public List<Person> getPersonsByAddress(String address) {
 		return allPersons().stream().filter(person -> person.address().equals(address)).collect(Collectors.toList());
 	}
 
+	@Override
 	public PersonsLastNameInfo extractNameAddressAgeEmailInfo(Person person, MedicalRecord medicalRecord) {
 		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), getPersonAge(person, medicalRecordService), person.email(), medicalRecord.medications(), medicalRecord.allergies());
 	}
 
+	@Override
 	public PersonEmail personEmails(String city) {
-
 		List<String> emails = allPersons().stream().filter(person -> person.city().equals(city)).map(Person::email).toList();
 		return new PersonEmail(emails);
 	}
 
+	@Override
 	public PersonInfo extractNameAddressPhoneInfo(Person person) {
 		return new PersonInfo(person.firstName(), person.lastName(), person.address(), person.phone());
-
 	}
 
+	@Override
 	public List<PersonInfo> extractPersonInfos(List<Person> persons) {
 		return persons.stream().map(this::extractNameAddressPhoneInfo).toList();
 	}
 
+	@Override
 	public ChildInfo extractChildInfo(Person person, MedicalRecordService medicalRecordService, PersonService personService) {
 		return new ChildInfo(person.firstName(), person.lastName(), person.address(), person.phone(), personService.getPersonAge(person, medicalRecordService));
 	}
 
+	@Override
 	public int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate) {
 		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
 	}
 
+	@Override
 	public int getPersonAge(Person person, MedicalRecordService medicalRecordService) {
 		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
 		if (medicalRecord != null) {
@@ -129,18 +138,35 @@ public class PersonServiceImpl implements PersonService {
 		return 0;
 	}
 
+	@Override
 	public List<Person> getPersonsByStationAddress(List<Firestation> firestation) {
 		List<Person> persons = allPersons();
 		return firestation.stream().flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream()).toList();
 	}
 
+	@Override
 	public List<String> getPhoneNumbersByStation(String stationNumber) {
 		return getPersonsByStation(stationNumber).stream().map(Person::phone).toList();
 	}
 
+	@Override
 	public List<Person> getPersonsByStation(String stationNumber) {
 		List<Firestation> firestation = firestationService.findAllByStationNumber(stationNumber);
 		return getPersonsByStationAddress(firestation);
+	}
+
+	@Override
+	public List<PersonsLastNameInfo> listOfPersonsFullInfo(String lastName) {
+		List<Person> persons = allPersons();
+		List<PersonsLastNameInfo> personsFullInfos = new ArrayList<>();
+		for (Person person : persons) {
+			if (person.lastName().equals(lastName)) {
+				MedicalRecord medicalRecord = medicalRecordService.findPersonsMedicalRecords(lastName);
+				personsFullInfos.add(extractNameAddressAgeEmailInfo(person, medicalRecord));
+			}
+		}
+		return personsFullInfos;
+
 	}
 
 }

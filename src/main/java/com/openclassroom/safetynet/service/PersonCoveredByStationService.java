@@ -32,17 +32,12 @@ public class PersonCoveredByStationService {
 	public PersonCoveredByStation findCoveredPersonsByFireStation(String stationNumber) {
 		log.info("Finding covered persons by fire station {}", stationNumber);
 		List<Firestation> firestations = fireStationService.findAllByStationNumber(stationNumber);
-		List<Person> persons = personService.allPersons();
-		List<Person> personByStation = findPersonsByStationAddress(firestations, persons);
+		List<Person> personByStation = personService.getPersonsByStationAddress(firestations);
 		List<PersonInfo> personInfos = personService.extractPersonInfos(personByStation);
 		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
 		int adultCount = countAdults(medicalRecords);
 		int childCount = countChildren(medicalRecords);
 		return new PersonCoveredByStation(personInfos, adultCount, childCount);
-	}
-
-	private List<Person> findPersonsByStationAddress(List<Firestation> firestations, List<Person> persons) {
-		return firestations.stream().flatMap(f -> persons.stream().filter(p -> p.address().equals(f.address()))).toList();
 	}
 
 	private int countChildren(List<MedicalRecord> medicalRecords) {

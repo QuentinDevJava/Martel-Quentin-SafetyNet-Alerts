@@ -21,7 +21,6 @@ import com.openclassroom.safetynet.service.MedicalRecordService;
 import com.openclassroom.safetynet.service.PersonCoveredByStationService;
 import com.openclassroom.safetynet.service.PersonService;
 import com.openclassroom.safetynet.service.PersonsAndStationInfoService;
-import com.openclassroom.safetynet.service.PersonsInfoWithLastNameService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,6 @@ public class SearchController {
 	private final MedicalRecordService medicalRecordService;
 	private final PersonService personService;
 	private final PersonCoveredByStationService personCoveredByStationService;
-	private final PersonsInfoWithLastNameService personsInfoWithLastNameService;
 
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam String stationNumber) {
@@ -116,7 +114,7 @@ public class SearchController {
 	public ResponseEntity<List<PersonsLastNameInfo>> getPersonsFullInfoWithLastName(@RequestParam String lastName) {
 		log.info("Search for resident information by last name : {}.", lastName);
 		try {
-			List<PersonsLastNameInfo> personsLastNameInfos = personsInfoWithLastNameService.listOfPersonsFullInfo(lastName);
+			List<PersonsLastNameInfo> personsLastNameInfos = personService.listOfPersonsFullInfo(lastName);
 			PersonInfoWithLastName personInfoWithLastName = new PersonInfoWithLastName(personsLastNameInfos);
 			log.info("Successful retrieval of list of persons and their medical records for last name : {} = {}", lastName, personInfoWithLastName);
 			return ResponseEntity.ok(personsLastNameInfos);

@@ -1,11 +1,8 @@
 package com.openclassroom.safetynet.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,14 +24,6 @@ public class MedicalRecordController {
 
 	public MedicalRecordController(MedicalRecordService medicalRecordService) {
 		this.medicalRecordService = medicalRecordService;
-	}
-
-	@GetMapping
-	public ResponseEntity<List<MedicalRecord>> getAllMedicalRecords() {
-		log.info("GET request received for /medicalrecord.");
-		List<MedicalRecord> medicalRecords = medicalRecordService.allMedicalRecords();
-		log.info("Successfully retrieved {} medical records.", medicalRecords.size());
-		return ResponseEntity.ok(medicalRecords);
 	}
 
 	@PostMapping

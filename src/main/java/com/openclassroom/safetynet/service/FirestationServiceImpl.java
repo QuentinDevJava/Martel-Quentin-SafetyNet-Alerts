@@ -26,6 +26,7 @@ public class FirestationServiceImpl implements FirestationService {
 		return repository.loadTypeOfData(TypeOfData.FIRESTATIONS).stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList());
 	}
 
+	@Override
 	public Firestation createFirestation(Firestation firestation) {
 		for (String field : new String[] { firestation.station(), firestation.address() }) {
 			if (Optional.ofNullable(field).map(StringUtils::isBlank).orElse(true)) {
@@ -38,6 +39,7 @@ public class FirestationServiceImpl implements FirestationService {
 		return firestation;
 	}
 
+	@Override
 	public Firestation updateFirestation(String address, Firestation firestation) {
 		Firestation existingFirestation = getFirestationByAddress(address);
 		if (existingFirestation != null) {
@@ -50,6 +52,7 @@ public class FirestationServiceImpl implements FirestationService {
 		}
 	}
 
+	@Override
 	public Boolean deleteFirestation(String address) {
 		List<Firestation> firestations = allFireStations();
 		boolean firestationsDeleted = firestations.removeIf(f -> f.address().equals(address));
@@ -65,15 +68,18 @@ public class FirestationServiceImpl implements FirestationService {
 		repository.saveData(TypeOfData.FIRESTATIONS, firestations.stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList()));
 	}
 
+	@Override
 	public List<Firestation> findAllByStationNumber(String stationNumber) {
 		return allFireStations().stream().filter(f -> f.station().equals(stationNumber)).toList();
 
 	}
 
+	@Override
 	public List<Firestation> getFirestationByListStationNumber(List<String> stationNumbers) {
 		return allFireStations().stream().filter(firestation -> stationNumbers.contains(firestation.station())).toList();
 	}
 
+	@Override
 	public Firestation getFirestationByAddress(String address) {
 		return allFireStations().stream().filter(firestation -> firestation.address().contains(address)).findFirst().orElse(null);
 	}
