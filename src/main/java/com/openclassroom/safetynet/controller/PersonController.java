@@ -3,8 +3,6 @@ package com.openclassroom.safetynet.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,11 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.service.PersonService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/person")
+@Slf4j
 public class PersonController {
-
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final PersonService personService;
 
@@ -34,56 +33,61 @@ public class PersonController {
 
 	@GetMapping
 	public ResponseEntity<List<Person>> getAllPersons() {
-		logger.info("GET request received for /person.");
-		List<Person> persons = personService.getAllPersons();
-		logger.info("Successfully retrieved {} persons.", persons.size());
+		log.info("GET request received for /person.");
+		List<Person> persons = personService.allPersons();
+		log.info("Successfully retrieved {} persons.", persons.size());
 		return new ResponseEntity<>(persons, HttpStatus.OK);
 	}
 
 	@PostMapping
 	public ResponseEntity<Person> addPerson(@Validated @RequestBody Person person) {
-		logger.info("POST request received for /person, adding person: {}", person);
+		log.info("POST request received for /person, adding person: {}", person);
 		try {
 			personService.createPerson(person);
-			logger.info("Person successfully created: {}", person);
+			log.info("Person successfully created: {}", person);
 			return new ResponseEntity<>(person, HttpStatus.CREATED);
 		} catch (Exception e) {
-			logger.error("Error creating person: {}", person, e);
+			log.error("Error creating person: {}", person, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
 	public ResponseEntity<Person> updatePerson(@PathVariable String firstName, @PathVariable String lastName, @RequestBody Person person) {
-		logger.info("PUT request received for /person/{}/{}", firstName, lastName);
-		logger.info("Updating person with details: {}", person);
+		log.info("PUT request received for /person/{}/{}", firstName, lastName);
+		log.info("Updating person with details: {}", person);
 		try {
 			personService.updatePerson(firstName, lastName, person);
-			logger.info("Person successfully updated: {}", person);
+			log.info("Person successfully updated: {}", person);
 			return new ResponseEntity<>(person, HttpStatus.OK);
+			// TODO no.content methode if (Objects.isNull(XXXXXXX)) tester pour supprimer le
+			// flag
+
 		} catch (Exception e) {
-			logger.error("Error updating person with first name: {} and last name: {}", firstName, lastName, e);
+			log.error("Error updating person with first name: {} and last name: {}", firstName, lastName, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@DeleteMapping("/{firstName}/{lastName}")
 	public ResponseEntity<Void> deletePerson(@PathVariable String firstName, @PathVariable String lastName) {
-		logger.info("DELETE request received for /person/{}/{}", firstName, lastName);
+		log.info("DELETE request received for /person/{}/{}", firstName, lastName);
 
 		try {
 			boolean personDeleted = personService.deletePerson(firstName, lastName);
 
+			// TODO if (Objects.isNull(personDeleted)) tester pour supprimer le flag
+
 			if (Boolean.TRUE.equals(personDeleted)) {
-				logger.info("Person successfully deleted: firstName: {}, lastName: {}", firstName, lastName);
+				log.info("Person successfully deleted: firstName: {}, lastName: {}", firstName, lastName);
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			} else {
-				logger.error("Person not found: firstName: {}, lastName: {}", firstName, lastName);
+				log.error("Person not found: firstName: {}, lastName: {}", firstName, lastName);
 				return ResponseEntity.notFound().build();
 			}
 
 		} catch (Exception e) {
-			logger.error("Error deleting person with first name: {} and last name: {}", firstName, lastName, e);
+			log.error("Error deleting person with first name: {} and last name: {}", firstName, lastName, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

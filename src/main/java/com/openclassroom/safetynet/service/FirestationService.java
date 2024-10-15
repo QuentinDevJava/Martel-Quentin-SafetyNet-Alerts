@@ -32,19 +32,12 @@ public interface FirestationService {
 	Boolean deleteFirestation(String address);
 
 	/**
-	 * Returns the list of all fire stations.
-	 *
-	 * @return The list of all fire stations.
-	 */
-	List<Firestation> getAllFirestations();
-
-	/**
 	 * Returns the list of fire stations corresponding to the given station numbers.
 	 *
 	 * @param stationNumbers The station numbers.
 	 * @return The corresponding fire stations.
 	 */
-	List<Firestation> getFirestationByStationNumber(String stationNumber);
+	List<Firestation> findAllByStationNumber(String stationNumber);
 
 	/**
 	 * Returns the list of fire stations corresponding to the given station numbers.

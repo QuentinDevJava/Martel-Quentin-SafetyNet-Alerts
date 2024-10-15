@@ -17,11 +17,11 @@ public class PersonsInfoWithLastNameService {
 	}
 
 	public List<PersonsLastNameInfo> listOfPersonsFullInfo(String lastName) {
-		List<Person> persons = personService.getAllPersons();
+		List<Person> persons = personService.allPersons();
 		List<PersonsLastNameInfo> personsFullInfos = new ArrayList<>();
 		for (Person person : persons) {
 			if (person.lastName().equals(lastName)) {
-				MedicalRecord medicalRecord = medicalRecordService.findMedicalRecordByLastName(lastName);
+				MedicalRecord medicalRecord = medicalRecordService.findPersonsMedicalRecords(lastName);
 				personsFullInfos.add(personService.extractNameAddressAgeEmailInfo(person, medicalRecord));
 			}
 		}

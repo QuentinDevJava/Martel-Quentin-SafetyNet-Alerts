@@ -29,15 +29,6 @@ public interface MedicalRecordService {
 	MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord);
 
 	/**
-	 * Retrieves a medical record by the full name of the person.
-	 *
-	 * @param firstName The first name of the person.
-	 * @param lastName  The last name of the person.
-	 * @return The medical record for the specified person.
-	 */
-	MedicalRecord getMedicalRecordByFullName(String firstName, String lastName);
-
-	/**
 	 * Deletes a medical record by the full name of the person.
 	 *
 	 * @param firstName The first name of the person.
@@ -51,7 +42,7 @@ public interface MedicalRecordService {
 	 *
 	 * @return A list of all medical records.
 	 */
-	List<MedicalRecord> getAllMedicalRecords();
+	List<MedicalRecord> allMedicalRecords();
 
 	/**
 	 * Extracts basic information from a person's medical record.
@@ -91,12 +82,21 @@ public interface MedicalRecordService {
 	MedicalRecordInfo getMedicalRecordInfosByPerson(Person person, MedicalRecordService medicalRecordService, PersonService personService);
 
 	/**
+	 * Retrieves a medical record by the full name of the person.
+	 *
+	 * @param firstName The first name of the person.
+	 * @param lastName  The last name of the person.
+	 * @return The medical record for the specified person.
+	 */
+	MedicalRecord getMedicalRecordByFullName(String firstName, String lastName);
+
+	/**
 	 * Finds a medical record by the last name of the person.
 	 *
 	 * @param lastName The last name of the person.
 	 * @return The medical record for the specified person.
 	 */
-	MedicalRecord findMedicalRecordByLastName(String lastName);
+	MedicalRecord findPersonsMedicalRecords(String lastName);
 
 	List<MedicalRecord> getPersonMedicalRecords(List<Person> persons);
 }

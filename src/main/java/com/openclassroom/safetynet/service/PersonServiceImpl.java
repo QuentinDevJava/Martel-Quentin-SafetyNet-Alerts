@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -21,25 +22,25 @@ import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
-import com.openclassroom.safetynet.repository.DataRepository;
+import com.openclassroom.safetynet.repository.JsonRepository;
 
 @Service
 public class PersonServiceImpl implements PersonService {
 
-	private final DataRepository dataRepository;
+	private final JsonRepository repository;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
 
-	public PersonServiceImpl(DataRepository dataRepository, FirestationService firestationService, MedicalRecordService medicalRecordService) {
-		this.dataRepository = dataRepository;
+	public PersonServiceImpl(JsonRepository dataRepository, FirestationService firestationService, MedicalRecordService medicalRecordService) {
+		this.repository = dataRepository;
 		this.medicalRecordService = medicalRecordService;
 		this.firestationService = firestationService;
 	}
 
-	public List<Person> getAllPersons() {
-		List<Object> personData = dataRepository.selectTypeOfData(TypeOfData.PERSONS);
+	public List<Person> allPersons() {
+		List<Object> personData = repository.loadTypeOfData(TypeOfData.PERSONS);
 		List<Person> persons = new ArrayList<>();
 		for (Object personObj : personData) {
 			persons.add(objectMapper.convertValue(personObj, Person.class));
@@ -53,14 +54,14 @@ public class PersonServiceImpl implements PersonService {
 				throw new IllegalArgumentException("All fields of the person must be filled.");
 			}
 		}
-		List<Person> persons = getAllPersons();
+		List<Person> persons = allPersons();
 		persons.add(person);
 		savePersons(persons);
 		return person;
 	}
 
 	public Person updatePerson(String firstName, String lastName, Person person) {
-		List<Person> persons = getAllPersons();
+		List<Person> persons = allPersons();
 		for (int i = 0; i < persons.size(); i++) {
 			if (persons.get(i).firstName().equals(firstName) && persons.get(i).lastName().equals(lastName)) {
 				persons.set(i, person);
@@ -72,14 +73,12 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	public boolean deletePerson(String firstName, String lastName) {
-		List<Person> persons = getAllPersons();
+		List<Person> persons = allPersons();
 		boolean personDeleted = persons.removeIf(p -> p.firstName().equals(firstName) && p.lastName().equals(lastName));
 		if (personDeleted) {
 			savePersons(persons);
-			return true;
-		} else {
-			throw new PersonNotFoundException("Person with first name '" + firstName + "' and last name '" + lastName + "' not found.");
 		}
+		return personDeleted;
 	}
 
 	private void savePersons(List<Person> listOfPersons) {
@@ -87,11 +86,11 @@ public class PersonServiceImpl implements PersonService {
 		for (Person personObj : listOfPersons) {
 			personData.add(objectMapper.convertValue(personObj, Person.class));
 		}
-		dataRepository.saveData(TypeOfData.PERSONS, personData);
+		repository.saveData(TypeOfData.PERSONS, personData);
 	}
 
 	public List<Person> getPersonsByAddress(String address) {
-		return getAllPersons().stream().filter(person -> person.address().equals(address)).toList();
+		return allPersons().stream().filter(person -> person.address().equals(address)).collect(Collectors.toList());
 	}
 
 	public PersonsLastNameInfo extractNameAddressAgeEmailInfo(Person person, MedicalRecord medicalRecord) {
@@ -100,7 +99,7 @@ public class PersonServiceImpl implements PersonService {
 
 	public PersonEmail personEmails(String city) {
 
-		List<String> emails = getAllPersons().stream().filter(person -> person.city().equals(city)).map(Person::email).toList();
+		List<String> emails = allPersons().stream().filter(person -> person.city().equals(city)).map(Person::email).toList();
 		return new PersonEmail(emails);
 	}
 
@@ -121,14 +120,6 @@ public class PersonServiceImpl implements PersonService {
 		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
 	}
 
-	public int getPersonAge(MedicalRecord medicalRecord) { // TODO methode implementé mais non utilisée
-		String dateString = medicalRecord.birthdate();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-		LocalDate birthdate = LocalDate.parse(dateString, formatter);
-		LocalDate today = LocalDate.now();
-		return Period.between(birthdate, today).getYears();
-	}
-
 	public int getPersonAge(Person person, MedicalRecordService medicalRecordService) {
 		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
 		if (medicalRecord != null) {
@@ -142,7 +133,7 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	public List<Person> getPersonsByStationAddress(List<Firestation> firestation) {
-		List<Person> persons = getAllPersons();
+		List<Person> persons = allPersons();
 		return firestation.stream().flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream()).toList();
 	}
 
@@ -151,7 +142,7 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	public List<Person> getPersonsByStation(String stationNumber) {
-		List<Firestation> firestation = firestationService.getFirestationByStationNumber(stationNumber);
+		List<Firestation> firestation = firestationService.findAllByStationNumber(stationNumber);
 		return getPersonsByStationAddress(firestation);
 	}
 

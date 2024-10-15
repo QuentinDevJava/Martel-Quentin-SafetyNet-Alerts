@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -14,16 +15,19 @@ import com.openclassroom.safetynet.exceptions.MedicalRecordNotFoundException;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
-import com.openclassroom.safetynet.repository.DataRepository;
+import com.openclassroom.safetynet.repository.JsonRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class MedicalRecordServiceImpl implements MedicalRecordService {
 
-	private final DataRepository dataRepository = new DataRepository();
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final JsonRepository repository;
+	private final ObjectMapper objectMapper;
 
-	public List<MedicalRecord> getAllMedicalRecords() {
-		return dataRepository.selectTypeOfData(TypeOfData.MEDICALRECORDS).stream().map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).toList();
+	public List<MedicalRecord> allMedicalRecords() {
+		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream().map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).collect(Collectors.toList());
 	}
 
 	public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord) {
@@ -32,16 +36,16 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 				throw new IllegalArgumentException("All fields of the person must be filled.");
 			}
 		}
-		List<MedicalRecord> medicalRecords = getAllMedicalRecords();
+		List<MedicalRecord> medicalRecords = allMedicalRecords();
 		medicalRecords.add(medicalRecord);
 		saveMedicalRecords(medicalRecords);
 		return medicalRecord;
 	}
 
 	public MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord) {
-		MedicalRecord existingMedicalRecord = findMedicalRecordByFullName(firstName, lastName);
+		MedicalRecord existingMedicalRecord = getMedicalRecordByFullName(firstName, lastName);
 		if (existingMedicalRecord != null) {
-			List<MedicalRecord> medicalRecords = getAllMedicalRecords();
+			List<MedicalRecord> medicalRecords = allMedicalRecords();
 			medicalRecords.set(medicalRecords.indexOf(existingMedicalRecord), medicalRecord);
 			saveMedicalRecords(medicalRecords);
 			return medicalRecord;
@@ -51,7 +55,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	}
 
 	public Boolean deleteMedicalRecord(String firstName, String lastName) {
-		List<MedicalRecord> medicalRecords = getAllMedicalRecords();
+		List<MedicalRecord> medicalRecords = allMedicalRecords();
 		boolean medicalRecordDeleted = medicalRecords.removeIf(m -> m.firstName().equals(firstName) && m.lastName().equals(lastName));
 		if (medicalRecordDeleted) {
 			saveMedicalRecords(medicalRecords);
@@ -66,24 +70,15 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		for (MedicalRecord medicalRecordObj : listOfMedicalRecords) {
 			medicalRecordData.add(objectMapper.convertValue(medicalRecordObj, MedicalRecord.class));
 		}
-		dataRepository.saveData(TypeOfData.MEDICALRECORDS, medicalRecordData);
+		repository.saveData(TypeOfData.MEDICALRECORDS, medicalRecordData);
 	}
 
 	public MedicalRecord getMedicalRecordByFullName(String firstName, String lastName) {
-		MedicalRecord medicalRecord = findMedicalRecordByFullName(firstName, lastName);
-		if (medicalRecord != null) {
-			return medicalRecord;
-		} else {
-			throw new MedicalRecordNotFoundException("Medical record not found for " + firstName + " " + lastName);
-		}
+		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.firstName().equals(firstName) && medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
 	}
 
-	private MedicalRecord findMedicalRecordByFullName(String firstName, String lastName) {
-		return getAllMedicalRecords().stream().filter(medicalRecord -> medicalRecord.firstName().equals(firstName) && medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
-	}
-
-	public MedicalRecord findMedicalRecordByLastName(String lastName) {
-		return getAllMedicalRecords().stream().filter(medicalRecord -> medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
+	public MedicalRecord findPersonsMedicalRecords(String lastName) {
+		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
 	}
 
 	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {

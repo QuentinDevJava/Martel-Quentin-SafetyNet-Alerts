@@ -15,20 +15,17 @@ import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.exceptions.DataLoadingException;
 import com.openclassroom.safetynet.exceptions.DataSavingException;
 
-@Repository
-public class DataRepository {
+import lombok.RequiredArgsConstructor;
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+@Repository
+@RequiredArgsConstructor
+public class JsonRepository {
+
+	private final ObjectMapper objectMapper;
 
 	public void saveData(TypeOfData typeOfData, List<Object> data) {
-		Map<String, List<Object>> jsonData = loadJsonData();
-
-		switch (typeOfData) {
-		case PERSONS -> jsonData.put("persons", data);
-		case FIRESTATIONS -> jsonData.put("firestations", data);
-		case MEDICALRECORDS -> jsonData.put("medicalrecords", data);
-		default -> throw new IllegalArgumentException("Error : Type of data not found");
-		}
+		Map<String, List<Object>> jsonData = loadJsonAllData();
+		jsonData.put(typeOfData.getJsonKey(), data);
 		try {
 			objectMapper.writeValue(new File(JsonPath.JSONFILEPATH), jsonData);
 		} catch (IOException e) {
@@ -36,7 +33,7 @@ public class DataRepository {
 		}
 	}
 
-	public Map<String, List<Object>> loadJsonData() {
+	private Map<String, List<Object>> loadJsonAllData() {
 		try {
 			return objectMapper.readValue(new File(JsonPath.JSONFILEPATH), new TypeReference<Map<String, List<Object>>>() {
 			});
@@ -45,15 +42,9 @@ public class DataRepository {
 		}
 	}
 
-	public List<Object> selectTypeOfData(TypeOfData typeOfData) {
-		Map<String, List<Object>> data = loadJsonData();
-
-		return switch (typeOfData) {
-		case PERSONS -> data.getOrDefault("persons", new ArrayList<>());
-		case FIRESTATIONS -> data.getOrDefault("firestations", new ArrayList<>());
-		case MEDICALRECORDS -> data.getOrDefault("medicalrecords", new ArrayList<>());
-		default -> throw new IllegalArgumentException("Error : Type of data no found");
-		};
+	public List<Object> loadTypeOfData(TypeOfData typeOfData) {
+		Map<String, List<Object>> data = loadJsonAllData();
+		return data.getOrDefault(typeOfData.getJsonKey(), new ArrayList<>());
 	}
 
 }

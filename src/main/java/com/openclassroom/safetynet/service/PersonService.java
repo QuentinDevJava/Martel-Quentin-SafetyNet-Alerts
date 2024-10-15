@@ -45,7 +45,7 @@ public interface PersonService {
 	 *
 	 * @return A list of all persons.
 	 */
-	List<Person> getAllPersons();
+	List<Person> allPersons();
 
 	/**
 	 * Retrieves persons associated with a specific fire station.
@@ -87,14 +87,6 @@ public interface PersonService {
 	 * @return The age of the person.
 	 */
 	int getPersonAge(Person person, MedicalRecordService medicalRecordService);
-
-	/**
-	 * Calculates the age of a person based on their birthdate.
-	 *
-	 * @param medicalRecord The medical record.
-	 * @return The age of the person for medical record.
-	 */
-	int getPersonAge(MedicalRecord medicalRecord); // TODO
 
 	/**
 	 * Extracts basic information from a person, including name, address, and phone
