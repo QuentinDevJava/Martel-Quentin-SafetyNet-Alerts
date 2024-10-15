@@ -4,23 +4,22 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class PersonsAndStationInfoService {
 	private final PersonService personService;
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	public PersonsAndStationInfoService(PersonService personService, MedicalRecordService medicalRecordService, FirestationService firestationService) {
-		this.personService = personService;
-		this.medicalRecordService = medicalRecordService;
-		this.firestationService = firestationService;
-	}
 
 	public PersonsAndStationInfo getPersonsAndStationInfoByAddress(String address) {
 		List<Person> persons = personService.getPersonsByAddress(address);

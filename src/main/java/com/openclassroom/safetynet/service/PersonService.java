@@ -3,6 +3,8 @@ package com.openclassroom.safetynet.service;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.springframework.stereotype.Service;
+
 import com.openclassroom.safetynet.model.ChildInfo;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
@@ -11,6 +13,7 @@ import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 
+@Service
 public interface PersonService {
 
 	/**

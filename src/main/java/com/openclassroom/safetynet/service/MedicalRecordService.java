@@ -2,10 +2,13 @@ package com.openclassroom.safetynet.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
 
+@Service
 public interface MedicalRecordService {
 
 	/**

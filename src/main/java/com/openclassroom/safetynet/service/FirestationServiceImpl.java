@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-
 public class FirestationServiceImpl implements FirestationService {
 
 	private final JsonRepository repository;

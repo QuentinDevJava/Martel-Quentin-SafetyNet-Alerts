@@ -5,21 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
+
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.FloodInfo;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class FloodService {
 	private final PersonService personService;
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
-
-	public FloodService(PersonService personService, MedicalRecordService medicalRecordService, FirestationService firestationService) {
-		this.personService = personService;
-		this.medicalRecordService = medicalRecordService;
-		this.firestationService = firestationService;
-	}
 
 	public Map<String, List<MedicalRecordInfo>> listOfPersonsByAddressByStationNumber(List<Firestation> firestations) {
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = new HashMap<>();

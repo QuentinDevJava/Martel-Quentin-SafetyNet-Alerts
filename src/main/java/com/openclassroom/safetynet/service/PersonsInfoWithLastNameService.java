@@ -3,18 +3,19 @@ package com.openclassroom.safetynet.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 
-public class PersonsInfoWithLastNameService {
-	private MedicalRecordService medicalRecordService;
-	private PersonService personService;
+import lombok.RequiredArgsConstructor;
 
-	public PersonsInfoWithLastNameService(PersonService personService, MedicalRecordService medicalRecordService) {
-		this.personService = personService;
-		this.medicalRecordService = medicalRecordService;
-	}
+@Service
+@RequiredArgsConstructor
+public class PersonsInfoWithLastNameService {
+	private final MedicalRecordService medicalRecordService;
+	private final PersonService personService;
 
 	public List<PersonsLastNameInfo> listOfPersonsFullInfo(String lastName) {
 		List<Person> persons = personService.allPersons();

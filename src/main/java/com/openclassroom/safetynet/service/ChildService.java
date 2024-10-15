@@ -3,12 +3,12 @@ package com.openclassroom.safetynet.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.openclassroom.safetynet.model.ChildInfo;
 import com.openclassroom.safetynet.model.Person;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+@Service
 public class ChildService {
 
 	private List<ChildInfo> childInfo = new ArrayList<>();

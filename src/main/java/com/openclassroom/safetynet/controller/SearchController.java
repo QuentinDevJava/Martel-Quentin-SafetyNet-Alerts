@@ -41,6 +41,7 @@ public class SearchController {
 	private final MedicalRecordService medicalRecordService;
 	private final PersonService personService;
 	private final PersonCoveredByStationService personCoveredByStationService;
+	private final PersonsInfoWithLastNameService personsInfoWithLastNameService;
 
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam String stationNumber) {
@@ -112,14 +113,13 @@ public class SearchController {
 	}
 
 	@GetMapping("/personInfolastName")
-	public ResponseEntity<PersonInfoWithLastName> getPersonsFullInfoWithLastName(@RequestParam String lastName) {
+	public ResponseEntity<List<PersonsLastNameInfo>> getPersonsFullInfoWithLastName(@RequestParam String lastName) {
 		log.info("Search for resident information by last name : {}.", lastName);
 		try {
-			PersonsInfoWithLastNameService listOfPersonsInfoWithLastName = new PersonsInfoWithLastNameService(personService, medicalRecordService);
-			List<PersonsLastNameInfo> personsLastNameInfos = listOfPersonsInfoWithLastName.listOfPersonsFullInfo(lastName);
+			List<PersonsLastNameInfo> personsLastNameInfos = personsInfoWithLastNameService.listOfPersonsFullInfo(lastName);
 			PersonInfoWithLastName personInfoWithLastName = new PersonInfoWithLastName(personsLastNameInfos);
 			log.info("Successful retrieval of list of persons and their medical records for last name : {} = {}", lastName, personInfoWithLastName);
-			return ResponseEntity.ok(personInfoWithLastName);
+			return ResponseEntity.ok(personsLastNameInfos);
 		} catch (Exception e) {
 			log.error("Error the list of persons for the last name = {} is not found.", lastName, e);
 			return ResponseEntity.notFound().build();

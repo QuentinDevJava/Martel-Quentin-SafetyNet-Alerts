@@ -33,14 +33,11 @@ public class PersonCoveredByStationService {
 		log.info("Finding covered persons by fire station {}", stationNumber);
 		List<Firestation> firestations = fireStationService.findAllByStationNumber(stationNumber);
 		List<Person> persons = personService.allPersons();
-
 		List<Person> personByStation = findPersonsByStationAddress(firestations, persons);
 		List<PersonInfo> personInfos = personService.extractPersonInfos(personByStation);
 		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
-
 		int adultCount = countAdults(medicalRecords);
 		int childCount = countChildren(medicalRecords);
-
 		return new PersonCoveredByStation(personInfos, adultCount, childCount);
 	}
 

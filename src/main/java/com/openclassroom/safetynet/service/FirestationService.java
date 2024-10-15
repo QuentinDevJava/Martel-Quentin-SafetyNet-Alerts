@@ -2,8 +2,11 @@ package com.openclassroom.safetynet.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.openclassroom.safetynet.model.Firestation;
 
+@Service
 public interface FirestationService {
 
 	/**

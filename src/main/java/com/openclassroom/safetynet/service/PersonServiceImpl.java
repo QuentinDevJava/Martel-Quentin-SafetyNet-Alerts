@@ -24,7 +24,10 @@ import com.openclassroom.safetynet.model.PersonInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.repository.JsonRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class PersonServiceImpl implements PersonService {
 
 	private final JsonRepository repository;
@@ -32,12 +35,6 @@ public class PersonServiceImpl implements PersonService {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
-
-	public PersonServiceImpl(JsonRepository dataRepository, FirestationService firestationService, MedicalRecordService medicalRecordService) {
-		this.repository = dataRepository;
-		this.medicalRecordService = medicalRecordService;
-		this.firestationService = firestationService;
-	}
 
 	public List<Person> allPersons() {
 		List<Object> personData = repository.loadTypeOfData(TypeOfData.PERSONS);
