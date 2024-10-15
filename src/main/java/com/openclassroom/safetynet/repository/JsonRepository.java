@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -16,9 +17,10 @@ import com.openclassroom.safetynet.exceptions.DataLoadingException;
 import com.openclassroom.safetynet.exceptions.DataSavingException;
 
 @Repository
-public class DataRepository {
+@RequiredArgsConstructor
+public class JsonRepository {
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper;
 
 	public void saveData(TypeOfData typeOfData, List<Object> data) {
 		Map<String, List<Object>> jsonData = loadJsonData();
@@ -36,7 +38,8 @@ public class DataRepository {
 		}
 	}
 
-	public Map<String, List<Object>> loadJsonData() {
+	// TODO this should be private scoped
+	private Map<String, List<Object>> loadJsonData() {
 		try {
 			return objectMapper.readValue(new File(JsonPath.JSONFILEPATH), new TypeReference<Map<String, List<Object>>>() {
 			});

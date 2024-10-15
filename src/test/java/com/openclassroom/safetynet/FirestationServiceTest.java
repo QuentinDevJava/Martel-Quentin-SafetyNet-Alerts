@@ -26,7 +26,7 @@ import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
-import com.openclassroom.safetynet.repository.DataRepository;
+import com.openclassroom.safetynet.repository.JsonRepository;
 import com.openclassroom.safetynet.service.FirestationService;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 import com.openclassroom.safetynet.service.PersonServiceImpl;
@@ -45,7 +45,7 @@ class FirestationServiceTest {
 	private MedicalRecordService medicalRecordService;
 
 	@MockBean
-	private DataRepository dataRepository;
+	private JsonRepository jsonRepository;
 
 	@Test
 	void testCalculateAgeCount() {
@@ -73,7 +73,7 @@ class FirestationServiceTest {
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"), new Person("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com"));
 
-		when(dataRepository.selectTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
+		when(jsonRepository.selectTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 
 		List<Person> personsTest = personServiceImpl.getPersonsByAddress("1509 Culver St");
 		List<Person> personResult = new ArrayList<Person>();
@@ -90,7 +90,7 @@ class FirestationServiceTest {
 		List<String> emails = Arrays.asList("jaboyd@email.com", "jdoe@email.com", "jdin@email.com");
 		PersonEmail Result = new PersonEmail(emails);
 
-		when(dataRepository.selectTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
+		when(jsonRepository.selectTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 
 		PersonEmail personsTest = personServiceImpl.personEmails("Culver");
 
@@ -180,7 +180,7 @@ class FirestationServiceTest {
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
 
-		when(dataRepository.selectTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
+		when(jsonRepository.selectTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
 
 		List<Person> personsTests = personServiceImpl.getPersonsByStationAddress(firestations);
 
@@ -195,14 +195,14 @@ class FirestationServiceTest {
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
 
 		when(firestationService.getFirestationByStationNumber(stationNumber)).thenReturn(firestations);
-		when(dataRepository.selectTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
+		when(jsonRepository.selectTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
 
 		List<String> phoneNumbers = personServiceImpl.getPhoneNumbersByStation(stationNumber);
 
 		assertThat(phoneNumbers).containsExactlyInAnyOrder("841-874-6512", "841-874-6513");
 
 		verify(firestationService, times(1)).getFirestationByStationNumber(stationNumber);
-		verify(dataRepository, times(1)).selectTypeOfData(TypeOfData.PERSONS);
+		verify(jsonRepository, times(1)).selectTypeOfData(TypeOfData.PERSONS);
 	}
 
 	@Disabled

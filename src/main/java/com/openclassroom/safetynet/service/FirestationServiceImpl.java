@@ -12,20 +12,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.exceptions.FirestationNotFoundException;
 import com.openclassroom.safetynet.model.Firestation;
-import com.openclassroom.safetynet.repository.DataRepository;
+import com.openclassroom.safetynet.repository.JsonRepository;
 
 @Service
 public class FirestationServiceImpl implements FirestationService {
 
-	private final DataRepository dataRepository;
+	private final JsonRepository jsonRepository;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public FirestationServiceImpl(DataRepository dataRepository) {
-		this.dataRepository = dataRepository;
+	public FirestationServiceImpl(JsonRepository jsonRepository) {
+		this.jsonRepository = jsonRepository;
 	}
 
 	public List<Firestation> getAllFirestations() {
-		return dataRepository.selectTypeOfData(TypeOfData.FIRESTATIONS).stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList());
+		return jsonRepository.selectTypeOfData(TypeOfData.FIRESTATIONS).stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList());
 	}
 
 	public Firestation createFirestation(Firestation firestation) {
@@ -64,7 +64,7 @@ public class FirestationServiceImpl implements FirestationService {
 	}
 
 	private void saveFirestations(List<Firestation> firestations) {
-		dataRepository.saveData(TypeOfData.FIRESTATIONS, firestations.stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList()));
+		jsonRepository.saveData(TypeOfData.FIRESTATIONS, firestations.stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList()));
 	}
 
 	public List<Firestation> getFirestationByStationNumber(String stationNumber) {

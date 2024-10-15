@@ -21,25 +21,25 @@ import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
-import com.openclassroom.safetynet.repository.DataRepository;
+import com.openclassroom.safetynet.repository.JsonRepository;
 
 @Service
 public class PersonServiceImpl implements PersonService {
 
-	private final DataRepository dataRepository;
+	private final JsonRepository jsonRepository;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
 
-	public PersonServiceImpl(DataRepository dataRepository, FirestationService firestationService, MedicalRecordService medicalRecordService) {
-		this.dataRepository = dataRepository;
+	public PersonServiceImpl(JsonRepository jsonRepository, FirestationService firestationService, MedicalRecordService medicalRecordService) {
+		this.jsonRepository = jsonRepository;
 		this.medicalRecordService = medicalRecordService;
 		this.firestationService = firestationService;
 	}
 
 	public List<Person> getAllPersons() {
-		List<Object> personData = dataRepository.selectTypeOfData(TypeOfData.PERSONS);
+		List<Object> personData = jsonRepository.selectTypeOfData(TypeOfData.PERSONS);
 		List<Person> persons = new ArrayList<>();
 		for (Object personObj : personData) {
 			persons.add(objectMapper.convertValue(personObj, Person.class));
@@ -87,7 +87,7 @@ public class PersonServiceImpl implements PersonService {
 		for (Person personObj : listOfPersons) {
 			personData.add(objectMapper.convertValue(personObj, Person.class));
 		}
-		dataRepository.saveData(TypeOfData.PERSONS, personData);
+		jsonRepository.saveData(TypeOfData.PERSONS, personData);
 	}
 
 	public List<Person> getPersonsByAddress(String address) {

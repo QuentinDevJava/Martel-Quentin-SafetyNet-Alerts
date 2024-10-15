@@ -14,16 +14,16 @@ import com.openclassroom.safetynet.exceptions.MedicalRecordNotFoundException;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
-import com.openclassroom.safetynet.repository.DataRepository;
+import com.openclassroom.safetynet.repository.JsonRepository;
 
 @Service
 public class MedicalRecordServiceImpl implements MedicalRecordService {
 
-	private final DataRepository dataRepository = new DataRepository();
+	private final JsonRepository jsonRepository = new JsonRepository();
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	public List<MedicalRecord> getAllMedicalRecords() {
-		return dataRepository.selectTypeOfData(TypeOfData.MEDICALRECORDS).stream().map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).toList();
+		return jsonRepository.selectTypeOfData(TypeOfData.MEDICALRECORDS).stream().map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).toList();
 	}
 
 	public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord) {
@@ -66,7 +66,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 		for (MedicalRecord medicalRecordObj : listOfMedicalRecords) {
 			medicalRecordData.add(objectMapper.convertValue(medicalRecordObj, MedicalRecord.class));
 		}
-		dataRepository.saveData(TypeOfData.MEDICALRECORDS, medicalRecordData);
+		jsonRepository.saveData(TypeOfData.MEDICALRECORDS, medicalRecordData);
 	}
 
 	public MedicalRecord getMedicalRecordByFullName(String firstName, String lastName) {
