@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassroom.safetynet.model.ChildInfo;
-import com.openclassroom.safetynet.model.FloodInfo;
+import com.openclassroom.safetynet.model.Child;
+import com.openclassroom.safetynet.model.PersonFloodInfo;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
-import com.openclassroom.safetynet.model.PersonInfoWithLastName;
+import com.openclassroom.safetynet.model.PersonLastNameInfo;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.service.FirestationService;
@@ -55,13 +55,13 @@ public class SearchController {
 	}
 
 	@GetMapping("/childAlert")
-	public ResponseEntity<List<ChildInfo>> getAllChild(@RequestParam String address) {
+	public ResponseEntity<List<Child>> getAllChild(@RequestParam String address) {
 		log.info("Search for children by address : {} ", address);
 		try {
 			List<Person> personsByAddress = personService.getPersonsByAddress(address);
 			log.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
 
-			List<ChildInfo> listOfChilds = personService.listOfChild(personsByAddress);
+			List<Child> listOfChilds = personService.listOfChild(personsByAddress);
 			log.info("Successful retrieval of the children's list : {}", listOfChilds);
 			return ResponseEntity.ok(listOfChilds);
 		} catch (Exception e) {
@@ -98,11 +98,11 @@ public class SearchController {
 	}
 
 	@GetMapping("/flood/stations")
-	public ResponseEntity<FloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(@RequestParam("stations") List<String> stationNumber) {
+	public ResponseEntity<PersonFloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(@RequestParam("stations") List<String> stationNumber) {
 		log.info("Search for resident information by list of station number : {}.", stationNumber);
 		try {
 			FloodService floodService = new FloodService(personService, medicalRecordService, firestationService);
-			FloodInfo floodInfo = floodService.floodInfo(stationNumber);
+			PersonFloodInfo floodInfo = floodService.floodInfo(stationNumber);
 			log.info("Successful retrieval of the list of persons and their medical records for List of station number : {} = {}", stationNumber, floodInfo);
 			return ResponseEntity.ok(floodInfo);
 		} catch (Exception e) {
@@ -116,7 +116,7 @@ public class SearchController {
 		log.info("Search for resident information by last name : {}.", lastName);
 		try {
 			List<PersonsLastNameInfo> personsLastNameInfos = personService.listOfPersonsFullInfo(lastName);
-			PersonInfoWithLastName personInfoWithLastName = new PersonInfoWithLastName(personsLastNameInfos);
+			PersonLastNameInfo personInfoWithLastName = new PersonLastNameInfo(personsLastNameInfos);
 			log.info("Successful retrieval of list of persons and their medical records for last name : {} = {}", lastName, personInfoWithLastName);
 			return ResponseEntity.ok(personsLastNameInfos);
 		} catch (Exception e) {

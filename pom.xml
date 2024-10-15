@@ -50,7 +50,10 @@
    <!-- ============================================================================================================= -->  
    
 	<dependencies>
-	<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+    	<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

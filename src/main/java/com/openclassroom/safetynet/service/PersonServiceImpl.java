@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.exceptions.PersonNotFoundException;
-import com.openclassroom.safetynet.model.ChildInfo;
+import com.openclassroom.safetynet.model.Child;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.Person;
@@ -115,8 +115,8 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	@Override
-	public ChildInfo extractChildInfo(Person person) {
-		return new ChildInfo(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person, medicalRecordService));
+	public Child extractChildInfo(Person person) {
+		return new Child(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person, medicalRecordService));
 	}
 
 //	@Override
@@ -169,7 +169,7 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	@Override
-	public List<ChildInfo> listOfChild(List<Person> personsByAddress) {
+	public List<Child> listOfChild(List<Person> personsByAddress) {
 		return personsByAddress.stream().filter(this::isChild).map(this::extractChildInfo).collect(Collectors.toList());
 	}
 

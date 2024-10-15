@@ -2,5 +2,7 @@ package com.openclassroom.safetynet.model;
 
 import java.util.List;
 
-public record PersonEmail(List<String> email) {
+import jakarta.validation.constraints.NotNull;
+
+public record PersonEmail(@NotNull @NotNull List<String> email) {
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.openclassroom.safetynet.model.ChildInfo;
+import com.openclassroom.safetynet.model.Child;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.Person;
@@ -109,7 +109,7 @@ public interface PersonService {
 	 * @param personService        The person service.
 	 * @return A ChildInfo object containing the extracted child information.
 	 */
-	ChildInfo extractChildInfo(Person person);
+	Child extractChildInfo(Person person);
 
 	/**
 	 * Extracts name, address, age, and email information from a person.
@@ -131,5 +131,5 @@ public interface PersonService {
 
 	List<PersonsLastNameInfo> listOfPersonsFullInfo(String lastName);
 
-	List<ChildInfo> listOfChild(List<Person> personsByAddress);
+	List<Child> listOfChild(List<Person> personsByAddress);
 }

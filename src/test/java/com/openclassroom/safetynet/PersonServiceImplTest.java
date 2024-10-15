@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.model.ChildInfo;
+import com.openclassroom.safetynet.model.Child;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.Person;
@@ -128,11 +128,11 @@ public class PersonServiceImplTest {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 		Person persons = new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
-		ChildInfo personResult = new ChildInfo("John", "Doe", "1509 Culver St", "841-874-6512", 10);
+		Child personResult = new Child("John", "Doe", "1509 Culver St", "841-874-6512", 10);
 
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Doe")).thenReturn(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies));
 
-		ChildInfo personsTest = personServiceImpl.extractChildInfo(persons);
+		Child personsTest = personServiceImpl.extractChildInfo(persons);
 
 		assertThat(personsTest).isEqualTo(personResult);
 	}

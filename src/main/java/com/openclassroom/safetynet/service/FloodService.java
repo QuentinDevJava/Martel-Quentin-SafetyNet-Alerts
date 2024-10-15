@@ -8,7 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.openclassroom.safetynet.model.Firestation;
-import com.openclassroom.safetynet.model.FloodInfo;
+import com.openclassroom.safetynet.model.PersonFloodInfo;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
 
@@ -32,10 +32,10 @@ public class FloodService {
 		return medicalRecordsByAddress;
 	}
 
-	public FloodInfo floodInfo(List<String> stationNumber) {
+	public PersonFloodInfo floodInfo(List<String> stationNumber) {
 		List<Firestation> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = listOfPersonsByAddressByStationNumber(firestations);
 
-		return new FloodInfo(medicalRecordsByAddress);
+		return new PersonFloodInfo(medicalRecordsByAddress);
 	}
 }

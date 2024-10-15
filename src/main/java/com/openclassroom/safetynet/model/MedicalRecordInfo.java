@@ -2,6 +2,11 @@ package com.openclassroom.safetynet.model;
 
 import java.util.List;
 
-public record MedicalRecordInfo(String firstName, String lastName, String phone, int age, List<String> medications,
-		List<String> allergies) {
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+
+public record MedicalRecordInfo(@NotBlank String firstName, @NotBlank String lastName, @NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @Min(0) int age, @NotNull List<String> medications,
+		@NotNull List<String> allergies) {
 }
