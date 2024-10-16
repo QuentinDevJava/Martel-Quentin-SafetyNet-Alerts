@@ -105,7 +105,7 @@ public class SearchController {
 	public ResponseEntity<List<PersonsLastNameInfo>> getPersonsFullInfoWithLastName(@RequestParam String lastName) {
 		log.info("Search for resident information by last name : {}.", lastName);
 		try {
-			List<PersonsLastNameInfo> personsLastNameInfos = personService.listOfPersonsFullInfo(lastName);
+			List<PersonsLastNameInfo> personsLastNameInfos = personService.listOfPersonsByLastName(lastName);
 			log.info("Successful retrieval of list of persons and their medical records for last name : {} = {}", lastName, personsLastNameInfos);
 			return ResponseEntity.ok(personsLastNameInfos);
 		} catch (Exception e) {

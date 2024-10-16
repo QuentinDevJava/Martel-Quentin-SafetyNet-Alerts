@@ -81,11 +81,6 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	}
 
 	@Override
-	public MedicalRecord findPersonsMedicalRecords(String lastName) {
-		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
-	}
-
-	@Override
 	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {
 		return persons.stream().map(p -> getMedicalRecordByFullName(p.firstName(), p.lastName())).filter(Objects::nonNull).toList();
 	}

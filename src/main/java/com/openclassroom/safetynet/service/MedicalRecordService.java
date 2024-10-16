@@ -60,12 +60,4 @@ public interface MedicalRecordService {
 	 */
 	MedicalRecord getMedicalRecordByFullName(String firstName, String lastName);
 
-	/**
-	 * Finds a medical record by the last name of the person.
-	 *
-	 * @param lastName The last name of the person.
-	 * @return The medical record for the specified person {@link MedicalRecord}.
-	 */
-	MedicalRecord findPersonsMedicalRecords(String lastName);
-
 }

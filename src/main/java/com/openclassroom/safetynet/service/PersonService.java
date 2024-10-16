@@ -65,14 +65,6 @@ public interface PersonService {
 	List<Person> getPersonsByAddress(String address);
 
 	/**
-	 * Retrieves persons by station number.
-	 *
-	 * @param stationNumber The station number to retrieve persons for.
-	 * @return A list of persons covered by the specified station.
-	 */
-	List<Person> getPersonsByStation(String stationNumber);
-
-	/**
 	 * Retrieves phone numbers of persons covered by a specific station.
 	 *
 	 * @param stationNumber The station number to retrieve phone numbers for.
@@ -92,30 +84,11 @@ public interface PersonService {
 	 * Extracts basic information from a person, including name, address, and phone
 	 * number.
 	 *
-	 * @param person The person to extract information from {@link Person}.
-	 * @return A PersonInfo object containing the extracted information
-	 *         {@link PersonInfo}.
-	 */
-	PersonInfo extractNameAddressPhoneInfo(Person person);
-
-	/**
-	 * Extracts basic information from a person, including name, address, and phone
-	 * number.
-	 *
 	 * @param List of person The persons to extract information from {@link Person}.
 	 * @return A list of PersonInfo object containing the extracted information
 	 *         {@link PersonInfo}.
 	 */
 	List<PersonInfo> extractPersonInfos(List<Person> persons);
-
-	/**
-	 * Extracts child information from a person.
-	 *
-	 * @param person The person to extract information from {@link Person}.
-	 * @return A ChildInfo object containing the extracted child information
-	 *         {@link Child}.
-	 */
-	Child extractChildInfo(Person person);
 
 	/**
 	 * Extracts name, address, age, and email information from a person.
@@ -144,7 +117,7 @@ public interface PersonService {
 	 * @return A list of PersonsLastNameInfo objects containing the extracted
 	 *         information {@link PersonsLastNameInfo}.
 	 */
-	List<PersonsLastNameInfo> listOfPersonsFullInfo(String lastName);
+	List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName);
 
 	/**
 	 * Retrieves a list of Child objects from a list of persons.

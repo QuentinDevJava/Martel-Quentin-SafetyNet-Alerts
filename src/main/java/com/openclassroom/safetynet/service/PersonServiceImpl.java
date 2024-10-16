@@ -5,10 +5,8 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,11 +44,6 @@ public class PersonServiceImpl implements PersonService {
 
 	@Override
 	public Person createPerson(Person person) {
-		for (String field : new String[] { person.firstName(), person.firstName(), person.address(), person.city(), person.zip(), person.phone(), person.email() }) {
-			if (Optional.ofNullable(field).map(StringUtils::isBlank).orElse(true)) {
-				throw new IllegalArgumentException("All fields of the person must be filled.");
-			}
-		}
 		List<Person> persons = allPersons();
 		persons.add(person);
 		savePersons(persons);
@@ -105,17 +98,20 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	@Override
-	public PersonInfo extractNameAddressPhoneInfo(Person person) {
+	public List<PersonInfo> extractPersonInfos(List<Person> persons) {
+		return persons.stream().map(this::extractNameAddressAndPhone).toList();
+	}
+
+	private PersonInfo extractNameAddressAndPhone(Person person) {
 		return new PersonInfo(person.firstName(), person.lastName(), person.address(), person.phone());
 	}
 
 	@Override
-	public List<PersonInfo> extractPersonInfos(List<Person> persons) {
-		return persons.stream().map(this::extractNameAddressPhoneInfo).toList();
+	public List<Child> listOfChild(List<Person> personsByAddress) {
+		return personsByAddress.stream().filter(this::isChild).map(this::extractChildInfo).collect(Collectors.toList());
 	}
 
-	@Override
-	public Child extractChildInfo(Person person) {
+	private Child extractChildInfo(Person person) {
 		return new Child(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person));
 	}
 
@@ -129,7 +125,7 @@ public class PersonServiceImpl implements PersonService {
 			LocalDate today = LocalDate.now();
 			return Period.between(birthdate, today).getYears();
 		}
-		return 0;
+		return -1;
 	}
 
 	@Override
@@ -143,29 +139,23 @@ public class PersonServiceImpl implements PersonService {
 		return getPersonsByStation(stationNumber).stream().map(Person::phone).toList();
 	}
 
-	@Override
-	public List<Person> getPersonsByStation(String stationNumber) {
+	private List<Person> getPersonsByStation(String stationNumber) {
 		List<Firestation> firestation = firestationService.findAllByStationNumber(stationNumber);
 		return getPersonsByStationAddress(firestation);
 	}
 
 	@Override
-	public List<PersonsLastNameInfo> listOfPersonsFullInfo(String lastName) {
+	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) {
 		List<Person> persons = allPersons();
-		List<PersonsLastNameInfo> personsFullInfos = new ArrayList<>();
+		List<PersonsLastNameInfo> listOfPersonsByLastName = new ArrayList<>();
 		for (Person person : persons) {
 			if (person.lastName().equals(lastName)) {
-				MedicalRecord medicalRecord = medicalRecordService.findPersonsMedicalRecords(lastName);
-				personsFullInfos.add(extractNameAddressAgeEmailInfo(person, medicalRecord));
+				MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
+				listOfPersonsByLastName.add(extractNameAddressAgeEmailInfo(person, medicalRecord));
 			}
 		}
-		return personsFullInfos;
+		return listOfPersonsByLastName;
 
-	}
-
-	@Override
-	public List<Child> listOfChild(List<Person> personsByAddress) {
-		return personsByAddress.stream().filter(this::isChild).map(this::extractChildInfo).collect(Collectors.toList());
 	}
 
 	private boolean isChild(Person person) {
@@ -175,16 +165,20 @@ public class PersonServiceImpl implements PersonService {
 	@Override
 	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord) {
 		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), getPersonAge(person), medicalRecord.medications(), medicalRecord.allergies());
+	}
 
+	private MedicalRecordInfo getMedicalRecordInfo(Person person) {
+		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
+		return extractBasicInfo(person, medicalRecord);
 	}
 
 	@Override
 	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons) {
-		return persons.stream().map(person -> extractBasicInfo(person, medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName()))).collect(Collectors.toList());
+		return persons.stream().map(this::getMedicalRecordInfo).collect(Collectors.toList());
 	}
 
 	@Override
 	public MedicalRecordInfo getMedicalRecordInfosByPerson(Person person) {
-		return extractBasicInfo(person, medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName()));
+		return getMedicalRecordInfo(person);
 	}
 }
