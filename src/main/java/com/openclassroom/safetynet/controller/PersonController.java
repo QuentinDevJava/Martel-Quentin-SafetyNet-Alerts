@@ -17,6 +17,12 @@ import com.openclassroom.safetynet.service.PersonService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * REST Controller for managing persons data.
+ *
+ * This controller provides endpoints for creating, updating, and deleting
+ * person records.
+ */
 @RestController
 @RequestMapping("/person")
 @Slf4j
@@ -49,9 +55,6 @@ public class PersonController {
 			personService.updatePerson(firstName, lastName, person);
 			log.info("Person successfully updated: {}", person);
 			return new ResponseEntity<>(person, HttpStatus.OK);
-			// TODO no.content methode if (Objects.isNull(XXXXXXX)) tester pour supprimer le
-			// flag
-
 		} catch (Exception e) {
 			log.error("Error updating person with first name: {} and last name: {}", firstName, lastName, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

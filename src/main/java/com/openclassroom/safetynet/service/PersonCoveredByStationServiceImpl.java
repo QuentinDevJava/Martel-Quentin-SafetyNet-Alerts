@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PersonCoveredByStationService {
+public abstract class PersonCoveredByStationServiceImpl implements SearchControllerService {
 
 	private final FirestationService fireStationService;
 	private final PersonService personService;
@@ -29,6 +29,7 @@ public class PersonCoveredByStationService {
 	private final Predicate<Integer> IS_ADULT = age -> age > 18;
 	private final Predicate<Integer> IS_CHILD = age -> age <= 18;
 
+	@Override
 	public PersonCoveredByStation findCoveredPersonsByFireStation(String stationNumber) {
 		log.info("Finding covered persons by fire station {}", stationNumber);
 		List<Firestation> firestations = fireStationService.findAllByStationNumber(stationNumber);

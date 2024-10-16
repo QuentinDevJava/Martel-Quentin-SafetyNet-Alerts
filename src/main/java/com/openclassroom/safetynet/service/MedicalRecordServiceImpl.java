@@ -25,6 +25,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
 	private final JsonRepository repository;
 	private final ObjectMapper objectMapper;
+	private final PersonService personService;
 
 	private List<MedicalRecord> allMedicalRecords() {
 		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream().map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).collect(Collectors.toList());
@@ -92,23 +93,19 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	}
 
 	@Override
-	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons, MedicalRecordService medicalRecordService, PersonService personService) {
-		List<MedicalRecordInfo> medicalRecordInfos = new ArrayList<>();
-		for (Person person : persons) {
-			medicalRecordInfos.add(extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()), medicalRecordService, personService));
-		}
-		return medicalRecordInfos;
+	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons) {
+		return persons.stream().map(person -> extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()))).collect(Collectors.toList());
 	}
 
 	@Override
-	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord, MedicalRecordService medicalRecordService, PersonService personService) {
-		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), personService.getPersonAge(person, medicalRecordService), medicalRecord.medications(), medicalRecord.allergies());
+	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord) {
+		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), personService.getPersonAge(person), medicalRecord.medications(), medicalRecord.allergies());
 
 	}
 
 	@Override
-	public MedicalRecordInfo getMedicalRecordInfosByPerson(Person person, MedicalRecordService medicalRecordService, PersonService personService) {
-		return extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()), medicalRecordService, personService);
+	public MedicalRecordInfo getMedicalRecordInfosByPerson(Person person) {
+		return extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()));
 	}
 
 }

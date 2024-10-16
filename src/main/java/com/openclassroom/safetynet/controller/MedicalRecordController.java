@@ -15,6 +15,12 @@ import com.openclassroom.safetynet.service.MedicalRecordService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * REST Controller for managing medical records data.
+ *
+ * This controller provides endpoints for creating, updating, and deleting
+ * medical records.
+ */
 @RestController
 @Slf4j
 @RequestMapping("/medicalrecord")

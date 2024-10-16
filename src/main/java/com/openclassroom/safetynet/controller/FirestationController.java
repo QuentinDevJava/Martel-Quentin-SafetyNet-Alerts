@@ -16,6 +16,12 @@ import com.openclassroom.safetynet.service.FirestationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * REST Controller for managing firestations data.
+ *
+ * This controller provides endpoints for creating, updating, and deleting
+ * firestation.
+ */
 @RestController
 @Slf4j
 @RequestMapping("/firestation")

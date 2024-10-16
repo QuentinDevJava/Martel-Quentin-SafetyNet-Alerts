@@ -95,7 +95,7 @@ public class PersonServiceImpl implements PersonService {
 
 	@Override
 	public PersonsLastNameInfo extractNameAddressAgeEmailInfo(Person person, MedicalRecord medicalRecord) {
-		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), getPersonAge(person, medicalRecordService), person.email(), medicalRecord.medications(), medicalRecord.allergies());
+		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), getPersonAge(person), person.email(), medicalRecord.medications(), medicalRecord.allergies());
 	}
 
 	@Override
@@ -116,16 +116,11 @@ public class PersonServiceImpl implements PersonService {
 
 	@Override
 	public Child extractChildInfo(Person person) {
-		return new Child(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person, medicalRecordService));
+		return new Child(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person));
 	}
 
-//	@Override
-//	public int CountsNumberOfChildrenAndAdults(List<Person> persons, Predicate<Integer> predicate) {
-//		return (int) persons.stream().map(person -> getPersonAge(person, medicalRecordService)).filter(predicate).count();
-//	}
-
 	@Override
-	public int getPersonAge(Person person, MedicalRecordService medicalRecordService) {
+	public int getPersonAge(Person person) {
 		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
 		if (medicalRecord != null) {
 			String dateString = medicalRecord.birthdate();
@@ -174,6 +169,6 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	private boolean isChild(Person person) {
-		return getPersonAge(person, medicalRecordService) < 18;
+		return getPersonAge(person) < 18;
 	}
 }
