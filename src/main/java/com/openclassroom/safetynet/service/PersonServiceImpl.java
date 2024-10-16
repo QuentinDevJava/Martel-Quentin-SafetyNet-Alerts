@@ -17,6 +17,7 @@ import com.openclassroom.safetynet.exceptions.PersonNotFoundException;
 import com.openclassroom.safetynet.model.Child;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
+import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonInfo;
@@ -30,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 public class PersonServiceImpl implements PersonService {
 
 	private final JsonRepository repository;
-
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
@@ -170,5 +170,21 @@ public class PersonServiceImpl implements PersonService {
 
 	private boolean isChild(Person person) {
 		return getPersonAge(person) < 18;
+	}
+
+	@Override
+	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord) {
+		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), getPersonAge(person), medicalRecord.medications(), medicalRecord.allergies());
+
+	}
+
+	@Override
+	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons) {
+		return persons.stream().map(person -> extractBasicInfo(person, medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName()))).collect(Collectors.toList());
+	}
+
+	@Override
+	public MedicalRecordInfo getMedicalRecordInfosByPerson(Person person) {
+		return extractBasicInfo(person, medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName()));
 	}
 }

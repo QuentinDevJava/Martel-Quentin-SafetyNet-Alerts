@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.exceptions.MedicalRecordNotFoundException;
 import com.openclassroom.safetynet.model.MedicalRecord;
-import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.repository.JsonRepository;
 
@@ -25,7 +24,6 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
 	private final JsonRepository repository;
 	private final ObjectMapper objectMapper;
-	private final PersonService personService;
 
 	private List<MedicalRecord> allMedicalRecords() {
 		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream().map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).collect(Collectors.toList());
@@ -90,22 +88,6 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 	@Override
 	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {
 		return persons.stream().map(p -> getMedicalRecordByFullName(p.firstName(), p.lastName())).filter(Objects::nonNull).toList();
-	}
-
-	@Override
-	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons) {
-		return persons.stream().map(person -> extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()))).collect(Collectors.toList());
-	}
-
-	@Override
-	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord) {
-		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), personService.getPersonAge(person), medicalRecord.medications(), medicalRecord.allergies());
-
-	}
-
-	@Override
-	public MedicalRecordInfo getMedicalRecordInfosByPerson(Person person) {
-		return extractBasicInfo(person, getMedicalRecordByFullName(person.firstName(), person.lastName()));
 	}
 
 }

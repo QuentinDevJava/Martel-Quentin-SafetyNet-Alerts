@@ -15,7 +15,7 @@ import com.openclassroom.safetynet.model.PersonFloodInfo;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.service.PersonService;
-import com.openclassroom.safetynet.service.SearchControllerService;
+import com.openclassroom.safetynet.service.SearchService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-
 public class SearchController {
 
 	private final PersonService personService;
-	private final SearchControllerService searchControllerService;
+	private final SearchService searchControllerService;
 
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam String stationNumber) {

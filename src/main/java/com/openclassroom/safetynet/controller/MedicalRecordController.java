@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,13 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequestMapping("/medicalrecord")
+@RequiredArgsConstructor
 public class MedicalRecordController {
 
 	private final MedicalRecordService medicalRecordService;
-
-	public MedicalRecordController(MedicalRecordService medicalRecordService) {
-		this.medicalRecordService = medicalRecordService;
-	}
 
 	@PostMapping
 	public ResponseEntity<MedicalRecord> createMedicalRecord(@RequestBody MedicalRecord medicalRecord) {

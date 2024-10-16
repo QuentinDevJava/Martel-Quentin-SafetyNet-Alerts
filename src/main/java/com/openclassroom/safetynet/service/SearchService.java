@@ -2,6 +2,8 @@ package com.openclassroom.safetynet.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
@@ -10,7 +12,8 @@ import com.openclassroom.safetynet.model.PersonsAndStationInfo;
  * Interface defining the operations for retrieving information about people for
  * SearchController.
  */
-public interface SearchControllerService {
+@Service
+public interface SearchService {
 
 	/**
 	 * Returns a list of people covered by a given fire station.

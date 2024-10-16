@@ -152,7 +152,7 @@ public class PersonServiceImplTest {
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Boyd")).thenReturn(medicalRecord);
 
 		// Act
-		int age = personServiceImpl.getPersonAge(person, medicalRecordService);
+		int age = personServiceImpl.getPersonAge(person);
 
 		// Assert
 		assertThat(age).isEqualTo(34);
@@ -168,7 +168,7 @@ public class PersonServiceImplTest {
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Boyd")).thenReturn(medicalRecord);
 
 		// Act
-		int age = personServiceImpl.getPersonAge(person, medicalRecordService);
+		int age = personServiceImpl.getPersonAge(person);
 
 		// Assert
 		assertThat(age).isZero();
