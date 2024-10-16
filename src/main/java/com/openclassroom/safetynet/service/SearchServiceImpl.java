@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SearchImpl implements SearchService {
+public class SearchServiceImpl implements SearchService {
 
 	private final FirestationService firestationService;
 	private final PersonService personService;
@@ -67,7 +67,7 @@ public class SearchImpl implements SearchService {
 
 	@Override
 	public PersonCoveredByStation findCoveredPersonsByFireStation(String stationNumber) {
-		List<Firestation> firestations = firestationService.findAllByStationNumber(stationNumber);
+		List<Firestation> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		List<Person> personByStation = personService.getPersonsByStationAddress(firestations);
 		List<PersonInfo> personInfos = personService.extractPersonInfos(personByStation);
 		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);

@@ -69,7 +69,7 @@ public class FirestationServiceImpl implements FirestationService {
 	}
 
 	@Override
-	public List<Firestation> findAllByStationNumber(String stationNumber) {
+	public List<Firestation> findFireStationByStationNumber(String stationNumber) {
 		return allFireStations().stream().filter(f -> f.station().equals(stationNumber)).toList();
 
 	}

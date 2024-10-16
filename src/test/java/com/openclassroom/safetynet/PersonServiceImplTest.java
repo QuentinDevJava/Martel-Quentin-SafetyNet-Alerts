@@ -26,12 +26,12 @@ import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.repository.JsonRepository;
 import com.openclassroom.safetynet.service.FirestationService;
 import com.openclassroom.safetynet.service.MedicalRecordService;
-import com.openclassroom.safetynet.service.PersonServiceImpl;
+import com.openclassroom.safetynet.service.PersonService;
 
 @SpringBootTest
 public class PersonServiceImplTest {
 	@Autowired
-	private PersonServiceImpl personServiceImpl;
+	private PersonService personService;
 
 	@MockBean
 	private FirestationService firestationService;
@@ -50,7 +50,7 @@ public class PersonServiceImplTest {
 
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 		// WHEN
-		List<Person> personsTest = personServiceImpl.getPersonsByAddress("1509 Culver St");
+		List<Person> personsTest = personService.getPersonsByAddress("1509 Culver St");
 		List<Person> personResult = new ArrayList<Person>();
 		personResult.add(persons.get(0));
 
@@ -69,7 +69,7 @@ public class PersonServiceImplTest {
 
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Doe")).thenReturn(new MedicalRecord("John", "Doe", "01/01/1980", medications, allergies));
 
-		PersonsLastNameInfo personsTest = personServiceImpl.extractNameAddressAgeEmailInfo(persons, medicalrecord);
+		PersonsLastNameInfo personsTest = personService.extractNameAddressAgeEmailInfo(persons, medicalrecord);
 
 		assertThat(personsTest).isEqualTo(personResult);
 	}
@@ -83,7 +83,7 @@ public class PersonServiceImplTest {
 
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 
-		PersonEmail personsTest = personServiceImpl.personEmails("Culver");
+		PersonEmail personsTest = personService.personEmails("Culver");
 
 		assertThat(personsTest).isEqualTo(personResult);
 	}
@@ -94,7 +94,7 @@ public class PersonServiceImplTest {
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
 		List<PersonInfo> personResult = Arrays.asList(new PersonInfo("John", "Doe", "1509 Culver St", "841-874-6512"), new PersonInfo("Jane", "Doe", "1509 Culver St", "841-874-6513"));
 
-		List<PersonInfo> personsTest = personServiceImpl.extractPersonInfos(persons);
+		List<PersonInfo> personsTest = personService.extractPersonInfos(persons);
 
 		assertThat(personsTest).isEqualTo(personResult);
 	}
@@ -111,7 +111,7 @@ public class PersonServiceImplTest {
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Doe")).thenReturn(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies));
 		when(medicalRecordService.getMedicalRecordByFullName("Jane", "Doe")).thenReturn(new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
 
-		List<Child> personsTest = personServiceImpl.listOfChild(persons);
+		List<Child> personsTest = personService.listOfChild(persons);
 
 		assertThat(personsTest).isEqualTo(personResult);
 	}
@@ -129,7 +129,7 @@ public class PersonServiceImplTest {
 
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Boyd")).thenReturn(medicalRecord);
 
-		int age = personServiceImpl.getPersonAge(person);
+		int age = personService.getPersonAge(person);
 
 		assertThat(age).isEqualTo(34);
 	}
@@ -142,7 +142,7 @@ public class PersonServiceImplTest {
 
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Boyd")).thenReturn(medicalRecord);
 
-		int age = personServiceImpl.getPersonAge(person);
+		int age = personService.getPersonAge(person);
 
 		assertThat(age).isEqualTo(-1);
 	}
@@ -156,7 +156,7 @@ public class PersonServiceImplTest {
 
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(personResult.get(0), personResult.get(1)));
 
-		List<Person> personsTests = personServiceImpl.getPersonsByStationAddress(firestations);
+		List<Person> personsTests = personService.getPersonsByStationAddress(firestations);
 
 		assertThat(personsTests).isEqualTo(personResult);
 	}
@@ -168,10 +168,10 @@ public class PersonServiceImplTest {
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
 
-		when(firestationService.findAllByStationNumber(stationNumber)).thenReturn(firestations);
+		when(firestationService.findFireStationByStationNumber(stationNumber)).thenReturn(firestations);
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
 
-		List<String> phoneNumbers = personServiceImpl.getPhoneNumbersByStation(stationNumber);
+		List<String> phoneNumbers = personService.getPhoneNumbersByStation(stationNumber);
 
 		assertThat(phoneNumbers).containsExactlyInAnyOrder("841-874-6512", "841-874-6513");
 	}
@@ -190,7 +190,7 @@ public class PersonServiceImplTest {
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Doe")).thenReturn(medicalRecords.get(0));
 		when(medicalRecordService.getMedicalRecordByFullName("Jane", "Doe")).thenReturn(medicalRecords.get(1));
 
-		List<PersonsLastNameInfo> personsTest = personServiceImpl.listOfPersonsByLastName("Doe");
+		List<PersonsLastNameInfo> personsTest = personService.listOfPersonsByLastName("Doe");
 
 		assertThat(personsResult).isEqualTo(personsTest);
 
@@ -210,7 +210,7 @@ public class PersonServiceImplTest {
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Doe")).thenReturn(medicalRecords.get(0));
 		when(medicalRecordService.getMedicalRecordByFullName("Jane", "Doe")).thenReturn(medicalRecords.get(1));
 
-		List<MedicalRecordInfo> personsTest = personServiceImpl.getMedicalRecordInfosByListPersons(persons);
+		List<MedicalRecordInfo> personsTest = personService.getMedicalRecordInfosByListPersons(persons);
 		assertThat(personsResult).isEqualTo(personsTest);
 	}
 
@@ -225,7 +225,7 @@ public class PersonServiceImplTest {
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(person));
 		when(medicalRecordService.getMedicalRecordByFullName("John", "Doe")).thenReturn(medicalRecord);
 
-		MedicalRecordInfo personsTest = personServiceImpl.getMedicalRecordInfosByPerson(person);
+		MedicalRecordInfo personsTest = personService.getMedicalRecordInfosByPerson(person);
 		assertThat(personsResult).isEqualTo(personsTest);
 	}
 

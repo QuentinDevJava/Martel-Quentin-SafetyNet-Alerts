@@ -51,7 +51,7 @@ public interface FirestationService {
 	 * @param stationNumbers The station numbers.
 	 * @return The corresponding fire stations {@link Firestation}.
 	 */
-	List<Firestation> findAllByStationNumber(String stationNumber);
+	List<Firestation> findFireStationByStationNumber(String stationNumber);
 
 	/**
 	 * Returns the list of fire stations corresponding to the given station numbers.

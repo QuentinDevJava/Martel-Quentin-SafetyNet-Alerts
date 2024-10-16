@@ -140,7 +140,7 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	private List<Person> getPersonsByStation(String stationNumber) {
-		List<Firestation> firestation = firestationService.findAllByStationNumber(stationNumber);
+		List<Firestation> firestation = firestationService.findFireStationByStationNumber(stationNumber);
 		return getPersonsByStationAddress(firestation);
 	}
 
