@@ -88,9 +88,9 @@ public class FirestationService {
 	 * @param stationNumbers The station numbers.
 	 * @return The corresponding fire stations {@link Firestation}.
 	 */
-	public List<Firestation> findFireStationByStationNumber(String stationNumber) {
-		return allFireStations().stream().filter(f -> f.station().equals(stationNumber)).toList();
-
+	public List<Firestation> findFireStationByStationNumber(int stationNumber) {
+		return allFireStations().stream().filter(f -> f.stationNumber() == stationNumber) // Use getStationNumber() and compare with ==
+				.toList();
 	}
 
 	/**
@@ -99,8 +99,8 @@ public class FirestationService {
 	 * @param stationNumbers The list of station numbers.
 	 * @return The list of corresponding fire stations {@link Firestation}.
 	 */
-	public List<Firestation> getFirestationByListStationNumber(List<String> stationNumbers) {
-		return allFireStations().stream().filter(firestation -> stationNumbers.contains(firestation.station())).toList();
+	public List<Firestation> getFirestationByListStationNumber(List<Integer> stationNumbers) {
+		return allFireStations().stream().filter(firestation -> stationNumbers.contains(firestation.stationNumber())).toList();
 	}
 
 	/**

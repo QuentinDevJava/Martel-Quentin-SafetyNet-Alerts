@@ -115,7 +115,8 @@ public class PersonService {
 	 * @return A list of {@link PersonCoveredByStation} representing the people
 	 *         covered by the station.
 	 */
-	public PersonCoveredByStation findCoveredPersonsByFireStation(String stationNumber) {
+	public PersonCoveredByStation findCoveredPersonsByFireStation(int stationNumber) {
+
 		List<Firestation> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		List<Person> personByStation = getPersonsByStationAddress(firestations);
 		List<PersonInfo> personInfos = extractPersonInfos(personByStation);
@@ -155,8 +156,8 @@ public class PersonService {
 		List<MedicalRecordInfo> medicalRecordInfos = getMedicalRecordInfosByListPersons(persons);
 		log.debug("Result of getMedicalRecordInfosByPersons for persons found in getPersonsByAddress : {}", medicalRecordInfos);
 		Firestation firestation = firestationService.getFirestationByAddress(address);
-		log.debug("Result of getFirestationByAddress the fire station number associated with address : {} = {} ", address, firestation.station());
-		return new PersonsAndStationInfo(medicalRecordInfos, firestation.station());
+		log.debug("Result of getFirestationByAddress the fire station number associated with address : {} = {} ", address, firestation.stationNumber());
+		return new PersonsAndStationInfo(medicalRecordInfos, firestation.stationNumber());
 	}
 
 	/**
@@ -262,11 +263,11 @@ public class PersonService {
 	 * @param stationNumber The station number to retrieve phone numbers for.
 	 * @return A list of phone numbers of persons covered by the specified station.
 	 */
-	public List<String> getPhoneNumbersByStation(String stationNumber) {
+	public List<String> getPhoneNumbersByStation(int stationNumber) {
 		return getPersonsByStation(stationNumber).stream().map(Person::phone).toList();
 	}
 
-	private List<Person> getPersonsByStation(String stationNumber) {
+	private List<Person> getPersonsByStation(int stationNumber) {
 		List<Firestation> firestation = firestationService.findFireStationByStationNumber(stationNumber);
 		return getPersonsByStationAddress(firestation);
 	}
@@ -346,7 +347,7 @@ public class PersonService {
 	 * @return A {@link PersonFloodInfo} object containing information about the
 	 *         people affected by the flood.
 	 */
-	public PersonFloodInfo floodInfo(List<String> stationNumber) {
+	public PersonFloodInfo floodInfo(List<Integer> stationNumber) {
 		List<Firestation> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = listOfPersonsByAddressByStationNumber(firestations);
 

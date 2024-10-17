@@ -32,10 +32,12 @@ public class SearchController {
 	private final PersonService personService;
 
 	@GetMapping("/firestation")
-	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam String stationNumber) {
+	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam int stationNumber) {
 		log.info("Search for people covered by the fire station N° {}.", stationNumber);
 		try {
 			PersonCoveredByStation personsCovered = personService.findCoveredPersonsByFireStation(stationNumber);
+			// Je verifie ici personsCovered ?
+
 			log.info("Successful retrieval of the list of persons : {}", personsCovered);
 			return ResponseEntity.ok(personsCovered);
 		} catch (Exception e) {
@@ -61,7 +63,7 @@ public class SearchController {
 	}
 
 	@GetMapping("/phoneAlert")
-	public ResponseEntity<List<String>> getPersonsPhoneNumbersByStationNumber(@RequestParam("firestation") String stationNumber) {
+	public ResponseEntity<List<String>> getPersonsPhoneNumbersByStationNumber(@RequestParam("firestation") int stationNumber) {
 		log.info("Search phone numbers by fire station N° {}", stationNumber);
 		try {
 			List<String> phoneNumbers = personService.getPhoneNumbersByStation(stationNumber);
@@ -87,7 +89,7 @@ public class SearchController {
 	}
 
 	@GetMapping("/flood/stations")
-	public ResponseEntity<PersonFloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(@RequestParam("stations") List<String> stationNumber) {
+	public ResponseEntity<PersonFloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(@RequestParam("stations") List<Integer> stationNumber) {
 		log.info("Search for resident information by list of station number : {}.", stationNumber);
 		try {
 			PersonFloodInfo floodInfo = personService.floodInfo(stationNumber);

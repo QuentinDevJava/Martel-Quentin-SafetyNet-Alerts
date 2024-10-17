@@ -29,10 +29,10 @@ public class FirestationServiceTest {
 	@Test
 	void findAllByStationNumber() {
 
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", "1"), new Firestation("1650 Culver St", "1"));
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 1));
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
-		List<Firestation> testFirestations = firestationService.findFireStationByStationNumber("1");
+		List<Firestation> testFirestations = firestationService.findFireStationByStationNumber(1);
 
 		assertThat(testFirestations).isEqualTo(firestations);
 
@@ -41,8 +41,8 @@ public class FirestationServiceTest {
 	@Test
 	void getFirestationByListStationNumber() {
 
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", "1"), new Firestation("1650 Culver St", "2"));
-		List<String> stationNumbers = Arrays.asList("1", "2");
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 2));
+		List<Integer> stationNumbers = Arrays.asList(1, 2);
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
 		List<Firestation> testFirestations = firestationService.getFirestationByListStationNumber(stationNumbers);
@@ -54,8 +54,8 @@ public class FirestationServiceTest {
 	@Test
 	void getFirestationByAddress() {
 
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", "1"), new Firestation("1650 Culver St", "2"));
-		Firestation firestationResult = new Firestation("1509 Culver St", "1");
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 2));
+		Firestation firestationResult = new Firestation("1509 Culver St", 1);
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
 		Firestation testFirestations = firestationService.getFirestationByAddress("1509 Culver St");

@@ -157,7 +157,7 @@ public class PersonServiceTest {
 
 	@Test
 	void testGetPersonsByStationAddress() {
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", "1"), new Firestation("2", "1604 Culver St"));
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1604 Culver St", 2));
 
 		List<Person> personResult = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
@@ -171,7 +171,7 @@ public class PersonServiceTest {
 
 	@Test
 	void testGetPhoneNumbersByStation() {
-		String stationNumber = "1";
+		int stationNumber = 1;
 		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", stationNumber));
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
@@ -247,7 +247,7 @@ public class PersonServiceTest {
 		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies), new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
 		List<MedicalRecordInfo> medicalRecordInfos = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
 				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
-		Firestation firestationResult = new Firestation("1509 Culver St", "1");
+		Firestation firestationResult = new Firestation("1509 Culver St", 1);
 
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
 		when(medicalRecordService.getMedicalRecordByFullName("John Doe")).thenReturn(medicalRecord.get(0));
@@ -255,7 +255,7 @@ public class PersonServiceTest {
 		when(firestationService.getFirestationByAddress(anyString())).thenReturn(firestationResult);
 
 		PersonsAndStationInfo stationInfoTest = personService.getPersonsAndStationInfoByAddress("1509 Culver St");
-		PersonsAndStationInfo personsAndStationInfo = new PersonsAndStationInfo(medicalRecordInfos, firestationResult.station());
+		PersonsAndStationInfo personsAndStationInfo = new PersonsAndStationInfo(medicalRecordInfos, firestationResult.stationNumber());
 
 		assertThat(personsAndStationInfo).isEqualTo(stationInfoTest);
 	}
@@ -268,10 +268,10 @@ public class PersonServiceTest {
 				new Person("Jane", "Doe", "1650 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
 		List<MedicalRecordInfo> medicalRecordInfos = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
 				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", "1"), new Firestation("1650 Culver St", "2"));
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 2));
 		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies), new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
 
-		List<String> stationNumbers = Arrays.asList("1", "2");
+		List<Integer> stationNumbers = Arrays.asList(1, 2);
 		Map<String, List<MedicalRecordInfo>> mapResult = new HashMap<>();
 		List<MedicalRecordInfo> medicalRecordInfos1 = new ArrayList<>();
 		medicalRecordInfos1.add(medicalRecordInfos.get(0));
@@ -304,9 +304,10 @@ public class PersonServiceTest {
 	@Disabled
 	@Test
 	void findCoveredPersonsByFireStation() {
+		int stationNumber = 1;
 
-		PersonCoveredByStation personCoveredByStationResult = personService.findCoveredPersonsByFireStation(null);
-
+		PersonCoveredByStation personCoveredByStationResult = personService.findCoveredPersonsByFireStation(stationNumber);
+		System.out.println(personCoveredByStationResult);
 	}
 
 }
