@@ -222,7 +222,7 @@ public class PersonService {
 	 * @return The age of the person.
 	 */
 	public int getPersonAge(Person person) {
-		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
+		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
 		if (medicalRecord != null) {
 			String dateString = medicalRecord.birthdate();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -284,7 +284,7 @@ public class PersonService {
 		List<PersonsLastNameInfo> listOfPersonsByLastName = new ArrayList<>();
 		for (Person person : persons) {
 			if (person.lastName().equals(lastName)) {
-				MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
+				MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
 				listOfPersonsByLastName.add(extractNameAddressAgeEmailInfo(person, medicalRecord));
 			}
 		}
@@ -310,7 +310,7 @@ public class PersonService {
 	}
 
 	private MedicalRecordInfo getMedicalRecordInfo(Person person) {
-		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.firstName(), person.lastName());
+		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
 		return extractBasicInfo(person, medicalRecord);
 	}
 

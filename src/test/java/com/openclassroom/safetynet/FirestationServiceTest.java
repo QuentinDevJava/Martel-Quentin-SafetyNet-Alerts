@@ -18,7 +18,7 @@ import com.openclassroom.safetynet.service.FirestationService;
 
 @SpringBootTest
 
-public class FirestationServiceImplTest {
+public class FirestationServiceTest {
 
 	@Autowired
 	private FirestationService firestationService;

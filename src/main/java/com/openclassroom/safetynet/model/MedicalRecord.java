@@ -20,5 +20,7 @@ import jakarta.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "firstName", "lastName", "birthdate", "medications", "allergies" })
 public record MedicalRecord(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String birthdate, @NotNull List<String> medications, @NotNull List<String> allergies) {
-
+	public String fullName() {
+		return firstName + " " + lastName;
+	}
 }

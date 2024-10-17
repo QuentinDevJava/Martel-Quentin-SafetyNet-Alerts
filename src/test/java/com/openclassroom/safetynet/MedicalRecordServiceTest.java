@@ -18,7 +18,7 @@ import com.openclassroom.safetynet.repository.JsonRepository;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
 @SpringBootTest
-public class MedicalRecordServiceImplTest {
+public class MedicalRecordServiceTest {
 
 	@Autowired
 	private MedicalRecordService medicalService;
@@ -36,7 +36,7 @@ public class MedicalRecordServiceImplTest {
 		MedicalRecord medicalRecord = new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies);
 
 		when(repository.loadTypeOfData(TypeOfData.MEDICALRECORDS)).thenReturn(Arrays.asList(medicalRecords.get(0), medicalRecords.get(1)));
-		MedicalRecord testMedicalRecord = medicalService.getMedicalRecordByFullName("John", "Doe");
+		MedicalRecord testMedicalRecord = medicalService.getMedicalRecordByFullName("John Doe");
 
 		assertThat(testMedicalRecord).isEqualTo(medicalRecord);
 	}

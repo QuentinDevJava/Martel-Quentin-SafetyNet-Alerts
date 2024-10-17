@@ -3,10 +3,8 @@ package com.openclassroom.safetynet.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,11 +37,6 @@ public class MedicalRecordService {
 	 * @return The created medical record {@link MedicalRecord}.
 	 */
 	public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord) {
-		for (String field : new String[] { medicalRecord.firstName(), medicalRecord.firstName(), medicalRecord.birthdate() }) {
-			if (Optional.ofNullable(field).map(StringUtils::isBlank).orElse(true)) {
-				throw new IllegalArgumentException("All fields of the person must be filled.");
-			}
-		}
 		List<MedicalRecord> medicalRecords = allMedicalRecords();
 		medicalRecords.add(medicalRecord);
 		saveMedicalRecords(medicalRecords);
@@ -61,7 +54,8 @@ public class MedicalRecordService {
 	 * @return The updated medical record {@link MedicalRecord}.
 	 */
 	public MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord) {
-		MedicalRecord existingMedicalRecord = getMedicalRecordByFullName(firstName, lastName);
+		String fullName = firstName + " " + lastName;
+		MedicalRecord existingMedicalRecord = getMedicalRecordByFullName(fullName);
 		if (existingMedicalRecord != null) {
 			List<MedicalRecord> medicalRecords = allMedicalRecords();
 			medicalRecords.set(medicalRecords.indexOf(existingMedicalRecord), medicalRecord);
@@ -105,8 +99,8 @@ public class MedicalRecordService {
 	 * @param lastName  The last name of the person.
 	 * @return The medical record for the specified person {@link MedicalRecord}.
 	 */
-	public MedicalRecord getMedicalRecordByFullName(String firstName, String lastName) {
-		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.firstName().equals(firstName) && medicalRecord.lastName().equals(lastName)).findFirst().orElse(null);
+	public MedicalRecord getMedicalRecordByFullName(String fullName) {
+		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.fullName().equals(fullName)).findFirst().orElse(null);
 	}
 
 	/**
@@ -117,7 +111,7 @@ public class MedicalRecordService {
 	 *         {@link MedicalRecord}.
 	 */
 	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {
-		return persons.stream().map(p -> getMedicalRecordByFullName(p.firstName(), p.lastName())).filter(Objects::nonNull).toList();
+		return persons.stream().map(p -> getMedicalRecordByFullName(p.fullName())).filter(Objects::nonNull).toList();
 	}
 
 }
