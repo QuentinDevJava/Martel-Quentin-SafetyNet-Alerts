@@ -15,13 +15,13 @@ import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.repository.JsonRepository;
-import com.openclassroom.safetynet.service.MedicalRecordServiceImpl;
+import com.openclassroom.safetynet.service.MedicalRecordService;
 
 @SpringBootTest
 public class MedicalRecordServiceImplTest {
 
 	@Autowired
-	private MedicalRecordServiceImpl medicalService;
+	private MedicalRecordService medicalService;
 
 	@MockBean
 	private JsonRepository repository;

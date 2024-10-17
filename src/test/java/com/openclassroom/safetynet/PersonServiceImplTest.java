@@ -1,14 +1,19 @@
 package com.openclassroom.safetynet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,8 +25,11 @@ import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
+import com.openclassroom.safetynet.model.PersonFloodInfo;
 import com.openclassroom.safetynet.model.PersonInfo;
+import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.repository.JsonRepository;
 import com.openclassroom.safetynet.service.FirestationService;
@@ -227,6 +235,78 @@ public class PersonServiceImplTest {
 
 		MedicalRecordInfo personsTest = personService.getMedicalRecordInfosByPerson(person);
 		assertThat(personsResult).isEqualTo(personsTest);
+	}
+
+	// TODO a refactor et verifier depuis la maj de SearchService
+	@Test
+	void testGetPersonsAndStationInfoByAddress() {
+		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
+		List<String> allergies = Arrays.asList("nillacilan");
+		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
+				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
+		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies), new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecordInfo> medicalRecordInfos = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
+				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
+		Firestation firestationResult = new Firestation("1509 Culver St", "1");
+
+		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
+		when(medicalRecordService.getMedicalRecordByFullName("John", "Doe")).thenReturn(medicalRecord.get(0));
+		when(medicalRecordService.getMedicalRecordByFullName("Jane", "Doe")).thenReturn(medicalRecord.get(1));
+		when(firestationService.getFirestationByAddress(anyString())).thenReturn(firestationResult);
+
+		PersonsAndStationInfo stationInfoTest = personService.getPersonsAndStationInfoByAddress("1509 Culver St");
+		PersonsAndStationInfo personsAndStationInfo = new PersonsAndStationInfo(medicalRecordInfos, firestationResult.station());
+
+		assertThat(personsAndStationInfo).isEqualTo(stationInfoTest);
+	}
+
+	@Test
+	void floodInfo() {
+		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
+		List<String> allergies = Arrays.asList("nillacilan");
+		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
+				new Person("Jane", "Doe", "1650 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
+		List<MedicalRecordInfo> medicalRecordInfos = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
+				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", "1"), new Firestation("1650 Culver St", "2"));
+		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies), new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+
+		List<String> stationNumbers = Arrays.asList("1", "2");
+		Map<String, List<MedicalRecordInfo>> mapResult = new HashMap<>();
+		List<MedicalRecordInfo> medicalRecordInfos1 = new ArrayList<>();
+		medicalRecordInfos1.add(medicalRecordInfos.get(0));
+		List<MedicalRecordInfo> medicalRecordInfos2 = new ArrayList<>();
+		medicalRecordInfos2.add(medicalRecordInfos.get(1));
+
+		mapResult.put("1509 Culver St", medicalRecordInfos1);
+		mapResult.put("1650 Culver St", medicalRecordInfos2);
+
+		List<Person> persons1 = new ArrayList<>();
+		persons1.add(persons.get(0));
+		List<Person> persons2 = new ArrayList<>();
+		persons2.add(persons.get(1));
+
+		PersonFloodInfo personFloodInfoResult = new PersonFloodInfo(mapResult);
+		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
+		when(firestationService.getFirestationByListStationNumber(anyList())).thenReturn(firestations);
+		when(medicalRecordService.getMedicalRecordByFullName("John", "Doe")).thenReturn(medicalRecord.get(0));
+		when(medicalRecordService.getMedicalRecordByFullName("Jane", "Doe")).thenReturn(medicalRecord.get(1));
+
+		PersonFloodInfo personFloodInfoTest = personService.floodInfo(stationNumbers);
+
+		System.out.println(personFloodInfoResult);
+
+		System.out.println(personFloodInfoTest);
+
+		assertThat(personFloodInfoTest).isEqualTo(personFloodInfoResult);
+	}
+
+	@Disabled
+	@Test
+	void findCoveredPersonsByFireStation() {
+
+		PersonCoveredByStation personCoveredByStationResult = personService.findCoveredPersonsByFireStation(null);
+
 	}
 
 }

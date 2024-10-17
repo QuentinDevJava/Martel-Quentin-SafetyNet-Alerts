@@ -15,7 +15,6 @@ import com.openclassroom.safetynet.model.PersonFloodInfo;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.service.PersonService;
-import com.openclassroom.safetynet.service.SearchService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 public class SearchController {
 
 	private final PersonService personService;
-	private final SearchService searchControllerService;
 
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam String stationNumber) {
 		log.info("Search for people covered by the fire station N° {}.", stationNumber);
 		try {
-			PersonCoveredByStation personsCovered = searchControllerService.findCoveredPersonsByFireStation(stationNumber);
+			PersonCoveredByStation personsCovered = personService.findCoveredPersonsByFireStation(stationNumber);
 			log.info("Successful retrieval of the list of persons : {}", personsCovered);
 			return ResponseEntity.ok(personsCovered);
 		} catch (Exception e) {
@@ -79,7 +77,7 @@ public class SearchController {
 	public ResponseEntity<PersonsAndStationInfo> getListOfPersonsInfoAndStationNumberByAddress(@RequestParam String address) {
 		log.info("Search for resident information and fire station number by address : {}", address);
 		try {
-			PersonsAndStationInfo personsAndStationInfo = searchControllerService.getPersonsAndStationInfoByAddress(address);
+			PersonsAndStationInfo personsAndStationInfo = personService.getPersonsAndStationInfoByAddress(address);
 			log.info("Successful retrieval of the list of persons, their medical records and the number of the fire station for address : {} = {}", address, personsAndStationInfo);
 			return ResponseEntity.ok(personsAndStationInfo);
 		} catch (Exception e) {
@@ -92,7 +90,7 @@ public class SearchController {
 	public ResponseEntity<PersonFloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(@RequestParam("stations") List<String> stationNumber) {
 		log.info("Search for resident information by list of station number : {}.", stationNumber);
 		try {
-			PersonFloodInfo floodInfo = searchControllerService.floodInfo(stationNumber);
+			PersonFloodInfo floodInfo = personService.floodInfo(stationNumber);
 			log.info("Successful retrieval of the list of persons and their medical records for List of station number : {} = {}", stationNumber, floodInfo);
 			return ResponseEntity.ok(floodInfo);
 		} catch (Exception e) {
