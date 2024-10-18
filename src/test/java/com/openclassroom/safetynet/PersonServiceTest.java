@@ -116,10 +116,11 @@ class PersonServiceTest {
 
 		List<Child> personResult = Arrays.asList(new Child("John", "Doe", "1509 Culver St", "841-874-6512", 10));
 
+		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
 		when(medicalRecordService.getMedicalRecordByFullName("John Doe")).thenReturn(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies));
 		when(medicalRecordService.getMedicalRecordByFullName("Jane Doe")).thenReturn(new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
 
-		List<Child> personsTest = personService.listOfChild(persons);
+		List<Child> personsTest = personService.listOfChild("1509 Culver St");
 
 		assertThat(personsTest).isEqualTo(personResult);
 	}
@@ -293,10 +294,6 @@ class PersonServiceTest {
 		when(medicalRecordService.getMedicalRecordByFullName("Jane Doe")).thenReturn(medicalRecord.get(1));
 
 		PersonFloodInfo personFloodInfoTest = personService.floodInfo(stationNumbers);
-
-		System.out.println(personFloodInfoResult);
-
-		System.out.println(personFloodInfoTest);
 
 		assertThat(personFloodInfoTest).isEqualTo(personFloodInfoResult);
 	}
