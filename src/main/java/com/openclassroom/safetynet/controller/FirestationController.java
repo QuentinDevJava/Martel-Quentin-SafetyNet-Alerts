@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,7 +38,7 @@ public class FirestationController {
 	private final FirestationService firestationService;
 
 	@PostMapping()
-	public ResponseEntity<Firestation> createFirestation(@RequestBody Firestation firestation) {
+	public ResponseEntity<Firestation> createFirestation(@Validated @RequestBody Firestation firestation) {
 		log.info("POST request received for /firestation, adding firestation: {}", firestation);
 		try {
 			Firestation createdFirestation = firestationService.createFirestation(firestation);
@@ -50,7 +51,7 @@ public class FirestationController {
 	}
 
 	@PutMapping("/{address}")
-	public ResponseEntity<Firestation> updateFirestation(@PathVariable String address, @RequestBody Firestation firestation) {
+	public ResponseEntity<Firestation> updateFirestation(@PathVariable String address, @Validated @RequestBody Firestation firestation) {
 		log.info("PUT request received for /firestation/{} updating firestation: {}", address, firestation);
 		try {
 			Firestation updatedFirestation = firestationService.updateFirestation(address, firestation);

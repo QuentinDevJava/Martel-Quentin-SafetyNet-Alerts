@@ -256,7 +256,7 @@ class PersonServiceTest {
 		when(firestationService.getFirestationByAddress(anyString())).thenReturn(firestationResult);
 
 		PersonsAndStationInfo stationInfoTest = personService.getPersonsAndStationInfoByAddress("1509 Culver St");
-		PersonsAndStationInfo personsAndStationInfo = new PersonsAndStationInfo(medicalRecordInfos, firestationResult.stationNumber());
+		PersonsAndStationInfo personsAndStationInfo = new PersonsAndStationInfo(medicalRecordInfos, firestationResult.station());
 
 		assertThat(personsAndStationInfo).isEqualTo(stationInfoTest);
 	}

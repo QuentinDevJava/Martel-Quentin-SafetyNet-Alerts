@@ -186,8 +186,8 @@ public class PersonService {
 		List<MedicalRecordInfo> medicalRecordInfos = getMedicalRecordInfosByListPersons(persons);
 		log.debug("Result of getMedicalRecordInfosByPersons for persons found in getPersonsByAddress : {}", medicalRecordInfos);
 		Firestation firestation = firestationService.getFirestationByAddress(address);
-		log.debug("Result of getFirestationByAddress the fire station number associated with address : {} = {} ", address, firestation.stationNumber());
-		return new PersonsAndStationInfo(medicalRecordInfos, firestation.stationNumber());
+		log.debug("Result of getFirestationByAddress the fire station number associated with address : {} = {} ", address, firestation.station());
+		return new PersonsAndStationInfo(medicalRecordInfos, firestation.station());
 	}
 
 	/**

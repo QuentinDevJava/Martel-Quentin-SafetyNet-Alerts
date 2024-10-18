@@ -10,10 +10,10 @@ import jakarta.validation.constraints.Positive;
 /**
  * Represents a fire station with its address and station number.
  *
- * @param address       The address of the fire station.
- * @param stationNumber The station number of the fire station.
+ * @param address The address of the fire station.
+ * @param station The station number of the fire station.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "address", "station" })
-public record Firestation(@NotBlank String address, @NotNull @Positive int stationNumber) {
+public record Firestation(@NotBlank String address, @NotNull @Positive int station) {
 }
