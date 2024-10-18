@@ -1,23 +1,25 @@
 package com.openclassroom.safetynet.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.exceptions.FirestationNotFoundException;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.repository.JsonRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service defining the operations for managing fire stations.
  */
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FirestationService {
 
@@ -35,10 +37,10 @@ public class FirestationService {
 	 * @return The created fire station {@link Firestation}.
 	 */
 	public Firestation createFirestation(Firestation firestation) {
-
 		List<Firestation> firestations = allFireStations();
 		firestations.add(firestation);
 		saveFirestations(firestations);
+		log.debug("Add firestation {} in allFireStations() : {}", firestation, firestations);
 		return firestation;
 	}
 
@@ -52,12 +54,14 @@ public class FirestationService {
 	public Firestation updateFirestation(String address, Firestation firestation) {
 		Firestation existingFirestation = getFirestationByAddress(address);
 		if (existingFirestation != null) {
+			log.debug("Found existing firestation: {}", existingFirestation);
 			List<Firestation> firestations = allFireStations();
 			firestations.set(firestations.indexOf(existingFirestation), firestation);
+			log.debug("Updated firestation list: {}", firestations);
 			saveFirestations(firestations);
 			return firestation;
 		} else {
-			throw new FirestationNotFoundException("Fire station not found for address: " + address);
+			throw new NoSuchElementException("Firestation with address '" + address + "' not found.");
 		}
 	}
 
@@ -72,10 +76,9 @@ public class FirestationService {
 		boolean firestationsDeleted = firestations.removeIf(f -> f.address().equals(address));
 		if (firestationsDeleted) {
 			saveFirestations(firestations);
-			return true;
-		} else {
-			throw new FirestationNotFoundException("Fire station not found for address: " + address);
+			log.debug("Fire station deleted successfully for {}.", address);
 		}
+		return firestationsDeleted;
 	}
 
 	private void saveFirestations(List<Firestation> firestations) {

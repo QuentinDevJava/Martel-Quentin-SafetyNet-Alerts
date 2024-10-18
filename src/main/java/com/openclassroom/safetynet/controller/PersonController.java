@@ -35,7 +35,7 @@ public class PersonController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Person> addPerson(@Validated @RequestBody Person person) {
+	public ResponseEntity<Person> createPerson(@Validated @RequestBody Person person) {
 		log.info("POST request received for /person, adding person: {}", person);
 		try {
 			personService.createPerson(person);
@@ -50,7 +50,6 @@ public class PersonController {
 	@PutMapping("/{firstName}/{lastName}")
 	public ResponseEntity<Person> updatePerson(@PathVariable String firstName, @PathVariable String lastName, @RequestBody Person person) {
 		log.info("PUT request received for /person/{}/{}", firstName, lastName);
-		log.info("Updating person with details: {}", person);
 		try {
 			personService.updatePerson(firstName, lastName, person);
 			log.info("Person successfully updated: {}", person);
@@ -67,8 +66,6 @@ public class PersonController {
 
 		try {
 			boolean personDeleted = personService.deletePerson(firstName, lastName);
-
-			// TODO if (Objects.isNull(personDeleted)) tester pour supprimer le flag
 
 			if (Boolean.TRUE.equals(personDeleted)) {
 				log.info("Person successfully deleted: firstName: {}, lastName: {}", firstName, lastName);

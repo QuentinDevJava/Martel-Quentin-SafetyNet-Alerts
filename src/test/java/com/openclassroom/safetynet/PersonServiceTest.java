@@ -37,7 +37,7 @@ import com.openclassroom.safetynet.service.MedicalRecordService;
 import com.openclassroom.safetynet.service.PersonService;
 
 @SpringBootTest
-public class PersonServiceTest {
+class PersonServiceTest {
 	@Autowired
 	private PersonService personService;
 

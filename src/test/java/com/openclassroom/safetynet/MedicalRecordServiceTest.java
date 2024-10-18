@@ -18,7 +18,7 @@ import com.openclassroom.safetynet.repository.JsonRepository;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
 @SpringBootTest
-public class MedicalRecordServiceTest {
+class MedicalRecordServiceTest {
 
 	@Autowired
 	private MedicalRecordService medicalService;

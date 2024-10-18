@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.model.Child;
-import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
@@ -36,8 +35,6 @@ public class SearchController {
 		log.info("Search for people covered by the fire station N° {}.", stationNumber);
 		try {
 			PersonCoveredByStation personsCovered = personService.findCoveredPersonsByFireStation(stationNumber);
-			// Je verifie ici personsCovered ?
-
 			log.info("Successful retrieval of the list of persons : {}", personsCovered);
 			return ResponseEntity.ok(personsCovered);
 		} catch (Exception e) {
@@ -50,10 +47,7 @@ public class SearchController {
 	public ResponseEntity<List<Child>> getAllChild(@RequestParam String address) {
 		log.info("Search for children by address : {} ", address);
 		try {
-			List<Person> personsByAddress = personService.getPersonsByAddress(address);
-			log.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
-
-			List<Child> listOfChilds = personService.listOfChild(personsByAddress);
+			List<Child> listOfChilds = personService.listOfChild(address);
 			log.info("Successful retrieval of the children's list : {}", listOfChilds);
 			return ResponseEntity.ok(listOfChilds);
 		} catch (Exception e) {

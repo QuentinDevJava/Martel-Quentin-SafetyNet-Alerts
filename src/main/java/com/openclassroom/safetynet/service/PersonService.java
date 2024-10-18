@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.exceptions.PersonNotFoundException;
 import com.openclassroom.safetynet.model.Child;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
@@ -42,8 +42,8 @@ public class PersonService {
 	private final JsonRepository repository;
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
-	private final Predicate<Integer> IS_ADULT = age -> age > 18;
-	private final Predicate<Integer> IS_CHILD = age -> age <= 18;
+	private final Predicate<Integer> isAdult = age -> age > 18;
+	private final Predicate<Integer> isChild = age -> age <= 18;
 
 	private List<Person> allPersons() {
 		List<Object> personData = repository.loadTypeOfData(TypeOfData.PERSONS);
@@ -61,6 +61,7 @@ public class PersonService {
 		List<Person> persons = allPersons();
 		persons.add(person);
 		savePersons(persons);
+		log.debug("Add person {} in allPersons() : {}", person, persons);
 		return person;
 	}
 
@@ -73,15 +74,22 @@ public class PersonService {
 	 * @return The updated person {@link Person}.
 	 */
 	public Person updatePerson(String firstName, String lastName, Person person) {
-		List<Person> persons = allPersons();
-		for (int i = 0; i < persons.size(); i++) {
-			if (persons.get(i).firstName().equals(firstName) && persons.get(i).lastName().equals(lastName)) {
-				persons.set(i, person);
-				savePersons(persons);
-				return person;
-			}
+		String fullName = firstName + " " + lastName;
+		Person existingPerson = getPersonByFullName(fullName);
+		if (existingPerson != null) {
+			List<Person> persons = allPersons();
+			log.debug("Found existing person: {}", existingPerson);
+			persons.set(persons.indexOf(existingPerson), person);
+			savePersons(persons);
+			log.debug("Updated person list: {}", persons);
+			return person;
+		} else {
+			throw new NoSuchElementException("Person with first name '" + firstName + "' and last name '" + lastName + "' not found.");
 		}
-		throw new PersonNotFoundException("Person with first name '" + firstName + "' and last name '" + lastName + "' not found.");
+	}
+
+	private Person getPersonByFullName(String fullName) {
+		return allPersons().stream().filter(p -> p.fullName().equals(fullName)).findFirst().orElse(null);
 	}
 
 	/**
@@ -92,10 +100,12 @@ public class PersonService {
 	 * @return True if the person was deleted successfully, false otherwise.
 	 */
 	public boolean deletePerson(String firstName, String lastName) {
+		String fullName = firstName + " " + lastName;
 		List<Person> persons = allPersons();
-		boolean personDeleted = persons.removeIf(p -> p.firstName().equals(firstName) && p.lastName().equals(lastName));
+		boolean personDeleted = persons.removeIf(p -> p.fullName().equals(fullName));
 		if (personDeleted) {
 			savePersons(persons);
+			log.debug("Person {} deleted successfully.", fullName);
 		}
 		return personDeleted;
 	}
@@ -105,6 +115,7 @@ public class PersonService {
 		for (Person personObj : listOfPersons) {
 			personData.add(objectMapper.convertValue(personObj, Person.class));
 		}
+		log.debug("Saving persons to repository: {}", personData);
 		repository.saveData(TypeOfData.PERSONS, personData);
 	}
 
@@ -116,22 +127,41 @@ public class PersonService {
 	 *         covered by the station.
 	 */
 	public PersonCoveredByStation findCoveredPersonsByFireStation(int stationNumber) {
-
 		List<Firestation> firestations = firestationService.findFireStationByStationNumber(stationNumber);
+		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {}", stationNumber, firestations);
 		List<Person> personByStation = getPersonsByStationAddress(firestations);
+		log.debug("Result of getPersonsByStationAddress for firestations found in findFireStationByStationNumber : {}", personByStation);
 		List<PersonInfo> personInfos = extractPersonInfos(personByStation);
+		log.debug("Result of extractPersonInfos for persons found in getPersonsByStationAddress : {}", personInfos);
 		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
+		log.debug("Result of getPersonMedicalRecords for persons found in getPersonsByStationAddress : {}", medicalRecords);
 		int adultCount = countAdults(medicalRecords);
+		log.debug("Result of countAdults for medicalRecords found in getPersonMedicalRecords : {}", adultCount);
 		int childCount = countChildren(medicalRecords);
+		log.debug("Result of countChildren for medicalRecords found in getPersonMedicalRecords : {}", childCount);
 		return new PersonCoveredByStation(personInfos, adultCount, childCount);
 	}
 
 	private int countChildren(List<MedicalRecord> medicalRecords) {
-		return (int) medicalRecords.stream().map(this::calculateAge).filter(IS_CHILD).count();
+		return (int) medicalRecords.stream().map(this::calculateAge).filter(isChild).count();
 	}
 
 	private int countAdults(List<MedicalRecord> medicalRecords) {
-		return (int) medicalRecords.stream().map(this::calculateAge).filter(IS_ADULT).count();
+		return (int) medicalRecords.stream().map(this::calculateAge).filter(isAdult).count();
+	}
+
+	/**
+	 * Calculates the age of a person based on their birthdate.
+	 *
+	 * @param person The person to calculate the age for {@link Person}.
+	 * @return The age of the person.
+	 */
+	public int getPersonAge(Person person) {
+		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
+		if (medicalRecord != null) {
+			return calculateAge(medicalRecord);
+		}
+		return -1;
 	}
 
 	private int calculateAge(MedicalRecord medicalRecord) {
@@ -208,30 +238,14 @@ public class PersonService {
 	 * @return A list of Child objects containing the extracted child information
 	 *         {@link Child}.
 	 */
-	public List<Child> listOfChild(List<Person> personsByAddress) {
-		return personsByAddress.stream().filter(this::isChild).map(this::extractChildInfo).collect(Collectors.toList());
+	public List<Child> listOfChild(String address) {
+		List<Person> personsByAddress = getPersonsByAddress(address);
+		log.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
+		return personsByAddress.stream().filter(this::isChild).map(this::extractChildInfo).toList();
 	}
 
 	private Child extractChildInfo(Person person) {
 		return new Child(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person));
-	}
-
-	/**
-	 * Calculates the age of a person based on their birthdate.
-	 *
-	 * @param person The person to calculate the age for {@link Person}.
-	 * @return The age of the person.
-	 */
-	public int getPersonAge(Person person) {
-		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
-		if (medicalRecord != null) {
-			String dateString = medicalRecord.birthdate();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-			LocalDate birthdate = LocalDate.parse(dateString, formatter);
-			LocalDate today = LocalDate.now();
-			return Period.between(birthdate, today).getYears();
-		}
-		return -1;
 	}
 
 	/**
@@ -354,6 +368,14 @@ public class PersonService {
 		return new PersonFloodInfo(medicalRecordsByAddress);
 	}
 
+	/**
+	 * Returns a map of fire station addresses to lists of medical record
+	 * information for people located at those addresses.
+	 *
+	 * @param firestations A list of fire stations {@link Firestation}.
+	 * @return A map where keys are addresses and values are lists of medical record
+	 *         information for people at those addresses.
+	 */
 	public Map<String, List<MedicalRecordInfo>> listOfPersonsByAddressByStationNumber(List<Firestation> firestations) {
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = new HashMap<>();
 		for (Firestation firestation : firestations) {
