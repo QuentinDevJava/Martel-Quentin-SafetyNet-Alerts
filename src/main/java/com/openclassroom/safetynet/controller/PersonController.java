@@ -1,10 +1,16 @@
 
 package com.openclassroom.safetynet.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,7 +54,7 @@ public class PersonController {
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
-	public ResponseEntity<Person> updatePerson(@PathVariable String firstName, @PathVariable String lastName, @RequestBody Person person) {
+	public ResponseEntity<Person> updatePerson(@PathVariable String firstName, @PathVariable String lastName, @Validated @RequestBody Person person) {
 		log.info("PUT request received for /person/{}/{}", firstName, lastName);
 		try {
 			personService.updatePerson(firstName, lastName, person);
@@ -79,5 +85,16 @@ public class PersonController {
 			log.error("Error deleting person with first name: {} and last name: {}", firstName, lastName, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		Map<String, String> errors = new HashMap<>();
+		ex.getBindingResult().getAllErrors().forEach((error) -> {
+			String fieldName = ((FieldError) error).getField();
+			String errorMessage = error.getDefaultMessage();
+			errors.put(fieldName, errorMessage);
+		});
+		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
 }
