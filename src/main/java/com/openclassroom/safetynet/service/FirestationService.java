@@ -73,7 +73,13 @@ public class FirestationService {
 	 */
 	public Boolean deleteFirestation(String address) {
 		List<Firestation> firestations = allFireStations();
-		boolean firestationsDeleted = firestations.removeIf(f -> f.address().equals(address));
+		boolean firestationsDeleted;
+		if (address.length() < 1) {
+			int stationNumber = Integer.parseInt(address);
+			firestationsDeleted = firestations.removeIf(f -> f.station() == stationNumber);
+		} else {
+			firestationsDeleted = firestations.removeIf(f -> f.address().equals(address));
+		}
 		if (firestationsDeleted) {
 			saveFirestations(firestations);
 			log.debug("Fire station deleted successfully for {}.", address);

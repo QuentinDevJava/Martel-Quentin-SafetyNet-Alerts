@@ -63,20 +63,20 @@ public class FirestationController {
 		}
 	}
 
-	@DeleteMapping("/{address}")
-	public ResponseEntity<Void> deleteFirestation(@PathVariable String address) {
-		log.info("DELETE request received for /firestation/{}", address);
+	@DeleteMapping("/{addressOrNum}")
+	public ResponseEntity<Void> deleteFirestation(@PathVariable String addressOrNum) {
+		log.info("DELETE request received for /firestation/{}", addressOrNum);
 		try {
-			Boolean firestationsDeleted = firestationService.deleteFirestation(address);
+			Boolean firestationsDeleted = firestationService.deleteFirestation(addressOrNum);
 			if (Boolean.TRUE.equals(firestationsDeleted)) {
-				log.info("Firestation successfully deleted: {}", address);
+				log.info("Firestation successfully deleted: {}", addressOrNum);
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			} else {
-				log.error("Firestation not found: address: {}", address);
+				log.error("Firestation not found: address: {}", addressOrNum);
 				return ResponseEntity.notFound().build();
 			}
 		} catch (Exception e) {
-			log.error("Error deleting firestation with address: {}", address, e);
+			log.error("Error deleting firestation with address: {}", addressOrNum, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

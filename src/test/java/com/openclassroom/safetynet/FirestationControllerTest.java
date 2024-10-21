@@ -38,7 +38,7 @@ public class FirestationControllerTest {
 	@Test
 	@Order(1)
 	void postFirestationTest() throws Exception {
-		Firestation firestation = new Firestation("1509 Culver St", 10);
+		Firestation firestation = new Firestation("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -62,12 +62,12 @@ public class FirestationControllerTest {
 	@Test
 	@Order(3)
 	void putFirestationTest() throws Exception {
-		Firestation firestation = new Firestation("1509 Culver St", 10);
+		Firestation firestation = new Firestation("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
-		mockMvc.perform(put("/firestation/1509 Culver St").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isOk());
+		mockMvc.perform(put("/firestation/1510 Culver St").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isOk());
 	}
 
 	@Test
@@ -78,13 +78,13 @@ public class FirestationControllerTest {
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
-		mockMvc.perform(put("/firestation/1509 Culver St").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isBadRequest());
+		mockMvc.perform(put("/firestation/1510 Culver St").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	@Order(5)
 	void deleteFirestationErrorTest() throws Exception {
-		mockMvc.perform(delete("/firestation/1509 Culver St")).andDo(print()).andExpect(status().isNoContent());
+		mockMvc.perform(delete("/firestation/1510 Culver St")).andDo(print()).andExpect(status().isNoContent());
 	}
 
 	@Test

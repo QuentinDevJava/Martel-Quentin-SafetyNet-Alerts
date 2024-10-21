@@ -33,7 +33,7 @@ public class JsonRepository {
 		}
 	}
 
-	private Map<String, List<Object>> loadJsonAllData() {
+	public Map<String, List<Object>> loadJsonAllData() {
 		try {
 			return objectMapper.readValue(new File(JsonPath.JSONFILEPATH), new TypeReference<Map<String, List<Object>>>() {
 			});

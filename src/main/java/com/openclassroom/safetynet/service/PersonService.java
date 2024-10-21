@@ -338,7 +338,13 @@ public class PersonService {
 	 *         the medical records {@link MedicalRecordInfo}.
 	 */
 	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons) {
-		return persons.stream().map(this::getMedicalRecordInfo).collect(Collectors.toList());
+		List<MedicalRecordInfo> medicalRecords = new ArrayList<>();
+		for (Person person : persons) {
+			medicalRecords.add(getMedicalRecordInfosByPerson(person));
+		}
+		return medicalRecords;
+
+		// persons.stream().map(this::getMedicalRecordInfo).collect(Collectors.toList());
 	}
 
 	/**

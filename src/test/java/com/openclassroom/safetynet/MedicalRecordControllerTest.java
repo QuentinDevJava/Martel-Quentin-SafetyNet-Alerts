@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -21,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.MedicalRecord;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,67 +32,75 @@ import lombok.RequiredArgsConstructor;
 @AutoConfigureMockMvc
 @RequiredArgsConstructor
 public class MedicalRecordControllerTest {
-
 	@Autowired
 	private MockMvc mockMvc;
+
+	private MedicalRecord medicalRecord;
+
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
 	@Test
 	@Order(1)
-	void postPersonTest() throws Exception {
-		Person persons = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+	void postMedicalRecordnTest() throws Exception {
+		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
+		List<String> allergies = Arrays.asList("nillacilan");
+		medicalRecord = new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(persons);
-		mockMvc.perform(post("/person").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isCreated());
-
+		String requestJson = ow.writeValueAsString(medicalRecord);
+		mockMvc.perform(post("/medicalrecord").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isCreated());
 	}
 
 	@Test
 	@Order(2)
-	void postPersonErrorTest() throws Exception {
-		Person persons = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", null);
+	void postMedicalRecordErrorTest() throws Exception {
+		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
+		List<String> allergies = Arrays.asList("nillacilan");
+		medicalRecord = new MedicalRecord("John", null, "01/01/2014", medications, allergies);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(persons);
-		mockMvc.perform(post("/person").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isBadRequest());
-
+		String requestJson = ow.writeValueAsString(medicalRecord);
+		mockMvc.perform(post("/medicalrecord").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	@Order(3)
-	void putPersonTest() throws Exception {
-		Person persons = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+	void putMedicalRecordTest() throws Exception {
+		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
+		List<String> allergies = Arrays.asList("nillacilan");
+		medicalRecord = new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(persons);
-		mockMvc.perform(put("/person/Johny/Doe").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isOk());
+		String requestJson = ow.writeValueAsString(medicalRecord);
+		mockMvc.perform(put("/medicalrecord/John/Doe").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isOk());
 	}
 
 	@Test
 	@Order(4)
-	void putPersonErrorTest() throws Exception {
-		Person persons = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", null);
+	void putMedicalRecordErrorTest() throws Exception {
+		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
+		List<String> allergies = Arrays.asList("nillacilan");
+		medicalRecord = new MedicalRecord("John", null, "01/01/2014", medications, allergies);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(persons);
-		mockMvc.perform(put("/person/Johny/Doe").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isBadRequest());
+		String requestJson = ow.writeValueAsString(medicalRecord);
+		mockMvc.perform(put("/medicalrecord/John/Doe").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andDo(print()).andExpect(status().isBadRequest());
 	}
 
 	@Test
 	@Order(5)
-	void deletePersonErrorTest() throws Exception {
-		mockMvc.perform(delete("/person/Johny/Doe")).andDo(print()).andExpect(status().isNoContent());
+	void deleteMedicalRecordErrorTest() throws Exception {
+		mockMvc.perform(delete("/medicalrecord/John/Doe")).andDo(print()).andExpect(status().isNoContent());
 	}
 
 	@Test
 	@Order(6)
-	void deletePersonNoFoundTest() throws Exception {
-		mockMvc.perform(delete("/person/Johny/nofound")).andDo(print()).andExpect(status().isNotFound());
+	void deleteMedicalRecordNoFoundTest() throws Exception {
+		mockMvc.perform(delete("/medicalrecord/John/nofound")).andDo(print()).andExpect(status().isNotFound());
 	}
 
 }
