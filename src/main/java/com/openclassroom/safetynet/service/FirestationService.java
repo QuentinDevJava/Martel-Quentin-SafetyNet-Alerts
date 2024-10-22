@@ -1,7 +1,6 @@
 package com.openclassroom.safetynet.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -53,16 +52,12 @@ public class FirestationService {
 	 */
 	public Firestation updateFirestation(String address, Firestation firestation) {
 		Firestation existingFirestation = getFirestationByAddress(address);
-		if (existingFirestation != null) {
-			log.debug("Found existing firestation: {}", existingFirestation);
-			List<Firestation> firestations = allFireStations();
-			firestations.set(firestations.indexOf(existingFirestation), firestation);
-			log.debug("Updated firestation list: {}", firestations);
-			saveFirestations(firestations);
-			return firestation;
-		} else {
-			throw new NoSuchElementException("Firestation with address '" + address + "' not found.");
-		}
+		log.debug("Found existing firestation: {}", existingFirestation);
+		List<Firestation> firestations = allFireStations();
+		firestations.set(firestations.indexOf(existingFirestation), firestation);
+		log.debug("Updated firestation list: {}", firestations);
+		saveFirestations(firestations);
+		return firestation;
 	}
 
 	/**
@@ -74,7 +69,7 @@ public class FirestationService {
 	public Boolean deleteFirestation(String address) {
 		List<Firestation> firestations = allFireStations();
 		boolean firestationsDeleted;
-		if (address.length() < 1) {
+		if (address.length() <= 2) {
 			int stationNumber = Integer.parseInt(address);
 			firestationsDeleted = firestations.removeIf(f -> f.station() == stationNumber);
 		} else {

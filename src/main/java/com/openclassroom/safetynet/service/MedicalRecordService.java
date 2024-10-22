@@ -2,7 +2,6 @@ package com.openclassroom.safetynet.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -59,16 +58,12 @@ public class MedicalRecordService {
 	public MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord) {
 		String fullName = firstName + " " + lastName;
 		MedicalRecord existingMedicalRecord = getMedicalRecordByFullName(fullName);
-		if (existingMedicalRecord != null) {
-			log.debug("Found existing medical record for: {} = {}", fullName, existingMedicalRecord);
-			List<MedicalRecord> medicalRecords = allMedicalRecords();
-			medicalRecords.set(medicalRecords.indexOf(existingMedicalRecord), medicalRecord);
-			saveMedicalRecords(medicalRecords);
-			log.debug("Updated medical record list with {} = {}", medicalRecord, medicalRecords);
-			return medicalRecord;
-		} else {
-			throw new NoSuchElementException("Medical record not updated beacause is not found for " + firstName + " " + lastName);
-		}
+		log.debug("Found existing medical record for: {} = {}", fullName, existingMedicalRecord);
+		List<MedicalRecord> medicalRecords = allMedicalRecords();
+		medicalRecords.set(medicalRecords.indexOf(existingMedicalRecord), medicalRecord);
+		saveMedicalRecords(medicalRecords);
+		log.debug("Updated medical record list with {} = {}", medicalRecord, medicalRecords);
+		return medicalRecord;
 	}
 
 	/**

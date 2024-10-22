@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -76,16 +75,12 @@ public class PersonService {
 	public Person updatePerson(String firstName, String lastName, Person person) {
 		String fullName = firstName + " " + lastName;
 		Person existingPerson = getPersonByFullName(fullName);
-		if (existingPerson != null) {
-			List<Person> persons = allPersons();
-			log.debug("Found existing person: {}", existingPerson);
-			persons.set(persons.indexOf(existingPerson), person);
-			savePersons(persons);
-			log.debug("Updated person list: {}", persons);
-			return person;
-		} else {
-			throw new NoSuchElementException("Person with first name '" + firstName + "' and last name '" + lastName + "' not found.");
-		}
+		List<Person> persons = allPersons();
+		log.debug("Found existing person: {}", existingPerson);
+		persons.set(persons.indexOf(existingPerson), person);
+		savePersons(persons);
+		log.debug("Updated person list: {}", persons);
+		return person;
 	}
 
 	private Person getPersonByFullName(String fullName) {

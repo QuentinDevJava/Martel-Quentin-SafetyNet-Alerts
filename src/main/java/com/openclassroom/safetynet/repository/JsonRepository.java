@@ -27,7 +27,7 @@ public class JsonRepository {
 		Map<String, List<Object>> jsonData = loadJsonAllData();
 		jsonData.put(typeOfData.getJsonKey(), data);
 		try {
-			objectMapper.writeValue(new File(JsonPath.JSONFILEPATH), jsonData);
+			objectMapper.writeValue(new File(getJsonFilePath()), jsonData);
 		} catch (IOException e) {
 			throw new DataSavingException("Error saving data: " + e.getMessage());
 		}
@@ -35,7 +35,7 @@ public class JsonRepository {
 
 	public Map<String, List<Object>> loadJsonAllData() {
 		try {
-			return objectMapper.readValue(new File(JsonPath.JSONFILEPATH), new TypeReference<Map<String, List<Object>>>() {
+			return objectMapper.readValue(new File(getJsonFilePath()), new TypeReference<Map<String, List<Object>>>() {
 			});
 		} catch (Exception e) {
 			throw new DataLoadingException("Error loading data: " + e.getMessage());
@@ -47,4 +47,11 @@ public class JsonRepository {
 		return data.getOrDefault(typeOfData.getJsonKey(), new ArrayList<>());
 	}
 
+	private String getJsonFilePath() {
+		if (System.getProperty("test.mode") != null && System.getProperty("test.mode").equals("true")) {
+			return JsonPath.JSONTESTFILEPATH;
+		} else {
+			return JsonPath.JSONFILEPATH;
+		}
+	}
 }

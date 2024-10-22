@@ -7,6 +7,6 @@ public class JsonPath {
 	}
 
 	public static final String JSONFILEPATH = "src/main/resources/data.json";
-	public static final String JSONTESTFILEPATH = "src/main/resources/dataTest.json";
+	public static final String JSONTESTFILEPATH = "src/test/resources/dataTest.json";
 
 }
