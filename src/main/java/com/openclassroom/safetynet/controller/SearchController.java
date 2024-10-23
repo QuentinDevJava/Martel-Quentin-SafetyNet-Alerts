@@ -48,9 +48,9 @@ public class SearchController {
 	public ResponseEntity<List<Child>> getAllChild(@RequestParam String address) {
 		log.info("Search for children by address : {} ", address);
 		try {
-			List<Child> listOfChilds = personService.listOfChild(address);
-			log.info("Successful retrieval of the children's list : {}", listOfChilds);
-			return ResponseEntity.ok(listOfChilds);
+			List<Child> childs = personService.listOfChild(address);
+			log.info("Successful retrieval of the children's list : {}", childs);
+			return ResponseEntity.ok(childs);
 		} catch (Exception e) {
 			log.error("Error children's list not found for this address : {}", address, e);
 			return ResponseEntity.notFound().build();
@@ -75,7 +75,8 @@ public class SearchController {
 		log.info("Search for resident information and fire station number by address : {}", address);
 		try {
 			PersonsAndStationInfo personsAndStationInfo = personService.getPersonsAndStationInfoByAddress(address);
-			log.info("Successful retrieval of the list of persons, their medical records and the number of the fire station for address : {} = {}", address, personsAndStationInfo);
+			log.info("Successful retrieval of the list of persons, their medical records and the number of the fire station for address : {} = {}",
+					address, personsAndStationInfo);
 			return ResponseEntity.ok(personsAndStationInfo);
 		} catch (Exception e) {
 			log.error("Error in returning list of persons, their medical records and fire station number for address : {}.", address, e);
@@ -84,11 +85,13 @@ public class SearchController {
 	}
 
 	@GetMapping("/flood/stations")
-	public ResponseEntity<PersonFloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(@RequestParam("stations") List<Integer> stationNumber) {
+	public ResponseEntity<PersonFloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(
+			@RequestParam("stations") List<Integer> stationNumber) {
 		log.info("Search for resident information by list of station number : {}.", stationNumber);
 		try {
 			PersonFloodInfo floodInfo = personService.floodInfo(stationNumber);
-			log.info("Successful retrieval of the list of persons and their medical records for List of station number : {} = {}", stationNumber, floodInfo);
+			log.info("Successful retrieval of the list of persons and their medical records for List of station number : {} = {}", stationNumber,
+					floodInfo);
 			return ResponseEntity.ok(floodInfo);
 		} catch (Exception e) {
 			log.error("Error fire station N°{} is not found.", stationNumber, e);

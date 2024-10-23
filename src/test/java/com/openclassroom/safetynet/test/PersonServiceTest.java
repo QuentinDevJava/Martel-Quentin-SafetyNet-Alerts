@@ -53,7 +53,8 @@ class PersonServiceTest {
 	void testGetPersonsByAddress() {
 		// GIVEN
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
-				new Person("Jane", "Doe", "1510 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"), new Person("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com"));
+				new Person("Jane", "Doe", "1510 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"),
+				new Person("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com"));
 
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 		// WHEN
@@ -74,7 +75,8 @@ class PersonServiceTest {
 
 		PersonsLastNameInfo personResult = new PersonsLastNameInfo("John", "Doe", "1509 Culver St", 44, "jaboyd@email.com", medications, allergies);
 
-		when(medicalRecordService.getMedicalRecordByFullName("John Doe")).thenReturn(new MedicalRecord("John", "Doe", "01/01/1980", medications, allergies));
+		when(medicalRecordService.getMedicalRecordByFullName("John Doe"))
+				.thenReturn(new MedicalRecord("John", "Doe", "01/01/1980", medications, allergies));
 
 		PersonsLastNameInfo personsTest = personService.extractNameAddressAgeEmailInfo(persons, medicalrecord);
 
@@ -84,7 +86,8 @@ class PersonServiceTest {
 	@Test
 	void testPersonEmails() throws NoSuchElementException {
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
-				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"), new Person("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com"));
+				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"),
+				new Person("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com"));
 		List<String> emails = Arrays.asList("jaboyd@email.com", "jdoe@email.com", "jdin@email.com");
 		PersonEmail personResult = new PersonEmail(emails);
 
@@ -99,11 +102,12 @@ class PersonServiceTest {
 	void testExtractNameAddressPhoneInfo() {
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-		List<PersonInfo> personResult = Arrays.asList(new PersonInfo("John", "Doe", "1509 Culver St", "841-874-6512"), new PersonInfo("Jane", "Doe", "1509 Culver St", "841-874-6513"));
+		List<PersonInfo> personResult = Arrays.asList(new PersonInfo("John", "Doe", "1509 Culver St", "841-874-6512"),
+				new PersonInfo("Jane", "Doe", "1509 Culver St", "841-874-6513"));
 
 		List<PersonInfo> personsTest = personService.extractPersonInfos(persons);
 
-		assertThat(personsTest).isEqualTo(personResult);
+		assertThat(personResult).isEqualTo(personsTest);
 	}
 
 	@Test
@@ -116,12 +120,14 @@ class PersonServiceTest {
 		List<Child> personResult = Arrays.asList(new Child("John", "Doe", "1509 Culver St", "841-874-6512", 10));
 
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
-		when(medicalRecordService.getMedicalRecordByFullName("John Doe")).thenReturn(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies));
-		when(medicalRecordService.getMedicalRecordByFullName("Jane Doe")).thenReturn(new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		when(medicalRecordService.getMedicalRecordByFullName("John Doe"))
+				.thenReturn(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies));
+		when(medicalRecordService.getMedicalRecordByFullName("Jane Doe"))
+				.thenReturn(new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
 
 		List<Child> personsTest = personService.listOfChild("1509 Culver St");
 
-		assertThat(personsTest).isEqualTo(personResult);
+		assertThat(personResult).isEqualTo(personsTest);
 	}
 
 	@Test
@@ -175,9 +181,12 @@ class PersonServiceTest {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
-				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"), new Person("Jack", "Nanar", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-		List<MedicalRecord> medicalRecords = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies), new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
-		List<PersonsLastNameInfo> personsResult = Arrays.asList(new PersonsLastNameInfo("John", "Doe", "1509 Culver St", 10, "jaboyd@email.com", medications, allergies),
+				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"),
+				new Person("Jack", "Nanar", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
+		List<MedicalRecord> medicalRecords = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<PersonsLastNameInfo> personsResult = Arrays.asList(
+				new PersonsLastNameInfo("John", "Doe", "1509 Culver St", 10, "jaboyd@email.com", medications, allergies),
 				new PersonsLastNameInfo("Jane", "Doe", "1509 Culver St", 24, "jdoe@email.com", medications, allergies));
 
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
@@ -196,7 +205,8 @@ class PersonServiceTest {
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-		List<MedicalRecord> medicalRecords = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies), new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecord> medicalRecords = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
 		List<MedicalRecordInfo> personsResult = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
 				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
 
@@ -230,7 +240,8 @@ class PersonServiceTest {
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies), new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
 		List<MedicalRecordInfo> medicalRecordInfos = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
 				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
 		Firestation firestationResult = new Firestation("1509 Culver St", 1);
@@ -255,7 +266,8 @@ class PersonServiceTest {
 		List<MedicalRecordInfo> medicalRecordInfos = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
 				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
 		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 2));
-		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies), new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
 
 		List<Integer> stationNumbers = Arrays.asList(1, 2);
 		Map<String, List<MedicalRecordInfo>> mapResult = new HashMap<>();

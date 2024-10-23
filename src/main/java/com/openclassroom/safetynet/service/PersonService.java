@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -42,8 +41,6 @@ public class PersonService {
 	private final JsonRepository repository;
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
-	private final Predicate<Integer> isAdult = age -> age > 18;
-	private final Predicate<Integer> isChild = age -> age <= 18;
 
 	private List<Person> allPersons() {
 		List<Object> personData = repository.loadTypeOfData(TypeOfData.PERSONS);
@@ -132,27 +129,10 @@ public class PersonService {
 		List<Person> personByStation = getPersonsByStationAddress(firestations);
 		log.debug("Result of getPersonsByStationAddress for firestations found in findFireStationByStationNumber : {}", personByStation);
 
-		// -------------------------------------------------------------
-		List<PersonInfo> personInfos = extractPersonInfos(personByStation);
-		log.debug("Result of extractPersonInfos for persons found in getPersonsByStationAddress : {}", personInfos);
-
 		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
 		log.debug("Result of getPersonMedicalRecords for persons found in getPersonsByStationAddress : {}", medicalRecords);
-		int adultCount = countAdults(medicalRecords);
-		log.debug("Result of countAdults for medicalRecords found in getPersonMedicalRecords : {}", adultCount);
-		int childCount = countChildren(medicalRecords);
-		log.debug("Result of countChildren for medicalRecords found in getPersonMedicalRecords : {}", childCount);
-		// -------------------------------------------------------------
 
-		return new PersonCoveredByStation(personInfos, adultCount, childCount);
-	}
-
-	private int countChildren(List<MedicalRecord> medicalRecords) {
-		return (int) medicalRecords.stream().map(this::calculateAge).filter(isChild).count();
-	}
-
-	private int countAdults(List<MedicalRecord> medicalRecords) {
-		return (int) medicalRecords.stream().map(this::calculateAge).filter(isAdult).count();
+		return PersonCoveredByStation.of(personByStation, medicalRecords);
 	}
 
 	/**
@@ -240,7 +220,8 @@ public class PersonService {
 	 *         {@link PersonsLastNameInfo}.
 	 */
 	public PersonsLastNameInfo extractNameAddressAgeEmailInfo(Person person, MedicalRecord medicalRecord) {
-		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), getPersonAge(person), person.email(), medicalRecord.medications(), medicalRecord.allergies());
+		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), getPersonAge(person), person.email(),
+				medicalRecord.medications(), medicalRecord.allergies());
 	}
 
 	/**
@@ -254,15 +235,10 @@ public class PersonService {
 	 */
 	public List<Child> listOfChild(String address) throws NoSuchElementException {
 		List<Person> personsByAddress = getPersonsByAddress(address);
-		log.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
 		if (personsByAddress.isEmpty()) {
 			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
 		}
-		return personsByAddress.stream().filter(this::isChild).map(this::extractChildInfo).toList();
-	}
-
-	private Child extractChildInfo(Person person) {
-		return new Child(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person));
+		return personsByAddress.stream().filter(person -> getPersonAge(person) <= 18).map(p -> new Child(p, this)).toList();
 	}
 
 	/**
@@ -332,10 +308,6 @@ public class PersonService {
 
 	}
 
-	private boolean isChild(Person person) {
-		return getPersonAge(person) < 18;
-	}
-
 	/**
 	 * Extracts basic information from a person's medical record.
 	 *
@@ -346,7 +318,8 @@ public class PersonService {
 	 *         medical record {@link MedicalRecordInfo}.
 	 */
 	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord) {
-		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), getPersonAge(person), medicalRecord.medications(), medicalRecord.allergies());
+		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), getPersonAge(person), medicalRecord.medications(),
+				medicalRecord.allergies());
 	}
 
 	private MedicalRecordInfo getMedicalRecordInfo(Person person) {
@@ -391,7 +364,8 @@ public class PersonService {
 		List<Firestation> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = listOfPersonsByAddressByStationNumber(firestations);
 		if (medicalRecordsByAddress.values().isEmpty()) {
-			throw new NoSuchElementException("The information about the people affected by the flood for the fire stations number : " + stationNumber + " cannot be found.");
+			throw new NoSuchElementException(
+					"The information about the people affected by the flood for the fire stations number : " + stationNumber + " cannot be found.");
 		}
 		return new PersonFloodInfo(medicalRecordsByAddress);
 	}

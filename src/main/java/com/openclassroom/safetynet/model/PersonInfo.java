@@ -11,6 +11,10 @@ import jakarta.validation.constraints.Pattern;
  * @param address   The address of the person.
  * @param phone     The phone number of the person in the format "XXX-XXX-XXXX".
  */
-public record PersonInfo(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String address, @NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone) {
+public record PersonInfo(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String address,
+		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone) {
+	public PersonInfo(Person person) {
+		this(person.firstName(), person.lastName(), person.address(), person.phone());
 
+	}
 }
