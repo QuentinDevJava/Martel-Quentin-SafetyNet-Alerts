@@ -1,14 +1,10 @@
 package com.openclassroom.safetynet.service;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -20,6 +16,7 @@ import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.PersonCoveredByFireStation;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
@@ -42,8 +39,6 @@ public class PersonService {
 	private final JsonRepository repository;
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
-	private final Predicate<Integer> isAdult = age -> age > 18;
-	private final Predicate<Integer> isChild = age -> age <= 18;
 
 	private List<Person> allPersons() {
 		List<Object> personData = repository.loadTypeOfData(TypeOfData.PERSONS);
@@ -123,7 +118,7 @@ public class PersonService {
 	 *         covered by the station.
 	 * @throws NoSuchElementException
 	 */
-	public PersonCoveredByStation findCoveredPersonsByFireStation(int stationNumber) throws NoSuchElementException {
+	public PersonCoveredByFireStation findCoveredPersonsByFireStation(int stationNumber) throws NoSuchElementException {
 		List<Firestation> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {}", stationNumber, firestations);
 		if (firestations.isEmpty()) {
@@ -131,51 +126,11 @@ public class PersonService {
 		}
 		List<Person> personByStation = getPersonsByStationAddress(firestations);
 		log.debug("Result of getPersonsByStationAddress for firestations found in findFireStationByStationNumber : {}", personByStation);
-
-		// -------------------------------------------------------------
-		List<PersonInfo> personInfos = extractPersonInfos(personByStation);
-		log.debug("Result of extractPersonInfos for persons found in getPersonsByStationAddress : {}", personInfos);
-
 		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
 		log.debug("Result of getPersonMedicalRecords for persons found in getPersonsByStationAddress : {}", medicalRecords);
-		int adultCount = countAdults(medicalRecords);
-		log.debug("Result of countAdults for medicalRecords found in getPersonMedicalRecords : {}", adultCount);
-		int childCount = countChildren(medicalRecords);
-		log.debug("Result of countChildren for medicalRecords found in getPersonMedicalRecords : {}", childCount);
-		// -------------------------------------------------------------
-
-		return new PersonCoveredByStation(personInfos, adultCount, childCount);
+		return new PersonCoveredByFireStation(personByStation, medicalRecords);
 	}
 
-	private int countChildren(List<MedicalRecord> medicalRecords) {
-		return (int) medicalRecords.stream().map(this::calculateAge).filter(isChild).count();
-	}
-
-	private int countAdults(List<MedicalRecord> medicalRecords) {
-		return (int) medicalRecords.stream().map(this::calculateAge).filter(isAdult).count();
-	}
-
-	/**
-	 * Calculates the age of a person based on their birthdate.
-	 *
-	 * @param person The person to calculate the age for {@link Person}.
-	 * @return The age of the person.
-	 */
-	public int getPersonAge(Person person) {
-		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
-		if (medicalRecord != null) {
-			return calculateAge(medicalRecord);
-		}
-		return -1;
-	}
-
-	private int calculateAge(MedicalRecord medicalRecord) {
-		String dateString = medicalRecord.birthdate();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-		LocalDate birthdate = LocalDate.parse(dateString, formatter);
-		LocalDate today = LocalDate.now();
-		return Period.between(birthdate, today).getYears();
-	}
 
 	/**
 	 * Returns information about the people and fire station associated with a given
@@ -240,7 +195,7 @@ public class PersonService {
 	 *         {@link PersonsLastNameInfo}.
 	 */
 	public PersonsLastNameInfo extractNameAddressAgeEmailInfo(Person person, MedicalRecord medicalRecord) {
-		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), getPersonAge(person), person.email(), medicalRecord.medications(), medicalRecord.allergies());
+		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), medicalRecordService.getPersonAge(person), person.email(), medicalRecord.medications(), medicalRecord.allergies());
 	}
 
 	/**
@@ -262,7 +217,7 @@ public class PersonService {
 	}
 
 	private Child extractChildInfo(Person person) {
-		return new Child(person.firstName(), person.lastName(), person.address(), person.phone(), getPersonAge(person));
+		return new Child(person.firstName(), person.lastName(), person.address(), person.phone(), medicalRecordService.getPersonAge(person));
 	}
 
 	/**
@@ -332,9 +287,6 @@ public class PersonService {
 
 	}
 
-	private boolean isChild(Person person) {
-		return getPersonAge(person) < 18;
-	}
 
 	/**
 	 * Extracts basic information from a person's medical record.
@@ -346,12 +298,15 @@ public class PersonService {
 	 *         medical record {@link MedicalRecordInfo}.
 	 */
 	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord) {
-		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), getPersonAge(person), medicalRecord.medications(), medicalRecord.allergies());
+		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), medicalRecordService.getPersonAge(person), medicalRecord.medications(), medicalRecord.allergies());
 	}
 
 	private MedicalRecordInfo getMedicalRecordInfo(Person person) {
 		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
 		return extractBasicInfo(person, medicalRecord);
+	}
+	private boolean isChild(Person person) {
+		return medicalRecordService.getPersonAge(person) < 18;
 	}
 
 	/**

@@ -1,5 +1,8 @@
 package com.openclassroom.safetynet.service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -114,5 +117,29 @@ public class MedicalRecordService {
 	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {
 		return persons.stream().map(p -> getMedicalRecordByFullName(p.fullName())).filter(Objects::nonNull).toList();
 	}
+	
+	/**
+	 * Calculates the age of a person based on their birthdate.
+	 *
+	 * @param person The person to calculate the age for {@link Person}.
+	 * @return The age of the person.
+	 */
+	public int getPersonAge(Person person) {
+		MedicalRecord medicalRecord = getMedicalRecordByFullName(person.fullName());
+		if (medicalRecord != null) {
+			return getAge(medicalRecord);
+		}
+		return -1;
+	}
 
+	private int getAge(MedicalRecord medicalRecord) {
+		String dateString = medicalRecord.birthdate();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		LocalDate birthdate = LocalDate.parse(dateString, formatter);
+		LocalDate today = LocalDate.now();
+		return Period.between(birthdate, today).getYears();
+	}
+
+
+	
 }

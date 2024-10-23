@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.model.Child;
+import com.openclassroom.safetynet.model.PersonCoveredByFireStation;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
@@ -32,10 +33,10 @@ public class SearchController {
 	private final PersonService personService;
 
 	@GetMapping("/firestation")
-	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam int stationNumber) {
+	public ResponseEntity<PersonCoveredByFireStation> getPersonsByStationNumber(@RequestParam int stationNumber) {
 		log.info("Search for people covered by the fire station N° {}.", stationNumber);
 		try {
-			PersonCoveredByStation personsCovered = personService.findCoveredPersonsByFireStation(stationNumber);
+			PersonCoveredByFireStation personsCovered = personService.findCoveredPersonsByFireStation(stationNumber);
 			log.info("Successful retrieval of the list of persons : {}", personsCovered);
 			return ResponseEntity.ok(personsCovered);
 		} catch (Exception e) {

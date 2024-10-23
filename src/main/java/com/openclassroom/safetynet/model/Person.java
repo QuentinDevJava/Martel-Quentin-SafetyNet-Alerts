@@ -25,4 +25,9 @@ public record Person(@NotBlank String firstName, @NotBlank String lastName, @Not
 	public String fullName() {
 		return firstName + " " + lastName;
 	}
+
+	public PersonInfo extractNameAddressAndPhone(Person person) {
+		
+		return new PersonInfo(person.firstName(), person.lastName(), person.address(), person.phone());
+	}
 }

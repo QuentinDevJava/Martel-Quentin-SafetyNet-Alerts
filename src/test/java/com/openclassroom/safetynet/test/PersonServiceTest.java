@@ -137,7 +137,7 @@ class PersonServiceTest {
 
 		when(medicalRecordService.getMedicalRecordByFullName("John Boyd")).thenReturn(medicalRecord);
 
-		int age = personService.getPersonAge(person);
+		int age = medicalRecordService.getPersonAge(person);
 
 		assertThat(age).isEqualTo(34);
 	}
@@ -150,7 +150,7 @@ class PersonServiceTest {
 
 		when(medicalRecordService.getMedicalRecordByFullName("John Boyd")).thenReturn(medicalRecord);
 
-		int age = personService.getPersonAge(person);
+		int age = medicalRecordService.getPersonAge(person);
 
 		assertThat(age).isEqualTo(-1);
 	}
@@ -223,7 +223,7 @@ class PersonServiceTest {
 		assertThat(personsResult).isEqualTo(personsTest);
 	}
 
-	// TODO a refactor et verifier depuis la maj de SearchService
+	// TODO
 	@Test
 	void testGetPersonsAndStationInfoByAddress() throws NoSuchElementException {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
