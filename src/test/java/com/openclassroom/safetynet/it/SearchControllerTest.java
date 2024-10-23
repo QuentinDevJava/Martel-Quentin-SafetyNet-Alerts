@@ -1,4 +1,4 @@
-package com.openclassroom.safetynet;
+package com.openclassroom.safetynet.it;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,8 +42,18 @@ public class SearchControllerTest {
 	}
 
 	@Test
+	void getPersonsByStationNumberNoFoundTest() throws Exception {
+		mockMvc.perform(get("/firestation?stationNumber=1000")).andExpect(status().isNotFound());
+	}
+
+	@Test
 	void getAllChildTest() throws Exception {
 		mockMvc.perform(get("/childAlert?address=1509 Culver St")).andExpect(status().isOk());
+	}
+
+	@Test
+	void getAllChildNoFoundTest() throws Exception {
+		mockMvc.perform(get("/childAlert?address=NoFound")).andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -53,8 +63,19 @@ public class SearchControllerTest {
 	}
 
 	@Test
+	void getPersonsPhoneNumbersByStationNumberNoFoundTest() throws Exception {
+
+		mockMvc.perform(get("/phoneAlert?firestation=1000")).andExpect(status().isNotFound());
+	}
+
+	@Test
 	void getListOfPersonsInfoAndStationNumberByAddressTest() throws Exception {
 		mockMvc.perform(get("/fire?address=1509 Culver St")).andExpect(status().isOk());
+	}
+
+	@Test
+	void getListOfPersonsInfoAndStationNumberByAddressNoFoundTest() throws Exception {
+		mockMvc.perform(get("/fire?address=NoFound")).andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -63,8 +84,18 @@ public class SearchControllerTest {
 	}
 
 	@Test
+	void getListOfPersonsInfoAndStationNumberByStationNumberNoFoundTest() throws Exception {
+		mockMvc.perform(get("/flood/stations?stations=3000,4000,5000")).andExpect(status().isNotFound());
+	}
+
+	@Test
 	void getPersonsFullInfoWithLastNameTest() throws Exception {
 		mockMvc.perform(get("/personInfolastName?lastName=Boyd")).andExpect(status().isOk());
+	}
+
+	@Test
+	void getPersonsFullInfoWithLastNameNoFoundTest() throws Exception {
+		mockMvc.perform(get("/personInfolastName?lastName=NoFound")).andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -72,4 +103,8 @@ public class SearchControllerTest {
 		mockMvc.perform(get("/communityEmail?city=Culver")).andExpect(status().isOk());
 	}
 
+	@Test
+	void getMailByCityNoFoundTest() throws Exception {
+		mockMvc.perform(get("/communityEmail?city=NoFoundCity")).andExpect(status().isNotFound());
+	}
 }

@@ -1,4 +1,4 @@
-package com.openclassroom.safetynet;
+package com.openclassroom.safetynet.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +25,6 @@ import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.Person;
-import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
 import com.openclassroom.safetynet.model.PersonInfo;
@@ -83,7 +82,7 @@ class PersonServiceTest {
 	}
 
 	@Test
-	void testPersonEmails() {
+	void testPersonEmails() throws NoSuchElementException {
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"), new Person("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com"));
 		List<String> emails = Arrays.asList("jaboyd@email.com", "jdoe@email.com", "jdin@email.com");
@@ -108,7 +107,7 @@ class PersonServiceTest {
 	}
 
 	@Test
-	void testlistOfChild() {
+	void testlistOfChild() throws NoSuchElementException {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
@@ -157,21 +156,7 @@ class PersonServiceTest {
 	}
 
 	@Test
-	void testGetPersonsByStationAddress() {
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1604 Culver St", 2));
-
-		List<Person> personResult = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
-				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-
-		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(personResult.get(0), personResult.get(1)));
-
-		List<Person> personsTests = personService.getPersonsByStationAddress(firestations);
-
-		assertThat(personsTests).isEqualTo(personResult);
-	}
-
-	@Test
-	void testGetPhoneNumbersByStation() {
+	void testGetPhoneNumbersByStation() throws NoSuchElementException {
 		int stationNumber = 1;
 		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", stationNumber));
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
@@ -186,7 +171,7 @@ class PersonServiceTest {
 	}
 
 	@Test
-	void testListOfPersonsByLastName() {
+	void testListOfPersonsByLastName() throws NoSuchElementException {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
@@ -240,7 +225,7 @@ class PersonServiceTest {
 
 	// TODO a refactor et verifier depuis la maj de SearchService
 	@Test
-	void testGetPersonsAndStationInfoByAddress() {
+	void testGetPersonsAndStationInfoByAddress() throws NoSuchElementException {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
@@ -262,7 +247,7 @@ class PersonServiceTest {
 	}
 
 	@Test
-	void floodInfo() {
+	void floodInfo() throws NoSuchElementException {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
@@ -296,15 +281,6 @@ class PersonServiceTest {
 		PersonFloodInfo personFloodInfoTest = personService.floodInfo(stationNumbers);
 
 		assertThat(personFloodInfoTest).isEqualTo(personFloodInfoResult);
-	}
-
-	@Disabled
-	@Test
-	void findCoveredPersonsByFireStation() {
-		int stationNumber = 1;
-
-		PersonCoveredByStation personCoveredByStationResult = personService.findCoveredPersonsByFireStation(stationNumber);
-		System.out.println(personCoveredByStationResult);
 	}
 
 }

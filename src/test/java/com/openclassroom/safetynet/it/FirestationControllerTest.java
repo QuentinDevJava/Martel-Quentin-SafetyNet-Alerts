@@ -1,4 +1,4 @@
-package com.openclassroom.safetynet;
+package com.openclassroom.safetynet.it;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,14 +23,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.openclassroom.safetynet.constants.JsonPath;
-import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.Firestation;
 
 import lombok.RequiredArgsConstructor;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @RequiredArgsConstructor
-public class PersonControllerTest {
+public class FirestationControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -43,55 +43,59 @@ public class PersonControllerTest {
 	}
 
 	@Test
-	void postPersonTest() throws Exception {
-		Person persons = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+	void postFirestationTest() throws Exception {
+		Firestation firestation = new Firestation("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(persons);
-		mockMvc.perform(post("/person").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isCreated());
+		String requestJson = ow.writeValueAsString(firestation);
+		mockMvc.perform(post("/firestation").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isCreated());
 
 	}
 
 	@Test
-	void postPersonErrorTest() throws Exception {
-		Person persons = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", null);
+	void postFirestationErrorTest() throws Exception {
+		Firestation firestation = new Firestation(null, 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(persons);
-		mockMvc.perform(post("/person").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
+		String requestJson = ow.writeValueAsString(firestation);
+		mockMvc.perform(post("/firestation").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
 
 	}
 
 	@Test
-	void putPersonTest() throws Exception {
-		Person persons = new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
+	void putFirestationTest() throws Exception {
+		Firestation firestation = new Firestation("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(persons);
-		mockMvc.perform(put("/person/John/Boyd").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isOk());
+		String requestJson = ow.writeValueAsString(firestation);
+		mockMvc.perform(put("/firestation/112 Steppes Pl").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isOk());
 	}
 
-	@Test
-	void putPersonErrorTest() throws Exception {
-		Person persons = new Person("Johny", "Doe", "1509 Culver St", "Paris", "97451", "841-874-6512", null);
+	void putFirestationErrorTest() throws Exception {
+		Firestation firestation = new Firestation(null, 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(persons);
-		mockMvc.perform(put("/person/Johny/Doe").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
+		String requestJson = ow.writeValueAsString(firestation);
+		mockMvc.perform(put("/firestation/112 Steppes Pl").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
 	}
 
 	@Test
-	void deletePersonErrorTest() throws Exception {
-		mockMvc.perform(delete("/person/Tenley/Boyd")).andExpect(status().isNoContent());
+	void deleteFirestationTest() throws Exception {
+		mockMvc.perform(delete("/firestation/1509 Culver St")).andExpect(status().isNoContent());
 	}
 
 	@Test
-	void deletePersonNoFoundTest() throws Exception {
-		mockMvc.perform(delete("/person/Tenley/nofound")).andExpect(status().isNotFound());
+	void deleteFirestationStationNumberTest() throws Exception {
+		mockMvc.perform(delete("/firestation/1")).andExpect(status().isNoContent());
+	}
+
+	@Test
+	void deleteFirestationNoFoundTest() throws Exception {
+		mockMvc.perform(delete("/firestation/Nofound")).andExpect(status().isNotFound());
 	}
 
 }

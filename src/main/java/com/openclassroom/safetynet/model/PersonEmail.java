@@ -2,6 +2,7 @@ package com.openclassroom.safetynet.model;
 
 import java.util.List;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -9,5 +10,5 @@ import jakarta.validation.constraints.NotNull;
  *
  * @param email A list of email addresses.
  */
-public record PersonEmail(@NotNull @NotNull List<String> email) {
+public record PersonEmail(@NotNull @Email List<String> email) {
 }

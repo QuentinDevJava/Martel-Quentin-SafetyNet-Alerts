@@ -1,4 +1,4 @@
-package com.openclassroom.safetynet;
+package com.openclassroom.safetynet.it;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @SpringBootTest
 @AutoConfigureMockMvc
 @RequiredArgsConstructor
-public class InternalServerErrorTest {
+public class ControllerInternalServerErrorTest {
 
 	@Autowired
 	private MockMvc mockMvc;

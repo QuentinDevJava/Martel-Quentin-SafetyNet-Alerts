@@ -1,4 +1,4 @@
-package com.openclassroom.safetynet;
+package com.openclassroom.safetynet.it;
 
 import org.springframework.boot.test.context.SpringBootTest;
 

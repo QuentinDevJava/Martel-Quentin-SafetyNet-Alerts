@@ -93,8 +93,7 @@ public class FirestationService {
 	 * @return The corresponding fire stations {@link Firestation}.
 	 */
 	public List<Firestation> findFireStationByStationNumber(int stationNumber) {
-		return allFireStations().stream().filter(f -> f.station() == stationNumber) // Use getStationNumber() and compare with ==
-				.toList();
+		return allFireStations().stream().filter(f -> f.station() == stationNumber).toList();
 	}
 
 	/**

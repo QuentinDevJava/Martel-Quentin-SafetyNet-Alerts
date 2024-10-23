@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -120,20 +121,29 @@ public class PersonService {
 	 * @param stationNumber The fire station number.
 	 * @return A list of {@link PersonCoveredByStation} representing the people
 	 *         covered by the station.
+	 * @throws NoSuchElementException
 	 */
-	public PersonCoveredByStation findCoveredPersonsByFireStation(int stationNumber) {
+	public PersonCoveredByStation findCoveredPersonsByFireStation(int stationNumber) throws NoSuchElementException {
 		List<Firestation> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {}", stationNumber, firestations);
+		if (firestations.isEmpty()) {
+			throw new NoSuchElementException("The list of fire stations whose station number is " + stationNumber + " cannot be found.");
+		}
 		List<Person> personByStation = getPersonsByStationAddress(firestations);
 		log.debug("Result of getPersonsByStationAddress for firestations found in findFireStationByStationNumber : {}", personByStation);
+
+		// -------------------------------------------------------------
 		List<PersonInfo> personInfos = extractPersonInfos(personByStation);
 		log.debug("Result of extractPersonInfos for persons found in getPersonsByStationAddress : {}", personInfos);
+
 		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
 		log.debug("Result of getPersonMedicalRecords for persons found in getPersonsByStationAddress : {}", medicalRecords);
 		int adultCount = countAdults(medicalRecords);
 		log.debug("Result of countAdults for medicalRecords found in getPersonMedicalRecords : {}", adultCount);
 		int childCount = countChildren(medicalRecords);
 		log.debug("Result of countChildren for medicalRecords found in getPersonMedicalRecords : {}", childCount);
+		// -------------------------------------------------------------
+
 		return new PersonCoveredByStation(personInfos, adultCount, childCount);
 	}
 
@@ -174,9 +184,13 @@ public class PersonService {
 	 * @param address The address to search for.
 	 * @return A {@link PersonsAndStationInfo} object containing information about
 	 *         the people and the station.
+	 * @throws NoSuchElementException
 	 */
-	public PersonsAndStationInfo getPersonsAndStationInfoByAddress(String address) {
+	public PersonsAndStationInfo getPersonsAndStationInfoByAddress(String address) throws NoSuchElementException {
 		List<Person> persons = getPersonsByAddress(address);
+		if (persons.isEmpty()) {
+			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
+		}
 		log.debug("Result of getPersonsByAddress for address {} = {} ", address, persons);
 		List<MedicalRecordInfo> medicalRecordInfos = getMedicalRecordInfosByListPersons(persons);
 		log.debug("Result of getMedicalRecordInfosByPersons for persons found in getPersonsByAddress : {}", medicalRecordInfos);
@@ -191,9 +205,13 @@ public class PersonService {
 	 * @param city The city to retrieve email addresses for .
 	 * @return A list of PersonEmail objects containing the extracted email
 	 *         addresses {@link PersonEmail}.
+	 * @throws NoSuchElementException
 	 */
-	public PersonEmail personEmails(String city) {
+	public PersonEmail personEmails(String city) throws NoSuchElementException {
 		List<String> emails = allPersons().stream().filter(person -> person.city().equals(city)).map(Person::email).toList();
+		if (emails.isEmpty()) {
+			throw new NoSuchElementException("The list of residents' e-mail addresses was not found for the city : " + city);
+		}
 		return new PersonEmail(emails);
 	}
 
@@ -209,7 +227,7 @@ public class PersonService {
 		return persons.stream().map(this::extractNameAddressAndPhone).toList();
 	}
 
-	private PersonInfo extractNameAddressAndPhone(Person person) {
+	public PersonInfo extractNameAddressAndPhone(Person person) {
 		return new PersonInfo(person.firstName(), person.lastName(), person.address(), person.phone());
 	}
 
@@ -232,10 +250,14 @@ public class PersonService {
 	 *                         {@link Person}.
 	 * @return A list of Child objects containing the extracted child information
 	 *         {@link Child}.
+	 * @throws NoSuchElementException
 	 */
-	public List<Child> listOfChild(String address) {
+	public List<Child> listOfChild(String address) throws NoSuchElementException {
 		List<Person> personsByAddress = getPersonsByAddress(address);
 		log.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
+		if (personsByAddress.isEmpty()) {
+			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
+		}
 		return personsByAddress.stream().filter(this::isChild).map(this::extractChildInfo).toList();
 	}
 
@@ -261,7 +283,7 @@ public class PersonService {
 	 * @return A list of persons associated with the specified fire station
 	 *         {@link Person}.
 	 */
-	public List<Person> getPersonsByStationAddress(List<Firestation> firestation) {
+	private List<Person> getPersonsByStationAddress(List<Firestation> firestation) {
 		List<Person> persons = allPersons();
 		return firestation.stream().flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream()).toList();
 	}
@@ -271,13 +293,17 @@ public class PersonService {
 	 *
 	 * @param stationNumber The station number to retrieve phone numbers for.
 	 * @return A list of phone numbers of persons covered by the specified station.
+	 * @throws NoSuchElementException
 	 */
-	public List<String> getPhoneNumbersByStation(int stationNumber) {
+	public List<String> getPhoneNumbersByStation(int stationNumber) throws NoSuchElementException {
 		return getPersonsByStation(stationNumber).stream().map(Person::phone).toList();
 	}
 
-	private List<Person> getPersonsByStation(int stationNumber) {
+	private List<Person> getPersonsByStation(int stationNumber) throws NoSuchElementException {
 		List<Firestation> firestation = firestationService.findFireStationByStationNumber(stationNumber);
+		if (firestation.isEmpty()) {
+			throw new NoSuchElementException("The list of fire stations number " + stationNumber + " cannot be found.");
+		}
 		return getPersonsByStationAddress(firestation);
 	}
 
@@ -288,8 +314,9 @@ public class PersonService {
 	 * @param lastName The last name of the persons to retrieve.
 	 * @return A list of PersonsLastNameInfo objects containing the extracted
 	 *         information {@link PersonsLastNameInfo}.
+	 * @throws NoSuchElementException
 	 */
-	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) {
+	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) throws NoSuchElementException {
 		List<Person> persons = allPersons();
 		List<PersonsLastNameInfo> listOfPersonsByLastName = new ArrayList<>();
 		for (Person person : persons) {
@@ -297,6 +324,9 @@ public class PersonService {
 				MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
 				listOfPersonsByLastName.add(extractNameAddressAgeEmailInfo(person, medicalRecord));
 			}
+		}
+		if (listOfPersonsByLastName.isEmpty()) {
+			throw new NoSuchElementException("The list of people whose last name is " + lastName + " cannot be found.");
 		}
 		return listOfPersonsByLastName;
 
@@ -333,13 +363,7 @@ public class PersonService {
 	 *         the medical records {@link MedicalRecordInfo}.
 	 */
 	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons) {
-		List<MedicalRecordInfo> medicalRecords = new ArrayList<>();
-		for (Person person : persons) {
-			medicalRecords.add(getMedicalRecordInfosByPerson(person));
-		}
-		return medicalRecords;
-
-		// persons.stream().map(this::getMedicalRecordInfo).collect(Collectors.toList());
+		return persons.stream().map(this::getMedicalRecordInfosByPerson).toList();
 	}
 
 	/**
@@ -361,11 +385,14 @@ public class PersonService {
 	 * @param stationNumber A list of fire station numbers.
 	 * @return A {@link PersonFloodInfo} object containing information about the
 	 *         people affected by the flood.
+	 * @throws NoSuchElementException
 	 */
-	public PersonFloodInfo floodInfo(List<Integer> stationNumber) {
+	public PersonFloodInfo floodInfo(List<Integer> stationNumber) throws NoSuchElementException {
 		List<Firestation> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = listOfPersonsByAddressByStationNumber(firestations);
-
+		if (medicalRecordsByAddress.values().isEmpty()) {
+			throw new NoSuchElementException("The information about the people affected by the flood for the fire stations number : " + stationNumber + " cannot be found.");
+		}
 		return new PersonFloodInfo(medicalRecordsByAddress);
 	}
 
