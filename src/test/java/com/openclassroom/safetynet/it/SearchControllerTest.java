@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.openclassroom.safetynet.constants.JsonPath;
+import com.openclassroom.safetynet.constants.JsonFilePath;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +28,7 @@ public class SearchControllerTest {
 
 	@BeforeAll
 	static void setup() throws IOException {
-		Files.copy(new File(JsonPath.JSONFILEPATH).toPath(), new File(JsonPath.JSONTESTFILEPATH).toPath(), StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(new File(JsonFilePath.JSONFILEPATH).toPath(), new File(JsonFilePath.JSONTESTFILEPATH).toPath(), StandardCopyOption.REPLACE_EXISTING);
 		System.setProperty("test.mode", "true");
 	}
 

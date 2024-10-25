@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.openclassroom.safetynet.constants.JsonPath;
+import com.openclassroom.safetynet.constants.JsonFilePath;
 import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.Person;
@@ -43,8 +43,8 @@ public class ControllerInternalServerErrorTest {
 
 	@BeforeAll
 	static void setup() throws IOException {
-		Files.copy(new File(JsonPath.JSONFILEPATH).toPath(), new File(JsonPath.JSONTESTFILEPATH).toPath(), StandardCopyOption.REPLACE_EXISTING);
-		Files.delete(new File(JsonPath.JSONTESTFILEPATH).toPath());
+		Files.copy(new File(JsonFilePath.JSONFILEPATH).toPath(), new File(JsonFilePath.JSONTESTFILEPATH).toPath(), StandardCopyOption.REPLACE_EXISTING);
+		Files.delete(new File(JsonFilePath.JSONTESTFILEPATH).toPath());
 		System.setProperty("test.mode", "true");
 	}
 

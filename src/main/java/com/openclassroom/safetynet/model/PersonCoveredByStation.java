@@ -17,21 +17,21 @@ import java.util.function.Predicate;
  */
 public record PersonCoveredByStation(List<PersonInfo> personInfos, int adultCounts, int childCounts) {
 
-    static  Predicate<Integer> isAdult = age -> age > 18;
-    static  Predicate<Integer> isChild = age -> age <= 18;
+	static Predicate<Integer> isAdult = age -> age > 18;
+	static Predicate<Integer> isChild = age -> age <= 18;
 
-     public static PersonCoveredByStation of(List<Person> persons, List<MedicalRecord> medicalRecords) {
-        List<PersonInfo> personInfos = persons.stream().map(PersonInfo::new).toList();
-        int adultCounts = (int) medicalRecords.stream().map(PersonCoveredByStation::getAge).filter(isAdult).count();
-        int childCounts = (int) medicalRecords.stream().map(PersonCoveredByStation::getAge).filter(isChild).count();
-        return new PersonCoveredByStation(personInfos, adultCounts, childCounts);
-    }
+	public PersonCoveredByStation(List<Person> persons, List<MedicalRecord> medicalRecords) {
 
-    public static int getAge(MedicalRecord medicalRecord) {
-        String dateString = medicalRecord.birthdate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        LocalDate birthdate = LocalDate.parse(dateString, formatter);
-        LocalDate today = LocalDate.now();
-        return Period.between(birthdate, today).getYears();
-    }
+		this(persons.stream().map(PersonInfo::new).toList(),
+				(int) medicalRecords.stream().map(PersonCoveredByStation::getAge).filter(isAdult).count(),
+				(int) medicalRecords.stream().map(PersonCoveredByStation::getAge).filter(isChild).count());
+	}
+
+	public static int getAge(MedicalRecord medicalRecord) {
+		String dateString = medicalRecord.birthdate();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		LocalDate birthdate = LocalDate.parse(dateString, formatter);
+		LocalDate today = LocalDate.now();
+		return Period.between(birthdate, today).getYears();
+	}
 }

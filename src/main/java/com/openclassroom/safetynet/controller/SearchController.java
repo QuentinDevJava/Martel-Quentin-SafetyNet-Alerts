@@ -3,7 +3,6 @@ package com.openclassroom.safetynet.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +34,7 @@ public class SearchController {
 	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam int stationNumber) {
 		log.info("Search for people covered by the fire station N° {}.", stationNumber);
 		try {
-			PersonCoveredByStation personsCovered = personService.findCoveredPersonsByFireStation(stationNumber);
+			PersonCoveredByStation personsCovered = personService.personCoveredByStation(stationNumber);
 			log.info("Successful retrieval of the list of persons : {}", personsCovered);
 			return ResponseEntity.ok(personsCovered);
 		} catch (Exception e) {
@@ -48,7 +47,7 @@ public class SearchController {
 	public ResponseEntity<List<Child>> getAllChild(@RequestParam String address) {
 		log.info("Search for children by address : {} ", address);
 		try {
-			List<Child> childs = personService.listOfChild(address);
+			List<Child> childs = personService.getchildsByAddress(address);
 			log.info("Successful retrieval of the children's list : {}", childs);
 			return ResponseEntity.ok(childs);
 		} catch (Exception e) {
@@ -113,7 +112,7 @@ public class SearchController {
 	}
 
 	@GetMapping("/communityEmail")
-	public ResponseEntity<PersonEmail> getMailByCity(@Validated @RequestParam String city) {
+	public ResponseEntity<PersonEmail> getMailByCity(@RequestParam String city) {
 		log.info("Search for residents' e-mail addresses by city : {}", city);
 		try {
 			PersonEmail communityEmail = personService.personEmails(city);

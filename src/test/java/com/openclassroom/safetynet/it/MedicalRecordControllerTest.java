@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.openclassroom.safetynet.constants.JsonPath;
+import com.openclassroom.safetynet.constants.JsonFilePath;
 import com.openclassroom.safetynet.model.MedicalRecord;
 
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class MedicalRecordControllerTest {
 
 	@BeforeAll
 	static void setup() throws IOException {
-		Files.copy(new File(JsonPath.JSONFILEPATH).toPath(), new File(JsonPath.JSONTESTFILEPATH).toPath(), StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(new File(JsonFilePath.JSONFILEPATH).toPath(), new File(JsonFilePath.JSONTESTFILEPATH).toPath(), StandardCopyOption.REPLACE_EXISTING);
 		System.setProperty("test.mode", "true");
 	}
 

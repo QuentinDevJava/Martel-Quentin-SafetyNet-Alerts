@@ -2,6 +2,8 @@ package com.openclassroom.safetynet.model;
 
 import java.util.List;
 
+import com.openclassroom.safetynet.service.MedicalRecordService;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -18,7 +20,13 @@ import jakarta.validation.constraints.NotNull;
  * @param medications A list of medications the person is taking.
  * @param allergies   A list of allergies the person has.
  */
-public record PersonsLastNameInfo(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String address, @Min(0) int age, @Email String email, @NotNull List<String> medications,
-		@NotNull List<String> allergies) {
+public record PersonsLastNameInfo(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String address, @Min(0) int age,
+		@Email String email, @NotNull List<String> medications, @NotNull List<String> allergies) {
+
+	public PersonsLastNameInfo(Person person, MedicalRecordService medicalRecordService, MedicalRecord medicalRecord) {
+		this(person.firstName(), person.lastName(), person.address(), medicalRecordService.getPersonAge(person), person.email(),
+				medicalRecord.medications(), medicalRecord.allergies());
+
+	}
 
 }

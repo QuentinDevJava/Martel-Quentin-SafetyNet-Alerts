@@ -1,15 +1,10 @@
 package com.openclassroom.safetynet.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,12 +30,14 @@ public class FirestationController {
 	public ResponseEntity<Firestation> createFirestation(@Validated @RequestBody Firestation firestation) {
 		log.info("POST request received for /firestation, adding firestation: {}", firestation);
 		try {
-			Firestation createdFirestation = firestationService.createFirestation(firestation);
-			log.info("Firestation successfully created: {}", createdFirestation);
-			return new ResponseEntity<>(createdFirestation, HttpStatus.CREATED);
+			firestationService.createFirestation(firestation);
+			log.info("Firestation successfully created: {}", firestation);
+			URI uri = new URI("/firestation");
+			return ResponseEntity.created(uri).body(firestation);
+
 		} catch (Exception e) {
 			log.error("Error creating firestation: {}", firestation, e);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 
@@ -48,12 +45,12 @@ public class FirestationController {
 	public ResponseEntity<Firestation> updateFirestation(@PathVariable String address, @Validated @RequestBody Firestation firestation) {
 		log.info("PUT request received for /firestation/{} updating firestation: {}", address, firestation);
 		try {
-			Firestation updatedFirestation = firestationService.updateFirestation(address, firestation);
-			log.info("Firestation successfully updated: {}", updatedFirestation);
-			return new ResponseEntity<>(updatedFirestation, HttpStatus.OK);
+			firestationService.updateFirestation(address, firestation);
+			log.info("Firestation successfully updated: {}", firestation);
+			return ResponseEntity.ok(firestation);
 		} catch (Exception e) {
 			log.error("Error updating firestation with address: {}", address, e);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 
@@ -64,25 +61,15 @@ public class FirestationController {
 			Boolean firestationsDeleted = firestationService.deleteFirestation(addressOrNum);
 			if (Boolean.TRUE.equals(firestationsDeleted)) {
 				log.info("Firestation successfully deleted: {}", addressOrNum);
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				return ResponseEntity.noContent().build();
 			} else {
 				log.error("Firestation not found: address: {}", addressOrNum);
 				return ResponseEntity.notFound().build();
 			}
 		} catch (Exception e) {
 			log.error("Error deleting firestation with address: {}", addressOrNum, e);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-		Map<String, String> errors = new HashMap<>();
-		ex.getBindingResult().getAllErrors().forEach((error) -> {
-			String fieldName = ((FieldError) error).getField();
-			String errorMessage = error.getDefaultMessage();
-			errors.put(fieldName, errorMessage);
-		});
-		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-	}
 }

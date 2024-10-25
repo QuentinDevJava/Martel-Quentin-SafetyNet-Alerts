@@ -1,8 +1,5 @@
 package com.openclassroom.safetynet.service;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +19,6 @@ import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
-import com.openclassroom.safetynet.model.PersonInfo;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.repository.JsonRepository;
@@ -43,23 +39,22 @@ public class PersonService {
 	private final FirestationService firestationService;
 
 	private List<Person> allPersons() {
-		List<Object> personData = repository.loadTypeOfData(TypeOfData.PERSONS);
-		List<Person> persons = new ArrayList<>();
-		for (Object personObj : personData) {
-			persons.add(objectMapper.convertValue(personObj, Person.class));
-		}
-		return persons;
+		return repository.loadTypeOfData(TypeOfData.PERSONS).stream().map(p -> objectMapper.convertValue(p, Person.class))
+				.filter(Person.class::isInstance).map(Person.class::cast).collect(Collectors.toList());
 	}
 
 	/**
-	 * Interface defining the operations for managing persons.
+	 * Creates a new Person.
+	 *
+	 * @param person The person to create {@link Person}.
+	 * 
 	 */
-	public Person createPerson(Person person) {
+
+	public void createPerson(Person person) {
 		List<Person> persons = allPersons();
 		persons.add(person);
 		savePersons(persons);
 		log.debug("Add person {} in allPersons() : {}", person, persons);
-		return person;
 	}
 
 	/**
@@ -68,17 +63,18 @@ public class PersonService {
 	 * @param firstName The first name of the person to update.
 	 * @param lastName  The last name of the person to update.
 	 * @param person    The updated person {@link Person}.
-	 * @return The updated person {@link Person}.
 	 */
-	public Person updatePerson(String firstName, String lastName, Person person) {
+	public void updatePerson(String firstName, String lastName, Person person) {
 		String fullName = firstName + " " + lastName;
 		Person existingPerson = getPersonByFullName(fullName);
+		if (existingPerson == null) {
+			throw new NoSuchElementException("The people full name is : " + fullName + " cannot be found.");
+		}
 		List<Person> persons = allPersons();
 		log.debug("Found existing person: {}", existingPerson);
 		persons.set(persons.indexOf(existingPerson), person);
 		savePersons(persons);
 		log.debug("Updated person list: {}", persons);
-		return person;
 	}
 
 	private Person getPersonByFullName(String fullName) {
@@ -103,13 +99,9 @@ public class PersonService {
 		return personDeleted;
 	}
 
-	private void savePersons(List<Person> listOfPersons) {
-		List<Object> personData = new ArrayList<>();
-		for (Person personObj : listOfPersons) {
-			personData.add(objectMapper.convertValue(personObj, Person.class));
-		}
-		log.debug("Saving persons to repository: {}", personData);
-		repository.saveData(TypeOfData.PERSONS, personData);
+	private void savePersons(List<Person> persons) {
+		repository.saveData(TypeOfData.PERSONS,
+				persons.stream().map(personsObj -> objectMapper.convertValue(personsObj, Person.class)).collect(Collectors.toList()));
 	}
 
 	/**
@@ -120,7 +112,7 @@ public class PersonService {
 	 *         covered by the station.
 	 * @throws NoSuchElementException
 	 */
-	public PersonCoveredByStation findCoveredPersonsByFireStation(int stationNumber) throws NoSuchElementException {
+	public PersonCoveredByStation personCoveredByStation(int stationNumber) throws NoSuchElementException {
 		List<Firestation> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {}", stationNumber, firestations);
 		if (firestations.isEmpty()) {
@@ -132,29 +124,7 @@ public class PersonService {
 		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
 		log.debug("Result of getPersonMedicalRecords for persons found in getPersonsByStationAddress : {}", medicalRecords);
 
-		return PersonCoveredByStation.of(personByStation, medicalRecords);
-	}
-
-	/**
-	 * Calculates the age of a person based on their birthdate.
-	 *
-	 * @param person The person to calculate the age for {@link Person}.
-	 * @return The age of the person.
-	 */
-	public int getPersonAge(Person person) {
-		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
-		if (medicalRecord != null) {
-			return calculateAge(medicalRecord);
-		}
-		return -1;
-	}
-
-	private int calculateAge(MedicalRecord medicalRecord) {
-		String dateString = medicalRecord.birthdate();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-		LocalDate birthdate = LocalDate.parse(dateString, formatter);
-		LocalDate today = LocalDate.now();
-		return Period.between(birthdate, today).getYears();
+		return new PersonCoveredByStation(personByStation, medicalRecords);
 	}
 
 	/**
@@ -172,7 +142,9 @@ public class PersonService {
 			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
 		}
 		log.debug("Result of getPersonsByAddress for address {} = {} ", address, persons);
-		List<MedicalRecordInfo> medicalRecordInfos = getMedicalRecordInfosByListPersons(persons);
+		List<MedicalRecordInfo> medicalRecordInfos = persons.stream().map(p -> new MedicalRecordInfo(p, medicalRecordService))
+				.collect(Collectors.toList());
+
 		log.debug("Result of getMedicalRecordInfosByPersons for persons found in getPersonsByAddress : {}", medicalRecordInfos);
 		Firestation firestation = firestationService.getFirestationByAddress(address);
 		log.debug("Result of getFirestationByAddress the fire station number associated with address : {} = {} ", address, firestation.station());
@@ -196,35 +168,6 @@ public class PersonService {
 	}
 
 	/**
-	 * Extracts basic information from a person, including name, address, and phone
-	 * number.
-	 *
-	 * @param List of person The persons to extract information from {@link Person}.
-	 * @return A list of PersonInfo object containing the extracted information
-	 *         {@link PersonInfo}.
-	 */
-	public List<PersonInfo> extractPersonInfos(List<Person> persons) {
-		return persons.stream().map(this::extractNameAddressAndPhone).toList();
-	}
-
-	public PersonInfo extractNameAddressAndPhone(Person person) {
-		return new PersonInfo(person.firstName(), person.lastName(), person.address(), person.phone());
-	}
-
-	/**
-	 * Extracts name, address, age, and email information from a person.
-	 *
-	 * @param person        The person to extract information from {@link Person}.
-	 * @param medicalRecord The medical record of the person {@link MedicalRecord}.
-	 * @return A PersonsLastNameInfo object containing the extracted information
-	 *         {@link PersonsLastNameInfo}.
-	 */
-	public PersonsLastNameInfo extractNameAddressAgeEmailInfo(Person person, MedicalRecord medicalRecord) {
-		return new PersonsLastNameInfo(person.firstName(), person.lastName(), person.address(), getPersonAge(person), person.email(),
-				medicalRecord.medications(), medicalRecord.allergies());
-	}
-
-	/**
 	 * Retrieves a list of Child objects from a list of persons.
 	 *
 	 * @param personsByAddress The list of persons to extract child information from
@@ -233,12 +176,13 @@ public class PersonService {
 	 *         {@link Child}.
 	 * @throws NoSuchElementException
 	 */
-	public List<Child> listOfChild(String address) throws NoSuchElementException {
+	public List<Child> getchildsByAddress(String address) throws NoSuchElementException {
 		List<Person> personsByAddress = getPersonsByAddress(address);
 		if (personsByAddress.isEmpty()) {
 			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
 		}
-		return personsByAddress.stream().filter(person -> getPersonAge(person) <= 18).map(p -> new Child(p, this)).toList();
+		return personsByAddress.stream().filter(person -> medicalRecordService.getPersonAge(person) <= 18)
+				.map(p -> new Child(p, medicalRecordService)).toList();
 	}
 
 	/**
@@ -294,61 +238,15 @@ public class PersonService {
 	 */
 	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) throws NoSuchElementException {
 		List<Person> persons = allPersons();
-		List<PersonsLastNameInfo> listOfPersonsByLastName = new ArrayList<>();
-		for (Person person : persons) {
-			if (person.lastName().equals(lastName)) {
-				MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
-				listOfPersonsByLastName.add(extractNameAddressAgeEmailInfo(person, medicalRecord));
-			}
-		}
+		List<PersonsLastNameInfo> listOfPersonsByLastName = persons.stream().filter(person -> person.lastName().equals(lastName)).map(
+				person -> new PersonsLastNameInfo(person, medicalRecordService, medicalRecordService.getMedicalRecordByFullName(person.fullName())))
+				.collect(Collectors.toList());
+
 		if (listOfPersonsByLastName.isEmpty()) {
 			throw new NoSuchElementException("The list of people whose last name is " + lastName + " cannot be found.");
 		}
+
 		return listOfPersonsByLastName;
-
-	}
-
-	/**
-	 * Extracts basic information from a person's medical record.
-	 *
-	 * @param person        The person whose medical record to extract information
-	 *                      from {@link Person}.
-	 * @param medicalRecord The medical record of the person {@link MedicalRecord}.
-	 * @return A MedicalRecordInfo object containing basic information from the
-	 *         medical record {@link MedicalRecordInfo}.
-	 */
-	public MedicalRecordInfo extractBasicInfo(Person person, MedicalRecord medicalRecord) {
-		return new MedicalRecordInfo(person.firstName(), person.lastName(), person.phone(), getPersonAge(person), medicalRecord.medications(),
-				medicalRecord.allergies());
-	}
-
-	private MedicalRecordInfo getMedicalRecordInfo(Person person) {
-		MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.fullName());
-		return extractBasicInfo(person, medicalRecord);
-	}
-
-	/**
-	 * Retrieves basic information from the medical records of a list of persons.
-	 *
-	 * @param persons The list of persons whose medical records to extract
-	 *                information from {@link Person}.
-	 * @return A list of MedicalRecordInfo objects containing basic information from
-	 *         the medical records {@link MedicalRecordInfo}.
-	 */
-	public List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons) {
-		return persons.stream().map(this::getMedicalRecordInfosByPerson).toList();
-	}
-
-	/**
-	 * Retrieves basic information from the medical record of a person.
-	 *
-	 * @param person The person whose medical record to extract information from
-	 *               {@link Person}.
-	 * @return A MedicalRecordInfo object containing basic information from the
-	 *         medical record {@link MedicalRecordInfo}.
-	 */
-	public MedicalRecordInfo getMedicalRecordInfosByPerson(Person person) {
-		return getMedicalRecordInfo(person);
 	}
 
 	/**
@@ -388,5 +286,30 @@ public class PersonService {
 			medicalRecordsByAddress.put(firestation.address(), medicalRecordInfos);
 		}
 		return medicalRecordsByAddress;
+	}
+
+	/**
+	 * Retrieves basic information from the medical records of a list of persons.
+	 *
+	 * @param persons The list of persons whose medical records to extract
+	 *                information from {@link Person}.
+	 * @return A list of MedicalRecordInfo objects containing basic information from
+	 *         the medical records {@link MedicalRecordInfo}.
+	 */
+	private List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<Person> persons) {
+		return persons.stream().map(this::getMedicalRecordInfosByPerson).toList();
+	}
+
+	/**
+	 * Retrieves basic information from the medical record of a person.
+	 *
+	 * @param person The person whose medical record to extract information from
+	 *               {@link Person}.
+	 * @return A MedicalRecordInfo object containing basic information from the
+	 *         medical record {@link MedicalRecordInfo}.
+	 */
+	private MedicalRecordInfo getMedicalRecordInfosByPerson(Person person) {
+		return new MedicalRecordInfo(person, medicalRecordService);
+
 	}
 }

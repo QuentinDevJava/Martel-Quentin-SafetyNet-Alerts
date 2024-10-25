@@ -26,7 +26,8 @@ public class FirestationService {
 	private final ObjectMapper objectMapper;
 
 	private List<Firestation> allFireStations() {
-		return repository.loadTypeOfData(TypeOfData.FIRESTATIONS).stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList());
+		return repository.loadTypeOfData(TypeOfData.FIRESTATIONS).stream()
+				.map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -35,12 +36,11 @@ public class FirestationService {
 	 * @param firestation The fire station to create {@link Firestation}.
 	 * @return The created fire station {@link Firestation}.
 	 */
-	public Firestation createFirestation(Firestation firestation) {
+	public void createFirestation(Firestation firestation) {
 		List<Firestation> firestations = allFireStations();
 		firestations.add(firestation);
 		saveFirestations(firestations);
 		log.debug("Add firestation {} in allFireStations() : {}", firestation, firestations);
-		return firestation;
 	}
 
 	/**
@@ -50,14 +50,13 @@ public class FirestationService {
 	 * @param firestation The updated fire station {@link Firestation}.
 	 * @return The updated fire station {@link Firestation}.
 	 */
-	public Firestation updateFirestation(String address, Firestation firestation) {
+	public void updateFirestation(String address, Firestation firestation) {
 		Firestation existingFirestation = getFirestationByAddress(address);
 		log.debug("Found existing firestation: {}", existingFirestation);
 		List<Firestation> firestations = allFireStations();
 		firestations.set(firestations.indexOf(existingFirestation), firestation);
 		log.debug("Updated firestation list: {}", firestations);
 		saveFirestations(firestations);
-		return firestation;
 	}
 
 	/**
@@ -83,7 +82,8 @@ public class FirestationService {
 	}
 
 	private void saveFirestations(List<Firestation> firestations) {
-		repository.saveData(TypeOfData.FIRESTATIONS, firestations.stream().map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList()));
+		repository.saveData(TypeOfData.FIRESTATIONS, firestations.stream()
+				.map(firestationObj -> objectMapper.convertValue(firestationObj, Firestation.class)).collect(Collectors.toList()));
 	}
 
 	/**

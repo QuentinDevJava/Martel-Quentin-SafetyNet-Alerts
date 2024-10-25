@@ -1,16 +1,12 @@
 
 package com.openclassroom.safetynet.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.util.NoSuchElementException;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,10 +42,11 @@ public class PersonController {
 		try {
 			personService.createPerson(person);
 			log.info("Person successfully created: {}", person);
-			return new ResponseEntity<>(person, HttpStatus.CREATED);
+			URI uri = new URI("/person");
+			return ResponseEntity.created(uri).body(person);
 		} catch (Exception e) {
 			log.error("Error creating person: {}", person, e);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 
@@ -59,10 +56,13 @@ public class PersonController {
 		try {
 			personService.updatePerson(firstName, lastName, person);
 			log.info("Person successfully updated: {}", person);
-			return new ResponseEntity<>(person, HttpStatus.OK);
+			return ResponseEntity.ok(person);
+		} catch (NoSuchElementException e) {
+			log.error("Error the people with full name : {} {} cannot be found.", firstName, lastName, e);
+			return ResponseEntity.notFound().build();
 		} catch (Exception e) {
 			log.error("Error updating person with first name: {} and last name: {}", firstName, lastName, e);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 
@@ -75,7 +75,7 @@ public class PersonController {
 
 			if (Boolean.TRUE.equals(personDeleted)) {
 				log.info("Person successfully deleted: firstName: {}, lastName: {}", firstName, lastName);
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				return ResponseEntity.noContent().build();
 			} else {
 				log.error("Person not found: firstName: {}, lastName: {}", firstName, lastName);
 				return ResponseEntity.notFound().build();
@@ -83,18 +83,7 @@ public class PersonController {
 
 		} catch (Exception e) {
 			log.error("Error deleting person with first name: {} and last name: {}", firstName, lastName, e);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.internalServerError().build();
 		}
-	}
-
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-		Map<String, String> errors = new HashMap<>();
-		ex.getBindingResult().getAllErrors().forEach((error) -> {
-			String fieldName = ((FieldError) error).getField();
-			String errorMessage = error.getDefaultMessage();
-			errors.put(fieldName, errorMessage);
-		});
-		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
 }

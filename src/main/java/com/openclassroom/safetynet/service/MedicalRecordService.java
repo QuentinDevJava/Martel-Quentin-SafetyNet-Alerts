@@ -1,6 +1,8 @@
 package com.openclassroom.safetynet.service;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,7 +30,8 @@ public class MedicalRecordService {
 	private final ObjectMapper objectMapper;
 
 	private List<MedicalRecord> allMedicalRecords() {
-		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream().map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).collect(Collectors.toList());
+		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream()
+				.map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -37,12 +40,11 @@ public class MedicalRecordService {
 	 * @param medicalRecord The medical record to create {@link MedicalRecord}.
 	 * @return The created medical record {@link MedicalRecord}.
 	 */
-	public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord) {
+	public void createMedicalRecord(MedicalRecord medicalRecord) {
 		List<MedicalRecord> medicalRecords = allMedicalRecords();
 		medicalRecords.add(medicalRecord);
 		saveMedicalRecords(medicalRecords);
 		log.debug("Add medicalRecord {} in allMedicalRecords() : {}", medicalRecord, medicalRecords);
-		return medicalRecord;
 	}
 
 	/**
@@ -55,7 +57,7 @@ public class MedicalRecordService {
 	 * @param medicalRecord The updated medical record {@link MedicalRecord}.
 	 * @return The updated medical record {@link MedicalRecord}.
 	 */
-	public MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord) {
+	public void updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord) {
 		String fullName = firstName + " " + lastName;
 		MedicalRecord existingMedicalRecord = getMedicalRecordByFullName(fullName);
 		log.debug("Found existing medical record for: {} = {}", fullName, existingMedicalRecord);
@@ -63,7 +65,6 @@ public class MedicalRecordService {
 		medicalRecords.set(medicalRecords.indexOf(existingMedicalRecord), medicalRecord);
 		saveMedicalRecords(medicalRecords);
 		log.debug("Updated medical record list with {} = {}", medicalRecord, medicalRecords);
-		return medicalRecord;
 	}
 
 	/**
@@ -84,13 +85,10 @@ public class MedicalRecordService {
 		return medicalRecordDeleted;
 	}
 
-	private void saveMedicalRecords(List<MedicalRecord> listOfMedicalRecords) {
-		List<Object> medicalRecordData = new ArrayList<>();
-		for (MedicalRecord medicalRecordObj : listOfMedicalRecords) {
-			medicalRecordData.add(objectMapper.convertValue(medicalRecordObj, MedicalRecord.class));
-		}
-		log.debug("Saving medical records to repository: {}", medicalRecordData);
-		repository.saveData(TypeOfData.MEDICALRECORDS, medicalRecordData);
+	private void saveMedicalRecords(List<MedicalRecord> medicalRecords) {
+
+		repository.saveData(TypeOfData.MEDICALRECORDS, medicalRecords.stream()
+				.map(medicalRecordsObj -> objectMapper.convertValue(medicalRecordsObj, MedicalRecord.class)).collect(Collectors.toList()));
 	}
 
 	/**
@@ -115,4 +113,25 @@ public class MedicalRecordService {
 		return persons.stream().map(p -> getMedicalRecordByFullName(p.fullName())).filter(Objects::nonNull).toList();
 	}
 
+	/**
+	 * Calculates the age of a person based on their birthdate.
+	 *
+	 * @param person The person to calculate the age for {@link Person}.
+	 * @return The age of the person.
+	 */
+	public int getPersonAge(Person person) {
+		MedicalRecord medicalRecord = getMedicalRecordByFullName(person.fullName());
+		if (medicalRecord != null) {
+			return calculateAge(medicalRecord);
+		}
+		return -1;
+	}
+
+	private int calculateAge(MedicalRecord medicalRecord) {
+		String dateString = medicalRecord.birthdate();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		LocalDate birthdate = LocalDate.parse(dateString, formatter);
+		LocalDate today = LocalDate.now();
+		return Period.between(birthdate, today).getYears();
+	}
 }

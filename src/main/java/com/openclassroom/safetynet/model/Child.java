@@ -1,6 +1,6 @@
 package com.openclassroom.safetynet.model;
 
-import com.openclassroom.safetynet.service.PersonService;
+import com.openclassroom.safetynet.service.MedicalRecordService;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -18,8 +18,8 @@ import jakarta.validation.constraints.Pattern;
 public record Child(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String address,
 		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @Min(0) int age) {
 
-	public Child(Person person, PersonService personService) {
-		this(person.firstName(), person.lastName(), person.address(), person.phone(), personService.getPersonAge(person));
+	public Child(Person person, MedicalRecordService medicalRecordService) {
+		this(person.firstName(), person.lastName(), person.address(), person.phone(), medicalRecordService.getPersonAge(person));
 	}
 
 }
