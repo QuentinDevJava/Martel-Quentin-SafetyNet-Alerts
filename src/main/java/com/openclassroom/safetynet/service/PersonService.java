@@ -142,8 +142,8 @@ public class PersonService {
 			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
 		}
 		log.debug("Result of getPersonsByAddress for address {} = {} ", address, persons);
-		List<MedicalRecordInfo> medicalRecordInfos = persons.stream().map(p -> new MedicalRecordInfo(p, medicalRecordService))
-				.collect(Collectors.toList());
+		List<MedicalRecordInfo> medicalRecordInfos = persons.stream()
+				.map(p -> new MedicalRecordInfo(p, medicalRecordService.getMedicalRecordByFullName(p.fullName()))).collect(Collectors.toList());
 
 		log.debug("Result of getMedicalRecordInfosByPersons for persons found in getPersonsByAddress : {}", medicalRecordInfos);
 		Firestation firestation = firestationService.getFirestationByAddress(address);
@@ -181,8 +181,8 @@ public class PersonService {
 		if (personsByAddress.isEmpty()) {
 			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
 		}
-		return personsByAddress.stream().filter(person -> medicalRecordService.getAge(person) <= 18).map(p -> new Child(p, medicalRecordService))
-				.toList();
+		return personsByAddress.stream().filter(person -> medicalRecordService.getAge(person) <= 18)
+				.map(p -> new Child(p, medicalRecordService.getMedicalRecordByFullName(p.fullName()))).toList();
 	}
 
 	/**
@@ -238,8 +238,8 @@ public class PersonService {
 	 */
 	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) throws NoSuchElementException {
 		List<Person> persons = allPersons();
-		List<PersonsLastNameInfo> listOfPersonsByLastName = persons.stream().filter(person -> person.lastName().equals(lastName)).map(
-				person -> new PersonsLastNameInfo(person, medicalRecordService, medicalRecordService.getMedicalRecordByFullName(person.fullName())))
+		List<PersonsLastNameInfo> listOfPersonsByLastName = persons.stream().filter(person -> person.lastName().equals(lastName))
+				.map(person -> new PersonsLastNameInfo(person, medicalRecordService.getMedicalRecordByFullName(person.fullName())))
 				.collect(Collectors.toList());
 
 		if (listOfPersonsByLastName.isEmpty()) {
@@ -309,7 +309,7 @@ public class PersonService {
 	 *         medical record {@link MedicalRecordInfo}.
 	 */
 	private MedicalRecordInfo getMedicalRecordInfosByPerson(Person person) {
-		return new MedicalRecordInfo(person, medicalRecordService);
+		return new MedicalRecordInfo(person, medicalRecordService.getMedicalRecordByFullName(person.fullName()));
 
 	}
 }

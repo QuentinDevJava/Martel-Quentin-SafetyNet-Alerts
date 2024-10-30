@@ -2,8 +2,6 @@ package com.openclassroom.safetynet.model;
 
 import java.util.List;
 
-import com.openclassroom.safetynet.service.MedicalRecordService;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,10 +22,8 @@ public record MedicalRecordInfo(@NotBlank String firstName, @NotBlank String las
 		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @Min(0) int age, @NotNull List<String> medications,
 		@NotNull List<String> allergies) {
 
-	public MedicalRecordInfo(Person person, MedicalRecordService medicalRecordService) {
-		this(person.firstName(), person.lastName(), person.phone(), medicalRecordService.getAge(person),
-				medicalRecordService.getMedicalRecordByFullName(person.fullName()).medications(),
-				medicalRecordService.getMedicalRecordByFullName(person.fullName()).allergies());
+	public MedicalRecordInfo(Person person, MedicalRecordResponse medicalRecord) {
+		this(person.firstName(), person.lastName(), person.phone(), medicalRecord.getAge(), medicalRecord.medications(), medicalRecord.allergies());
 	}
 
 }
