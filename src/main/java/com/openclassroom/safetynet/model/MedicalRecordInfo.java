@@ -25,7 +25,7 @@ public record MedicalRecordInfo(@NotBlank String firstName, @NotBlank String las
 		@NotNull List<String> allergies) {
 
 	public MedicalRecordInfo(Person person, MedicalRecordService medicalRecordService) {
-		this(person.firstName(), person.lastName(), person.phone(), medicalRecordService.getPersonAge(person),
+		this(person.firstName(), person.lastName(), person.phone(), medicalRecordService.getAge(person),
 				medicalRecordService.getMedicalRecordByFullName(person.fullName()).medications(),
 				medicalRecordService.getMedicalRecordByFullName(person.fullName()).allergies());
 	}

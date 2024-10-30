@@ -19,8 +19,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.model.Child;
 import com.openclassroom.safetynet.model.Firestation;
-import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
+import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
@@ -86,8 +86,8 @@ class PersonServiceTest {
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-		List<MedicalRecord> medicalRecords = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies),
-				new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecordResponse> medicalRecords = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
 
 		when(firestationService.findFireStationByStationNumber(stationNumber)).thenReturn(firestations);
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
@@ -111,8 +111,8 @@ class PersonServiceTest {
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", address, "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", address, "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-		List<MedicalRecord> medicalRecords = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies),
-				new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecordResponse> medicalRecords = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
 
 		List<MedicalRecordInfo> medicalRecordsInfo = Arrays.asList(
 				new MedicalRecordInfo(persons.get(0).firstName(), persons.get(0).lastName(), persons.get(0).phone(), 10, medications, allergies),
@@ -120,8 +120,8 @@ class PersonServiceTest {
 
 		when(firestationService.getFirestationByAddress(address)).thenReturn(firestations);
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
-		when(medicalRecordService.getPersonAge(persons.get(0))).thenReturn(10);
-		when(medicalRecordService.getPersonAge(persons.get(1))).thenReturn(24);
+		when(medicalRecordService.getAge(persons.get(0))).thenReturn(10);
+		when(medicalRecordService.getAge(persons.get(1))).thenReturn(24);
 		when(medicalRecordService.getMedicalRecordByFullName(persons.get(0).fullName())).thenReturn(medicalRecords.get(0));
 		when(medicalRecordService.getMedicalRecordByFullName(persons.get(1).fullName())).thenReturn(medicalRecords.get(1));
 		when(medicalRecordService.getPersonMedicalRecords(anyList())).thenReturn(medicalRecords);
@@ -150,14 +150,19 @@ class PersonServiceTest {
 
 	@Test
 	void testgetchildsByAddress() throws NoSuchElementException {
+		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
+		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-
+		List<MedicalRecordResponse> medicalRecords = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
 		List<Child> personResult = Arrays.asList(new Child("John", "Doe", "1509 Culver St", "841-874-6512", 10));
 
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
-		when(medicalRecordService.getPersonAge(persons.get(0))).thenReturn(10);
-		when(medicalRecordService.getPersonAge(persons.get(1))).thenReturn(24);
+		when(medicalRecordService.getAge(persons.get(0))).thenReturn(10);
+		when(medicalRecordService.getAge(persons.get(1))).thenReturn(24);
+		when(medicalRecordService.getMedicalRecordByFullName(persons.get(0).fullName())).thenReturn(medicalRecords.get(0));
+		when(medicalRecordService.getMedicalRecordByFullName(persons.get(1).fullName())).thenReturn(medicalRecords.get(1));
 
 		List<Child> personsTest = personService.getchildsByAddress("1509 Culver St");
 
@@ -171,8 +176,8 @@ class PersonServiceTest {
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"),
 				new Person("Jack", "Nanar", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-		List<MedicalRecord> medicalRecords = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies),
-				new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecordResponse> medicalRecords = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
 		List<PersonsLastNameInfo> personsResult = Arrays.asList(
 				new PersonsLastNameInfo("John", "Doe", "1509 Culver St", 10, "jaboyd@email.com", medications, allergies),
 				new PersonsLastNameInfo("Jane", "Doe", "1509 Culver St", 24, "jdoe@email.com", medications, allergies));
@@ -180,8 +185,8 @@ class PersonServiceTest {
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 		when(medicalRecordService.getMedicalRecordByFullName("John Doe")).thenReturn(medicalRecords.get(0));
 		when(medicalRecordService.getMedicalRecordByFullName("Jane Doe")).thenReturn(medicalRecords.get(1));
-		when(medicalRecordService.getPersonAge(persons.get(0))).thenReturn(10);
-		when(medicalRecordService.getPersonAge(persons.get(1))).thenReturn(24);
+		when(medicalRecordService.getAge(persons.get(0))).thenReturn(10);
+		when(medicalRecordService.getAge(persons.get(1))).thenReturn(24);
 
 		List<PersonsLastNameInfo> personsTest = personService.listOfPersonsByLastName("Doe");
 
@@ -198,8 +203,8 @@ class PersonServiceTest {
 		List<MedicalRecordInfo> medicalRecordInfos = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
 				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
 		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 2));
-		List<MedicalRecord> medicalRecord = Arrays.asList(new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies),
-				new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecordResponse> medicalRecord = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
 
 		List<Integer> stationNumbers = Arrays.asList(1, 2);
 		Map<String, List<MedicalRecordInfo>> mapResult = new HashMap<>();
@@ -225,8 +230,8 @@ class PersonServiceTest {
 		when(medicalRecordService.getMedicalRecordByFullName("John Doe")).thenReturn(medicalRecord.get(0));
 		when(medicalRecordService.getMedicalRecordByFullName("Jane Doe")).thenReturn(medicalRecord.get(1));
 
-		when(medicalRecordService.getPersonAge(persons.get(0))).thenReturn(10);
-		when(medicalRecordService.getPersonAge(persons.get(1))).thenReturn(24);
+		when(medicalRecordService.getAge(persons.get(0))).thenReturn(10);
+		when(medicalRecordService.getAge(persons.get(1))).thenReturn(24);
 
 		PersonFloodInfo personFloodInfoTest = personService.floodInfo(stationNumbers);
 

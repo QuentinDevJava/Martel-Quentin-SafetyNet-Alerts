@@ -19,7 +19,7 @@ public record Child(@NotBlank String firstName, @NotBlank String lastName, @NotB
 		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @Min(0) int age) {
 
 	public Child(Person person, MedicalRecordService medicalRecordService) {
-		this(person.firstName(), person.lastName(), person.address(), person.phone(), medicalRecordService.getPersonAge(person));
+		this(person.firstName(), person.lastName(), person.address(), person.phone(), medicalRecordService.getAge(person));
 	}
 
 }

@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.model.Child;
 import com.openclassroom.safetynet.model.Firestation;
-import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
+import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonEmail;
@@ -121,7 +121,7 @@ public class PersonService {
 		List<Person> personByStation = getPersonsByStationAddress(firestations);
 		log.debug("Result of getPersonsByStationAddress for firestations found in findFireStationByStationNumber : {}", personByStation);
 
-		List<MedicalRecord> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
+		List<MedicalRecordResponse> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
 		log.debug("Result of getPersonMedicalRecords for persons found in getPersonsByStationAddress : {}", medicalRecords);
 
 		return new PersonCoveredByStation(personByStation, medicalRecords);
@@ -181,8 +181,8 @@ public class PersonService {
 		if (personsByAddress.isEmpty()) {
 			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
 		}
-		return personsByAddress.stream().filter(person -> medicalRecordService.getPersonAge(person) <= 18)
-				.map(p -> new Child(p, medicalRecordService)).toList();
+		return personsByAddress.stream().filter(person -> medicalRecordService.getAge(person) <= 18).map(p -> new Child(p, medicalRecordService))
+				.toList();
 	}
 
 	/**

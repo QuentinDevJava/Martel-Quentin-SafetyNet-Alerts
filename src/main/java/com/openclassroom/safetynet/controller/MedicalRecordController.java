@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassroom.safetynet.model.MedicalRecord;
+import com.openclassroom.safetynet.model.CreateMedicalRecordRequest;
+import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,27 +34,31 @@ public class MedicalRecordController {
 	private final MedicalRecordService medicalRecordService;
 
 	@PostMapping
-	public ResponseEntity<MedicalRecord> createMedicalRecord(@Validated @RequestBody MedicalRecord medicalRecord) {
-		log.info("POST request received for /medicalrecord, adding medical record: {}", medicalRecord);
+	public ResponseEntity<MedicalRecordResponse> createMedicalRecord(@Validated @RequestBody CreateMedicalRecordRequest medicalRecordRequest) {
+		log.info("POST request received for /medicalrecord, adding medical record: {}", medicalRecordRequest);
 		try {
-			medicalRecordService.createMedicalRecord(medicalRecord);
-			log.info("Medical record successfully created: {}", medicalRecord);
+			MedicalRecordResponse medicalRecordResponse = medicalRecordService.medicalRecordRequestToMedicalRecordResponse(medicalRecordRequest);
+			medicalRecordService.createMedicalRecord(medicalRecordResponse);
+
+			log.info("Medical record successfully created: {}", medicalRecordResponse);
 			URI uri = new URI("/medicalrecord");
-			return ResponseEntity.created(uri).body(medicalRecord);
+			return ResponseEntity.created(uri).body(medicalRecordResponse);
 		} catch (Exception e) {
-			log.error("Error creating medical record: {}", medicalRecord, e);
+			log.error("Error creating medical record: {}", medicalRecordRequest, e);
 			return ResponseEntity.internalServerError().build();
 		}
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
-	public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable String firstName, @PathVariable String lastName,
-			@Validated @RequestBody MedicalRecord medicalRecord) {
-		log.info("PUT request received for /medicalrecord/{}/{} updating medical record: {}", firstName, lastName, medicalRecord);
+	public ResponseEntity<MedicalRecordResponse> updateMedicalRecord(@PathVariable String firstName, @PathVariable String lastName,
+			@Validated @RequestBody CreateMedicalRecordRequest medicalRecordRequest) {
+		log.info("PUT request received for /medicalrecord/{}/{} updating medical record: {}", firstName, lastName, medicalRecordRequest);
 		try {
-			medicalRecordService.updateMedicalRecord(firstName, lastName, medicalRecord);
-			log.info("Medical record successfully updated: {}", medicalRecord);
-			return ResponseEntity.ok(medicalRecord);
+			MedicalRecordResponse medicalRecordResponse = medicalRecordService.medicalRecordRequestToMedicalRecordResponse(medicalRecordRequest);
+
+			medicalRecordService.updateMedicalRecord(firstName, lastName, medicalRecordResponse);
+			log.info("Medical record successfully updated: {}", medicalRecordResponse);
+			return ResponseEntity.ok(medicalRecordResponse);
 		} catch (Exception e) {
 			log.error("Error updating medical record with first name: {} and last name: {}", firstName, lastName, e);
 			return ResponseEntity.internalServerError().build();

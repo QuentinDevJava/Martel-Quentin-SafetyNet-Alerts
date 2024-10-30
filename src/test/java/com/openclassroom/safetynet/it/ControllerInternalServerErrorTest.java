@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.openclassroom.safetynet.constants.JsonFilePath;
 import com.openclassroom.safetynet.model.Firestation;
-import com.openclassroom.safetynet.model.MedicalRecord;
+import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.model.Person;
 
 import lombok.RequiredArgsConstructor;
@@ -78,7 +78,7 @@ public class ControllerInternalServerErrorTest {
 	void postMedicalRecordnErrorTest() throws Exception {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		MedicalRecord medicalRecord = new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies);
+		MedicalRecordResponse medicalRecord = new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -90,7 +90,7 @@ public class ControllerInternalServerErrorTest {
 	void putMedicalRecordErrorTest() throws Exception {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		MedicalRecord medicalRecord = new MedicalRecord("Jacob", "Doe", "01/01/2014", medications, allergies);
+		MedicalRecordResponse medicalRecord = new MedicalRecordResponse("Jacob", "Doe", "01/01/2014", medications, allergies);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
