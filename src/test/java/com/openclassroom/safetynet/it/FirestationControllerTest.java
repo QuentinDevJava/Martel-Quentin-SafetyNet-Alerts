@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.openclassroom.safetynet.constants.JsonFilePath;
-import com.openclassroom.safetynet.model.Firestation;
+import com.openclassroom.safetynet.model.FirestationRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,7 +45,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void postFirestationTest() throws Exception {
-		Firestation firestation = new Firestation("1510 Culver St", 10);
+		FirestationRequest firestation = new FirestationRequest("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -56,7 +56,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void postFirestationErrorTest() throws Exception {
-		Firestation firestation = new Firestation(null, 10);
+		FirestationRequest firestation = new FirestationRequest(null, 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -66,7 +66,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void putFirestationTest() throws Exception {
-		Firestation firestation = new Firestation("1510 Culver St", 10);
+		FirestationRequest firestation = new FirestationRequest("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -76,7 +76,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void putFirestationErrorTest() {
-		Firestation firestation = new Firestation(null, 10);
+		FirestationRequest firestation = new FirestationRequest(null, 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();

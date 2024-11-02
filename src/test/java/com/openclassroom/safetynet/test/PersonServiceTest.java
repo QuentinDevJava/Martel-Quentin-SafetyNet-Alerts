@@ -18,7 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.model.Child;
-import com.openclassroom.safetynet.model.Firestation;
+import com.openclassroom.safetynet.model.FirestationResponse;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.model.Person;
@@ -66,7 +66,7 @@ class PersonServiceTest {
 	@Test
 	void testGetPhoneNumbersByStation() throws NoSuchElementException {
 		int stationNumber = 1;
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", stationNumber));
+		List<FirestationResponse> firestations = Arrays.asList(new FirestationResponse("1509 Culver St", stationNumber));
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
 				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
 
@@ -81,7 +81,7 @@ class PersonServiceTest {
 	@Test
 	void testPersonCoveredByFirStation() { // OK
 		int stationNumber = 1;
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", stationNumber));
+		List<FirestationResponse> firestations = Arrays.asList(new FirestationResponse("1509 Culver St", stationNumber));
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
@@ -106,7 +106,7 @@ class PersonServiceTest {
 		int stationNumber = 1;
 		String address = "1509 Culver St";
 
-		Firestation firestations = new Firestation(address, stationNumber);
+		FirestationResponse firestations = new FirestationResponse(address, stationNumber);
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 		List<Person> persons = Arrays.asList(new Person("John", "Doe", address, "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
@@ -202,7 +202,8 @@ class PersonServiceTest {
 				new Person("Jane", "Doe", "1650 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
 		List<MedicalRecordInfo> medicalRecordInfos = Arrays.asList(new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies),
 				new MedicalRecordInfo("Jane", "Doe", "841-874-6513", 24, medications, allergies));
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 2));
+		List<FirestationResponse> firestations = Arrays.asList(new FirestationResponse("1509 Culver St", 1),
+				new FirestationResponse("1650 Culver St", 2));
 		List<MedicalRecordResponse> medicalRecord = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
 				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
 

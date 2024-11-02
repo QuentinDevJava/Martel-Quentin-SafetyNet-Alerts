@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.model.Child;
-import com.openclassroom.safetynet.model.Firestation;
+import com.openclassroom.safetynet.model.FirestationRequest;
+import com.openclassroom.safetynet.model.FirestationResponse;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
 import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.model.Person;
@@ -113,7 +114,7 @@ public class PersonService {
 	 * @throws NoSuchElementException
 	 */
 	public PersonCoveredByStation personCoveredByStation(int stationNumber) throws NoSuchElementException {
-		List<Firestation> firestations = firestationService.findFireStationByStationNumber(stationNumber);
+		List<FirestationResponse> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {}", stationNumber, firestations);
 		if (firestations.isEmpty()) {
 			throw new NoSuchElementException("The list of fire stations whose station number is " + stationNumber + " cannot be found.");
@@ -146,7 +147,7 @@ public class PersonService {
 				.map(p -> new MedicalRecordInfo(p, medicalRecordService.getMedicalRecordByFullName(p.fullName()))).collect(Collectors.toList());
 
 		log.debug("Result of getMedicalRecordInfosByPersons for persons found in getPersonsByAddress : {}", medicalRecordInfos);
-		Firestation firestation = firestationService.getFirestationByAddress(address);
+		FirestationResponse firestation = firestationService.getFirestationByAddress(address);
 		log.debug("Result of getFirestationByAddress the fire station number associated with address : {} = {} ", address, firestation.station());
 		return new PersonsAndStationInfo(medicalRecordInfos, firestation.station());
 	}
@@ -199,11 +200,11 @@ public class PersonService {
 	 * Retrieves persons associated with a specific fire station.
 	 *
 	 * @param firestation The fire station to retrieve persons for
-	 *                    {@link Firestation}.
+	 *                    {@link FirestationRequest}.
 	 * @return A list of persons associated with the specified fire station
 	 *         {@link Person}.
 	 */
-	private List<Person> getPersonsByStationAddress(List<Firestation> firestation) {
+	private List<Person> getPersonsByStationAddress(List<FirestationResponse> firestation) {
 		List<Person> persons = allPersons();
 		return firestation.stream().flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream()).toList();
 	}
@@ -220,7 +221,7 @@ public class PersonService {
 	}
 
 	private List<Person> getPersonsByStation(int stationNumber) throws NoSuchElementException {
-		List<Firestation> firestation = firestationService.findFireStationByStationNumber(stationNumber);
+		List<FirestationResponse> firestation = firestationService.findFireStationByStationNumber(stationNumber);
 		if (firestation.isEmpty()) {
 			throw new NoSuchElementException("The list of fire stations number " + stationNumber + " cannot be found.");
 		}
@@ -259,7 +260,7 @@ public class PersonService {
 	 * @throws NoSuchElementException
 	 */
 	public PersonFloodInfo floodInfo(List<Integer> stationNumber) throws NoSuchElementException {
-		List<Firestation> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
+		List<FirestationResponse> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = listOfPersonsByAddressByStationNumber(firestations);
 		if (medicalRecordsByAddress.values().isEmpty()) {
 			throw new NoSuchElementException(
@@ -272,13 +273,13 @@ public class PersonService {
 	 * Returns a map of fire station addresses to lists of medical record
 	 * information for people located at those addresses.
 	 *
-	 * @param firestations A list of fire stations {@link Firestation}.
+	 * @param firestations A list of fire stations {@link FirestationRequest}.
 	 * @return A map where keys are addresses and values are lists of medical record
 	 *         information for people at those addresses.
 	 */
-	public Map<String, List<MedicalRecordInfo>> listOfPersonsByAddressByStationNumber(List<Firestation> firestations) {
+	public Map<String, List<MedicalRecordInfo>> listOfPersonsByAddressByStationNumber(List<FirestationResponse> firestations) {
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = new HashMap<>();
-		for (Firestation firestation : firestations) {
+		for (FirestationResponse firestation : firestations) {
 			List<Person> persons = new ArrayList<>();
 			persons.addAll(getPersonsByAddress(firestation.address()));
 

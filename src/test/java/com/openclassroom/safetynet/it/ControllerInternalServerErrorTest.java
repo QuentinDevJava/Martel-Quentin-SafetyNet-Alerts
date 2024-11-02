@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.openclassroom.safetynet.constants.JsonFilePath;
-import com.openclassroom.safetynet.model.Firestation;
+import com.openclassroom.safetynet.model.FirestationRequest;
 import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.model.Person;
 
@@ -50,7 +50,7 @@ public class ControllerInternalServerErrorTest {
 
 	@Test
 	void postFirestationErrorTest() throws Exception {
-		Firestation firestation = new Firestation("1510 Culver St", 10);
+		FirestationRequest firestation = new FirestationRequest("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -61,7 +61,7 @@ public class ControllerInternalServerErrorTest {
 
 	@Test
 	void putFirestationErrorTest() throws Exception {
-		Firestation firestation = new Firestation("1510 Culver St", 10);
+		FirestationRequest firestation = new FirestationRequest("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();

@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassroom.safetynet.model.Firestation;
+import com.openclassroom.safetynet.model.FirestationRequest;
+import com.openclassroom.safetynet.model.FirestationResponse;
 import com.openclassroom.safetynet.service.FirestationService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,27 +28,33 @@ public class FirestationController {
 	private final FirestationService firestationService;
 
 	@PostMapping()
-	public ResponseEntity<Firestation> createFirestation(@Validated @RequestBody Firestation firestation) {
-		log.info("POST request received for /firestation, adding firestation: {}", firestation);
+	public ResponseEntity<FirestationResponse> createFirestation(@Validated @RequestBody FirestationRequest firestationRequest) {
+		log.info("POST request received for /firestation, adding firestation: {}", firestationRequest);
 		try {
-			firestationService.createFirestation(firestation);
-			log.info("Firestation successfully created: {}", firestation);
+
+			FirestationResponse firestationResponse = firestationService.firestationRequestToFirestationResponse(firestationRequest);
+
+			firestationService.createFirestation(firestationResponse);
+			log.info("Firestation successfully created: {}", firestationResponse);
 			URI uri = new URI("/firestation");
-			return ResponseEntity.created(uri).body(firestation);
+			return ResponseEntity.created(uri).body(firestationResponse);
 
 		} catch (Exception e) {
-			log.error("Error creating firestation: {}", firestation, e);
+			log.error("Error creating firestation: {}", firestationRequest, e);
 			return ResponseEntity.internalServerError().build();
 		}
 	}
 
 	@PutMapping("/{address}")
-	public ResponseEntity<Firestation> updateFirestation(@PathVariable String address, @Validated @RequestBody Firestation firestation) {
-		log.info("PUT request received for /firestation/{} updating firestation: {}", address, firestation);
+	public ResponseEntity<FirestationResponse> updateFirestation(@PathVariable String address,
+			@Validated @RequestBody FirestationRequest firestationRequest) {
+		log.info("PUT request received for /firestation/{} updating firestation: {}", address, firestationRequest);
 		try {
-			firestationService.updateFirestation(address, firestation);
-			log.info("Firestation successfully updated: {}", firestation);
-			return ResponseEntity.ok(firestation);
+			FirestationResponse firestationResponse = firestationService.firestationRequestToFirestationResponse(firestationRequest);
+
+			firestationService.updateFirestation(address, firestationResponse);
+			log.info("Firestation successfully updated: {}", firestationResponse);
+			return ResponseEntity.ok(firestationResponse);
 		} catch (Exception e) {
 			log.error("Error updating firestation with address: {}", address, e);
 			return ResponseEntity.internalServerError().build();
