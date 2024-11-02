@@ -2,7 +2,7 @@
 package com.openclassroom.safetynet.controller;
 
 import java.net.URI;
-import java.util.NoSuchElementException;
+import java.net.URISyntaxException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassroom.safetynet.model.PersonRequest;
-import com.openclassroom.safetynet.model.PersonResponse;
+import com.openclassroom.safetynet.model.ApiResponse;
+import com.openclassroom.safetynet.model.PersonDTO;
 import com.openclassroom.safetynet.service.PersonService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,65 +30,40 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/person")
 @Slf4j
+@RequiredArgsConstructor
 public class PersonController {
 
 	private final PersonService personService;
 
-	public PersonController(PersonService personService) {
-		this.personService = personService;
-	}
-
 	@PostMapping
-	public ResponseEntity<PersonResponse> createPerson(@Validated @RequestBody PersonRequest personRequest) {
-		log.info("POST request received for /person, adding person: {}", personRequest);
-		try {
-			PersonResponse personResponse = personService.personRequestToPersonResponse(personRequest);
-			personService.createPerson(personResponse);
-			log.info("Person successfully created: {}", personResponse);
-			URI uri = new URI("/person");
-			return ResponseEntity.created(uri).body(personResponse);
-		} catch (Exception e) {
-			log.error("Error creating person: {}", personRequest, e);
-			return ResponseEntity.internalServerError().build();
-		}
+	public ResponseEntity<ApiResponse> createPerson(@Validated @RequestBody PersonDTO personDTO) throws URISyntaxException {
+		log.info("POST request received for /person, adding person: {}", personDTO);
+		personService.createPerson(personDTO);
+		log.info("Person successfully created: {}", personDTO);
+		String str = "/person";
+		URI uri = new URI(str);
+		return ResponseEntity.created(uri).body(new ApiResponse(201));
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
-	public ResponseEntity<PersonResponse> updatePerson(@PathVariable String firstName, @PathVariable String lastName,
-			@Validated @RequestBody PersonRequest personRequest) {
-		log.info("PUT request received for /person/{}/{} updating person : {}", firstName, lastName, personRequest);
-		try {
-			PersonResponse personResponse = personService.personRequestToPersonResponse(personRequest);
-			personService.updatePerson(firstName, lastName, personResponse);
-			log.info("Person successfully updated: {}", personResponse);
-			return ResponseEntity.ok(personResponse);
-		} catch (NoSuchElementException e) {
-			log.error("Error the people with full name : {} {} cannot be found.", firstName, lastName, e);
-			return ResponseEntity.notFound().build();
-		} catch (Exception e) {
-			log.error("Error updating person with first name: {} and last name: {}", firstName, lastName, e);
-			return ResponseEntity.internalServerError().build();
-		}
+	public ResponseEntity<ApiResponse> updatePerson(@PathVariable String firstName, @PathVariable String lastName,
+			@Validated @RequestBody PersonDTO personDTO) {
+		log.info("PUT request received for /person/{}/{} updating person : {}", firstName, lastName, personDTO);
+		personService.updatePerson(firstName, lastName, personDTO);
+		log.info("Person successfully updated: {}", personDTO);
+		return ResponseEntity.ok(new ApiResponse(200));
 	}
 
 	@DeleteMapping("/{firstName}/{lastName}")
 	public ResponseEntity<Void> deletePerson(@PathVariable String firstName, @PathVariable String lastName) {
 		log.info("DELETE request received for /person/{}/{}", firstName, lastName);
-
-		try {
-			boolean personDeleted = personService.deletePerson(firstName, lastName);
-
-			if (Boolean.TRUE.equals(personDeleted)) {
-				log.info("Person successfully deleted: firstName: {}, lastName: {}", firstName, lastName);
-				return ResponseEntity.noContent().build();
-			} else {
-				log.error("Person not found: firstName: {}, lastName: {}", firstName, lastName);
-				return ResponseEntity.notFound().build();
-			}
-
-		} catch (Exception e) {
-			log.error("Error deleting person with first name: {} and last name: {}", firstName, lastName, e);
-			return ResponseEntity.internalServerError().build();
+		boolean personDeleted = personService.deletePerson(firstName, lastName);
+		if (Boolean.TRUE.equals(personDeleted)) {
+			log.info("Person successfully deleted: firstName: {}, lastName: {}", firstName, lastName);
+			return ResponseEntity.noContent().build();
+		} else {
+			log.error("Person not found: firstName: {}, lastName: {}", firstName, lastName);
+			return ResponseEntity.notFound().build();
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package com.openclassroom.safetynet.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -8,9 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.model.MedicalRecordRequest;
-import com.openclassroom.safetynet.model.MedicalRecordResponse;
-import com.openclassroom.safetynet.model.PersonResponse;
+import com.openclassroom.safetynet.model.MedicalRecordDTO;
+import com.openclassroom.safetynet.model.PersonDTO;
 import com.openclassroom.safetynet.repository.JsonRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,20 +27,14 @@ public class MedicalRecordService {
 	private final JsonRepository repository;
 	private final ObjectMapper objectMapper;
 
-	private List<MedicalRecordResponse> allMedicalRecords() {
-		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream()
-				.map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecordResponse.class)).collect(Collectors.toList());
-	}
-
 	/**
 	 * Creates a new medical record.
 	 *
-	 * @param medicalRecord The medical record to create
-	 *                      {@link MedicalRecordResponse}.
-	 * @return The created medical record {@link MedicalRecordResponse}.
+	 * @param medicalRecord The medical record to create {@link MedicalRecordDTO}.
+	 * @return The created medical record {@link MedicalRecordDTO}.
 	 */
-	public void createMedicalRecord(MedicalRecordResponse medicalRecord) {
-		List<MedicalRecordResponse> medicalRecords = allMedicalRecords();
+	public void createMedicalRecord(MedicalRecordDTO medicalRecord) {
+		List<MedicalRecordDTO> medicalRecords = allMedicalRecords();
 		medicalRecords.add(medicalRecord);
 		saveMedicalRecords(medicalRecords);
 		log.debug("Add medicalRecord {} in allMedicalRecords() : {}", medicalRecord, medicalRecords);
@@ -53,15 +47,14 @@ public class MedicalRecordService {
 	 *                      update.
 	 * @param lastName      The last name of the person whose medical record to
 	 *                      update.
-	 * @param medicalRecord The updated medical record
-	 *                      {@link MedicalRecordResponse}.
-	 * @return The updated medical record {@link MedicalRecordResponse}.
+	 * @param medicalRecord The updated medical record {@link MedicalRecordDTO}.
+	 * @return The updated medical record {@link MedicalRecordDTO}.
 	 */
-	public void updateMedicalRecord(String firstName, String lastName, MedicalRecordResponse medicalRecord) {
+	public void updateMedicalRecord(String firstName, String lastName, MedicalRecordDTO medicalRecord) {
 		String fullName = firstName + " " + lastName;
-		MedicalRecordResponse existingMedicalRecord = getMedicalRecordByFullName(fullName);
+		MedicalRecordDTO existingMedicalRecord = getMedicalRecordByFullName(fullName);
 		log.debug("Found existing medical record for: {} = {}", fullName, existingMedicalRecord);
-		List<MedicalRecordResponse> medicalRecords = allMedicalRecords();
+		List<MedicalRecordDTO> medicalRecords = allMedicalRecords();
 		medicalRecords.set(medicalRecords.indexOf(existingMedicalRecord), medicalRecord);
 		saveMedicalRecords(medicalRecords);
 		log.debug("Updated medical record list with {} = {}", medicalRecord, medicalRecords);
@@ -74,9 +67,9 @@ public class MedicalRecordService {
 	 * @param lastName  The last name of the person.
 	 * @return True if the medical record was deleted successfully, false otherwise.
 	 */
-	public Boolean deleteMedicalRecord(String firstName, String lastName) {
+	public boolean deleteMedicalRecord(String firstName, String lastName) {
 		String fullName = firstName + " " + lastName;
-		List<MedicalRecordResponse> medicalRecords = allMedicalRecords();
+		List<MedicalRecordDTO> medicalRecords = allMedicalRecords();
 		boolean medicalRecordDeleted = medicalRecords.removeIf(m -> m.fullName().equals(fullName));
 		if (medicalRecordDeleted) {
 			saveMedicalRecords(medicalRecords);
@@ -85,21 +78,14 @@ public class MedicalRecordService {
 		return medicalRecordDeleted;
 	}
 
-	private void saveMedicalRecords(List<MedicalRecordResponse> medicalRecords) {
-
-		repository.saveData(TypeOfData.MEDICALRECORDS, medicalRecords.stream()
-				.map(medicalRecordsObj -> objectMapper.convertValue(medicalRecordsObj, MedicalRecordResponse.class)).collect(Collectors.toList()));
-	}
-
 	/**
 	 * Retrieves a medical record by the full name of the person.
 	 *
 	 * @param firstName The first name of the person.
 	 * @param lastName  The last name of the person.
-	 * @return The medical record for the specified person
-	 *         {@link MedicalRecordResponse}.
+	 * @return The medical record for the specified person {@link MedicalRecordDTO}.
 	 */
-	public MedicalRecordResponse getMedicalRecordByFullName(String fullName) {
+	public MedicalRecordDTO getMedicalRecordByFullName(String fullName) {
 		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.fullName().equals(fullName)).findFirst().orElse(null);
 	}
 
@@ -108,28 +94,22 @@ public class MedicalRecordService {
 	 *
 	 * @param persons The list of persons {@link PersonResponse}.
 	 * @return A list of medical records for the specified persons
-	 *         {@link MedicalRecordResponse}.
+	 *         {@link MedicalRecordDTO}.
 	 */
-	public List<MedicalRecordResponse> getPersonMedicalRecords(List<PersonResponse> persons) {
+	public List<MedicalRecordDTO> getPersonMedicalRecords(List<PersonDTO> persons) {
 		return persons.stream().map(p -> getMedicalRecordByFullName(p.fullName())).filter(Objects::nonNull).toList();
 	}
 
-	/**
-	 * Calculates the age of a person based on their birthdate.
-	 *
-	 * @param person The person to calculate the age for {@link PersonResponse}.
-	 * @return The age of the person.
-	 */
-	public int getAge(PersonResponse person) {
-		MedicalRecordResponse medicalRecord = getMedicalRecordByFullName(person.fullName());
-		if (medicalRecord != null) {
-			return medicalRecord.getAge();
-		}
-		return -1;
+	private List<MedicalRecordDTO> allMedicalRecords() {
+		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream()
+				.map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecordDTO.class))
+				.collect((Collectors.toCollection(ArrayList::new)));
 	}
 
-	public MedicalRecordResponse medicalRecordRequestToMedicalRecordResponse(MedicalRecordRequest request) {
-		return new MedicalRecordResponse(request.firstName(), request.lastName(), request.birthdate(), request.medications(), request.allergies());
+	private void saveMedicalRecords(List<MedicalRecordDTO> medicalRecords) {
+
+		repository.saveData(TypeOfData.MEDICALRECORDS, medicalRecords.stream()
+				.map(medicalRecordsObj -> objectMapper.convertValue(medicalRecordsObj, MedicalRecordDTO.class)).collect(Collectors.toList()));
 	}
 
 }

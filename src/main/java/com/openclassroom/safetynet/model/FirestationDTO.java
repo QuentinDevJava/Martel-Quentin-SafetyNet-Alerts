@@ -13,5 +13,5 @@ import jakarta.validation.constraints.Positive;
  * @param station The station number of the fire station.
  */
 @JsonPropertyOrder({ "address", "station" })
-public record FirestationRequest(@NotBlank String address, @NotNull @Positive int station) {
+public record FirestationDTO(@NotBlank String address, @NotNull @Positive int station) {
 }

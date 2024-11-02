@@ -12,15 +12,12 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.model.Child;
-import com.openclassroom.safetynet.model.FirestationRequest;
-import com.openclassroom.safetynet.model.FirestationResponse;
+import com.openclassroom.safetynet.model.FirestationDTO;
+import com.openclassroom.safetynet.model.MedicalRecordDTO;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
-import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
-import com.openclassroom.safetynet.model.PersonEmail;
+import com.openclassroom.safetynet.model.PersonDTO;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
-import com.openclassroom.safetynet.model.PersonRequest;
-import com.openclassroom.safetynet.model.PersonResponse;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.repository.JsonRepository;
@@ -40,20 +37,14 @@ public class PersonService {
 	private final MedicalRecordService medicalRecordService;
 	private final FirestationService firestationService;
 
-	private List<PersonResponse> allPersons() {
-		return repository.loadTypeOfData(TypeOfData.PERSONS).stream().map(p -> objectMapper.convertValue(p, PersonResponse.class))
-				.filter(PersonResponse.class::isInstance).map(PersonResponse.class::cast).collect(Collectors.toList());
-	}
-
 	/**
 	 * Creates a new Person.
 	 *
-	 * @param person The person to create {@link PersonResponse}.
+	 * @param person The person to create {@link PersonDTO}.
 	 * 
 	 */
-
-	public void createPerson(PersonResponse person) {
-		List<PersonResponse> persons = allPersons();
+	public void createPerson(PersonDTO person) {
+		List<PersonDTO> persons = allPersons();
 		persons.add(person);
 		savePersons(persons);
 		log.debug("Add person {} in allPersons() : {}", person, persons);
@@ -64,23 +55,16 @@ public class PersonService {
 	 *
 	 * @param firstName The first name of the person to update.
 	 * @param lastName  The last name of the person to update.
-	 * @param person    The updated person {@link PersonResponse}.
+	 * @param person    The updated person {@link PersonDTO}.
 	 */
-	public void updatePerson(String firstName, String lastName, PersonResponse person) {
+	public void updatePerson(String firstName, String lastName, PersonDTO person) {
 		String fullName = firstName + " " + lastName;
-		PersonResponse existingPerson = getPersonByFullName(fullName);
-		if (existingPerson == null) {
-			throw new NoSuchElementException("The people full name is : " + fullName + " cannot be found.");
-		}
-		List<PersonResponse> persons = allPersons();
+		PersonDTO existingPerson = getPersonByFullName(fullName);
+		List<PersonDTO> persons = allPersons();
 		log.debug("Found existing person: {}", existingPerson);
 		persons.set(persons.indexOf(existingPerson), person);
 		savePersons(persons);
 		log.debug("Updated person list: {}", persons);
-	}
-
-	private PersonResponse getPersonByFullName(String fullName) {
-		return allPersons().stream().filter(p -> p.fullName().equals(fullName)).findFirst().orElse(null);
 	}
 
 	/**
@@ -92,18 +76,13 @@ public class PersonService {
 	 */
 	public boolean deletePerson(String firstName, String lastName) {
 		String fullName = firstName + " " + lastName;
-		List<PersonResponse> persons = allPersons();
+		List<PersonDTO> persons = allPersons();
 		boolean personDeleted = persons.removeIf(p -> p.fullName().equals(fullName));
 		if (personDeleted) {
 			savePersons(persons);
 			log.debug("Person {} deleted successfully.", fullName);
 		}
 		return personDeleted;
-	}
-
-	private void savePersons(List<PersonResponse> persons) {
-		repository.saveData(TypeOfData.PERSONS,
-				persons.stream().map(personsObj -> objectMapper.convertValue(personsObj, PersonResponse.class)).collect(Collectors.toList()));
 	}
 
 	/**
@@ -114,16 +93,14 @@ public class PersonService {
 	 *         covered by the station.
 	 * @throws NoSuchElementException
 	 */
-	public PersonCoveredByStation personCoveredByStation(int stationNumber) throws NoSuchElementException {
-		List<FirestationResponse> firestations = firestationService.findFireStationByStationNumber(stationNumber);
+	public PersonCoveredByStation personCoveredByStation(int stationNumber) {
+		List<FirestationDTO> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {}", stationNumber, firestations);
-		if (firestations.isEmpty()) {
-			throw new NoSuchElementException("The list of fire stations whose station number is " + stationNumber + " cannot be found.");
-		}
-		List<PersonResponse> personByStation = getPersonsByStationAddress(firestations);
+
+		List<PersonDTO> personByStation = getPersonsByStationAddress(firestations);
 		log.debug("Result of getPersonsByStationAddress for firestations found in findFireStationByStationNumber : {}", personByStation);
 
-		List<MedicalRecordResponse> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
+		List<MedicalRecordDTO> medicalRecords = medicalRecordService.getPersonMedicalRecords(personByStation);
 		log.debug("Result of getPersonMedicalRecords for persons found in getPersonsByStationAddress : {}", medicalRecords);
 
 		return new PersonCoveredByStation(personByStation, medicalRecords);
@@ -138,17 +115,13 @@ public class PersonService {
 	 *         the people and the station.
 	 * @throws NoSuchElementException
 	 */
-	public PersonsAndStationInfo getPersonsAndStationInfoByAddress(String address) throws NoSuchElementException {
-		List<PersonResponse> persons = getPersonsByAddress(address);
-		if (persons.isEmpty()) {
-			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
-		}
+	public PersonsAndStationInfo getPersonsAndStationInfoByAddress(String address) {
+		List<PersonDTO> persons = getPersonsByAddress(address);
 		log.debug("Result of getPersonsByAddress for address {} = {} ", address, persons);
 		List<MedicalRecordInfo> medicalRecordInfos = persons.stream()
-				.map(p -> new MedicalRecordInfo(p, medicalRecordService.getMedicalRecordByFullName(p.fullName()))).collect(Collectors.toList());
-
+				.map(p -> new MedicalRecordInfo(p, medicalRecordService.getMedicalRecordByFullName(p.fullName()))).toList();
 		log.debug("Result of getMedicalRecordInfosByPersons for persons found in getPersonsByAddress : {}", medicalRecordInfos);
-		FirestationResponse firestation = firestationService.getFirestationByAddress(address);
+		FirestationDTO firestation = firestationService.getFirestationByAddress(address);
 		log.debug("Result of getFirestationByAddress the fire station number associated with address : {} = {} ", address, firestation.station());
 		return new PersonsAndStationInfo(medicalRecordInfos, firestation.station());
 	}
@@ -161,29 +134,22 @@ public class PersonService {
 	 *         addresses {@link PersonEmail}.
 	 * @throws NoSuchElementException
 	 */
-	public PersonEmail personEmails(String city) throws NoSuchElementException {
-		List<String> emails = allPersons().stream().filter(person -> person.city().equals(city)).map(PersonResponse::email).toList();
-		if (emails.isEmpty()) {
-			throw new NoSuchElementException("The list of residents' e-mail addresses was not found for the city : " + city);
-		}
-		return new PersonEmail(emails);
+	public List<String> personEmails(String city) {
+		return allPersons().stream().filter(person -> person.city().equals(city)).map(PersonDTO::email).toList();
 	}
 
 	/**
 	 * Retrieves a list of Child objects from a list of persons.
 	 *
 	 * @param personsByAddress The list of persons to extract child information from
-	 *                         {@link PersonResponse}.
+	 *                         {@link PersonDTO}.
 	 * @return A list of Child objects containing the extracted child information
 	 *         {@link Child}.
 	 * @throws NoSuchElementException
 	 */
-	public List<Child> getchildsByAddress(String address) throws NoSuchElementException {
-		List<PersonResponse> personsByAddress = getPersonsByAddress(address);
-		if (personsByAddress.isEmpty()) {
-			throw new NoSuchElementException("The list of people whose address is " + address + " cannot be found.");
-		}
-		return personsByAddress.stream().filter(person -> medicalRecordService.getAge(person) <= 18)
+	public List<Child> getChildsByAddress(String address) {
+		List<PersonDTO> personsByAddress = getPersonsByAddress(address);
+		return personsByAddress.stream().filter(person -> medicalRecordService.getMedicalRecordByFullName(person.fullName()).isChild())
 				.map(p -> new Child(p, medicalRecordService.getMedicalRecordByFullName(p.fullName()))).toList();
 	}
 
@@ -192,23 +158,10 @@ public class PersonService {
 	 *
 	 * @param address The address to retrieve persons for.
 	 * @return A list of persons residing at the specified address
-	 *         {@link PersonResponse}.
+	 *         {@link PersonDTO}.
 	 */
-	public List<PersonResponse> getPersonsByAddress(String address) {
-		return allPersons().stream().filter(person -> person.address().equals(address)).collect(Collectors.toList());
-	}
-
-	/**
-	 * Retrieves persons associated with a specific fire station.
-	 *
-	 * @param firestation The fire station to retrieve persons for
-	 *                    {@link FirestationRequest}.
-	 * @return A list of persons associated with the specified fire station
-	 *         {@link PersonResponse}.
-	 */
-	private List<PersonResponse> getPersonsByStationAddress(List<FirestationResponse> firestation) {
-		List<PersonResponse> persons = allPersons();
-		return firestation.stream().flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream()).toList();
+	public List<PersonDTO> getPersonsByAddress(String address) {
+		return allPersons().stream().filter(person -> person.address().equals(address)).toList();
 	}
 
 	/**
@@ -218,16 +171,8 @@ public class PersonService {
 	 * @return A list of phone numbers of persons covered by the specified station.
 	 * @throws NoSuchElementException
 	 */
-	public List<String> getPhoneNumbersByStation(int stationNumber) throws NoSuchElementException {
-		return getPersonsByStation(stationNumber).stream().map(PersonResponse::phone).toList();
-	}
-
-	private List<PersonResponse> getPersonsByStation(int stationNumber) throws NoSuchElementException {
-		List<FirestationResponse> firestation = firestationService.findFireStationByStationNumber(stationNumber);
-		if (firestation.isEmpty()) {
-			throw new NoSuchElementException("The list of fire stations number " + stationNumber + " cannot be found.");
-		}
-		return getPersonsByStationAddress(firestation);
+	public List<String> getPhoneNumbersByStation(int stationNumber) {
+		return getPersonsByStation(stationNumber).stream().map(PersonDTO::phone).toList();
 	}
 
 	/**
@@ -239,17 +184,10 @@ public class PersonService {
 	 *         information {@link PersonsLastNameInfo}.
 	 * @throws NoSuchElementException
 	 */
-	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) throws NoSuchElementException {
-		List<PersonResponse> persons = allPersons();
-		List<PersonsLastNameInfo> listOfPersonsByLastName = persons.stream().filter(person -> person.lastName().equals(lastName))
-				.map(person -> new PersonsLastNameInfo(person, medicalRecordService.getMedicalRecordByFullName(person.fullName())))
-				.collect(Collectors.toList());
-
-		if (listOfPersonsByLastName.isEmpty()) {
-			throw new NoSuchElementException("The list of people whose last name is " + lastName + " cannot be found.");
-		}
-
-		return listOfPersonsByLastName;
+	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) {
+		List<PersonDTO> persons = allPersons();
+		return persons.stream().filter(person -> person.lastName().equals(lastName))
+				.map(person -> new PersonsLastNameInfo(person, medicalRecordService.getMedicalRecordByFullName(person.fullName()))).toList();
 	}
 
 	/**
@@ -261,13 +199,9 @@ public class PersonService {
 	 *         people affected by the flood.
 	 * @throws NoSuchElementException
 	 */
-	public PersonFloodInfo floodInfo(List<Integer> stationNumber) throws NoSuchElementException {
-		List<FirestationResponse> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
+	public PersonFloodInfo floodInfo(List<Integer> stationNumber) {
+		List<FirestationDTO> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = listOfPersonsByAddressByStationNumber(firestations);
-		if (medicalRecordsByAddress.values().isEmpty()) {
-			throw new NoSuchElementException(
-					"The information about the people affected by the flood for the fire stations number : " + stationNumber + " cannot be found.");
-		}
 		return new PersonFloodInfo(medicalRecordsByAddress);
 	}
 
@@ -275,50 +209,52 @@ public class PersonService {
 	 * Returns a map of fire station addresses to lists of medical record
 	 * information for people located at those addresses.
 	 *
-	 * @param firestations A list of fire stations {@link FirestationRequest}.
+	 * @param firestations A list of fire stations {@link FirestationDTO}.
 	 * @return A map where keys are addresses and values are lists of medical record
 	 *         information for people at those addresses.
 	 */
-	public Map<String, List<MedicalRecordInfo>> listOfPersonsByAddressByStationNumber(List<FirestationResponse> firestations) {
+	public Map<String, List<MedicalRecordInfo>> listOfPersonsByAddressByStationNumber(List<FirestationDTO> firestations) {
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = new HashMap<>();
-		for (FirestationResponse firestation : firestations) {
-			List<PersonResponse> persons = new ArrayList<>();
+		for (FirestationDTO firestation : firestations) {
+			List<PersonDTO> persons = new ArrayList<>();
 			persons.addAll(getPersonsByAddress(firestation.address()));
-
 			List<MedicalRecordInfo> medicalRecordInfos = getMedicalRecordInfosByListPersons(persons);
 			medicalRecordsByAddress.put(firestation.address(), medicalRecordInfos);
 		}
 		return medicalRecordsByAddress;
 	}
 
-	/**
-	 * Retrieves basic information from the medical records of a list of persons.
-	 *
-	 * @param persons The list of persons whose medical records to extract
-	 *                information from {@link PersonResponse}.
-	 * @return A list of MedicalRecordInfo objects containing basic information from
-	 *         the medical records {@link MedicalRecordInfo}.
-	 */
-	private List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<PersonResponse> persons) {
+	private List<PersonDTO> allPersons() {
+		return repository.loadTypeOfData(TypeOfData.PERSONS).stream().map(p -> objectMapper.convertValue(p, PersonDTO.class))
+				.filter(PersonDTO.class::isInstance).map(PersonDTO.class::cast).collect((Collectors.toCollection(ArrayList::new)));
+	}
+
+	private void savePersons(List<PersonDTO> persons) {
+		repository.saveData(TypeOfData.PERSONS,
+				persons.stream().map(personsObj -> objectMapper.convertValue(personsObj, PersonDTO.class)).collect(Collectors.toList()));
+	}
+
+	private List<MedicalRecordInfo> getMedicalRecordInfosByListPersons(List<PersonDTO> persons) {
 		return persons.stream().map(this::getMedicalRecordInfosByPerson).toList();
 	}
 
-	/**
-	 * Retrieves basic information from the medical record of a person.
-	 *
-	 * @param person The person whose medical record to extract information from
-	 *               {@link PersonResponse}.
-	 * @return A MedicalRecordInfo object containing basic information from the
-	 *         medical record {@link MedicalRecordInfo}.
-	 */
-	private MedicalRecordInfo getMedicalRecordInfosByPerson(PersonResponse person) {
+	private MedicalRecordInfo getMedicalRecordInfosByPerson(PersonDTO person) {
 		return new MedicalRecordInfo(person, medicalRecordService.getMedicalRecordByFullName(person.fullName()));
 
 	}
 
-	public PersonResponse personRequestToPersonResponse(PersonRequest personRequest) {
-		return new PersonResponse(personRequest.firstName(), personRequest.lastName(), personRequest.address(), personRequest.city(),
-				personRequest.zip(), personRequest.phone(), personRequest.email());
-
+	private PersonDTO getPersonByFullName(String fullName) {
+		return allPersons().stream().filter(p -> p.fullName().equals(fullName)).findFirst().orElse(null);
 	}
+
+	private List<PersonDTO> getPersonsByStation(int stationNumber) {
+		List<FirestationDTO> firestation = firestationService.findFireStationByStationNumber(stationNumber);
+		return getPersonsByStationAddress(firestation);
+	}
+
+	private List<PersonDTO> getPersonsByStationAddress(List<FirestationDTO> firestation) {
+		List<PersonDTO> persons = allPersons();
+		return firestation.stream().flatMap(f -> persons.stream().filter(person -> person.address().equals(f.address())).toList().stream()).toList();
+	}
+
 }

@@ -16,7 +16,7 @@ import java.util.List;
 public record PersonsLastNameInfo(String firstName, String lastName, String address, int age, String email, List<String> medications,
 		List<String> allergies) {
 
-	public PersonsLastNameInfo(PersonResponse person, MedicalRecordResponse medicalRecord) {
+	public PersonsLastNameInfo(PersonDTO person, MedicalRecordDTO medicalRecord) {
 		this(person.firstName(), person.lastName(), person.address(), medicalRecord.getAge(), person.email(), medicalRecord.medications(),
 				medicalRecord.allergies());
 

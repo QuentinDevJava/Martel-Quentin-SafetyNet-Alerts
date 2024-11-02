@@ -11,7 +11,7 @@ package com.openclassroom.safetynet.model;
  */
 public record Child(String firstName, String lastName, String address, String phone, int age) {
 
-	public Child(PersonResponse person, MedicalRecordResponse medicalRecord) {
+	public Child(PersonDTO person, MedicalRecordDTO medicalRecord) {
 		this(person.firstName(), person.lastName(), person.address(), person.phone(), medicalRecord.getAge());
 	}
 

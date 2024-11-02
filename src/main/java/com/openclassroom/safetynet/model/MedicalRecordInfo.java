@@ -22,7 +22,7 @@ public record MedicalRecordInfo(@NotBlank String firstName, @NotBlank String las
 		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @Min(0) int age, @NotNull List<String> medications,
 		@NotNull List<String> allergies) {
 
-	public MedicalRecordInfo(PersonResponse person, MedicalRecordResponse medicalRecord) {
+	public MedicalRecordInfo(PersonDTO person, MedicalRecordDTO medicalRecord) {
 		this(person.firstName(), person.lastName(), person.phone(), medicalRecord.getAge(), medicalRecord.medications(), medicalRecord.allergies());
 	}
 

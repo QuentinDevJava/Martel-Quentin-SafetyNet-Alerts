@@ -18,13 +18,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.model.Child;
-import com.openclassroom.safetynet.model.FirestationResponse;
+import com.openclassroom.safetynet.model.FirestationDTO;
 import com.openclassroom.safetynet.model.MedicalRecordInfo;
-import com.openclassroom.safetynet.model.MedicalRecordResponse;
+import com.openclassroom.safetynet.model.MedicalRecordDTO;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
-import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
-import com.openclassroom.safetynet.model.PersonResponse;
+import com.openclassroom.safetynet.model.PersonDTO;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
 import com.openclassroom.safetynet.repository.JsonRepository;
@@ -48,49 +47,49 @@ class PersonServiceTest {
 
 	private String address;
 	private int stationNumber;
-	private List<FirestationResponse> firestationsN1;
+	private List<FirestationDTO> firestationsN1;
 
-	private PersonResponse johnDoe;
-	private PersonResponse janeDoe;
-	private PersonResponse jackDin;
+	private PersonDTO johnDoe;
+	private PersonDTO janeDoe;
+	private PersonDTO jackDin;
 
 	private List<String> medications;
 	private List<String> allergies;
 
-	private MedicalRecordResponse johnDoeMedicalRecordResponse;
-	private MedicalRecordResponse janeDoeMedicalRecordResponse;
-	private MedicalRecordResponse jackDinMedicalRecordResponse;
+	private MedicalRecordDTO johnDoeMedicalRecordRequest;
+	private MedicalRecordDTO janeDoeMedicalRecordRequest;
+	private MedicalRecordDTO jackDinMedicalRecordRequest;
 
 	@BeforeEach
 	void setup() {
 
 		stationNumber = 1;
 		address = "1509 Culver St";
-		firestationsN1 = Arrays.asList(new FirestationResponse(address, stationNumber));
+		firestationsN1 = Arrays.asList(new FirestationDTO(address, stationNumber));
 
-		johnDoe = new PersonResponse("John", "Doe", address, "Culver", "97451", "841-874-6512", "jaboyd@email.com");
-		janeDoe = new PersonResponse("Jane", "Doe", address, "Culver", "97451", "841-874-6513", "jdoe@email.com");
-		jackDin = new PersonResponse("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com");
+		johnDoe = new PersonDTO("John", "Doe", address, "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+		janeDoe = new PersonDTO("Jane", "Doe", address, "Culver", "97451", "841-874-6513", "jdoe@email.com");
+		jackDin = new PersonDTO("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com");
 
 		medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		allergies = Arrays.asList("nillacilan");
 
-		johnDoeMedicalRecordResponse = new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies);
-		janeDoeMedicalRecordResponse = new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies);
-		jackDinMedicalRecordResponse = new MedicalRecordResponse("Jack", "Din", "01/01/2000", medications, allergies);
+		johnDoeMedicalRecordRequest = new MedicalRecordDTO("John", "Doe", "01/01/2014", medications, allergies);
+		janeDoeMedicalRecordRequest = new MedicalRecordDTO("Jane", "Doe", "01/01/2000", medications, allergies);
+		jackDinMedicalRecordRequest = new MedicalRecordDTO("Jack", "Din", "01/01/2000", medications, allergies);
 	}
 
 	@Test
 	void shouldReturnPersonsMatchingGivenAddress() {
 		// GIVEN
-		List<PersonResponse> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
-		List<PersonResponse> expectedPersons = Arrays.asList(johnDoe, janeDoe);
+		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
+		List<PersonDTO> expectedPersons = Arrays.asList(johnDoe, janeDoe);
 
 		// WHEN
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 
 		// THEN
-		List<PersonResponse> personsTest = personService.getPersonsByAddress(address);
+		List<PersonDTO> personsTest = personService.getPersonsByAddress(address);
 
 		assertThat(expectedPersons).isEqualTo(personsTest);
 	}
@@ -98,7 +97,7 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnPhoneNumbersForPersonsInGivenStation() {
 		// GIVEN
-		List<PersonResponse> persons = Arrays.asList(johnDoe, janeDoe);
+		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe);
 		List<String> expectedPhoneNumbers = Arrays.asList("841-874-6512", "841-874-6513");
 
 		// WHEN
@@ -117,8 +116,8 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnPersonsAndMedicalRecordsForGivenStationNumber() {
 		// GIVEN
-		List<PersonResponse> persons = Arrays.asList(johnDoe, janeDoe);
-		List<MedicalRecordResponse> medicalRecords = Arrays.asList(johnDoeMedicalRecordResponse, janeDoeMedicalRecordResponse);
+		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe);
+		List<MedicalRecordDTO> medicalRecords = Arrays.asList(johnDoeMedicalRecordRequest, janeDoeMedicalRecordRequest);
 		PersonCoveredByStation expectedPersonCoveredByStationResult = new PersonCoveredByStation(persons, medicalRecords);
 
 		// WHEN
@@ -136,8 +135,8 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnPersonsAndStationInfoForGivenAddress() {
 		// GIVEN
-		List<PersonResponse> persons = Arrays.asList(johnDoe, janeDoe);
-		List<MedicalRecordResponse> medicalRecords = Arrays.asList(johnDoeMedicalRecordResponse, janeDoeMedicalRecordResponse);
+		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe);
+		List<MedicalRecordDTO> medicalRecords = Arrays.asList(johnDoeMedicalRecordRequest, janeDoeMedicalRecordRequest);
 		List<MedicalRecordInfo> expectedMedicalRecordInfos = Arrays.asList(
 				new MedicalRecordInfo(johnDoe.firstName(), johnDoe.lastName(), johnDoe.phone(), 10, medications, allergies),
 				new MedicalRecordInfo(janeDoe.firstName(), janeDoe.lastName(), janeDoe.phone(), 24, medications, allergies));
@@ -146,8 +145,6 @@ class PersonServiceTest {
 		// WHEN
 		when(firestationService.getFirestationByAddress(address)).thenReturn(firestationsN1.get(0));
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
-		when(medicalRecordService.getAge(johnDoe)).thenReturn(10);
-		when(medicalRecordService.getAge(janeDoe)).thenReturn(24);
 		when(medicalRecordService.getMedicalRecordByFullName(johnDoe.fullName())).thenReturn(medicalRecords.get(0));
 		when(medicalRecordService.getMedicalRecordByFullName(janeDoe.fullName())).thenReturn(medicalRecords.get(1));
 
@@ -160,13 +157,13 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnListOfEmailsForPersonsInGivenCity() {
 		// GIVEN
-		List<PersonResponse> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
+		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
 		List<String> emails = Arrays.asList("jaboyd@email.com", "jdoe@email.com", "jdin@email.com");
-		PersonEmail expectedPersonEmailResult = new PersonEmail(emails);
+		List<String> expectedPersonEmailResult = emails;
 		// WHEN
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 		// THEN
-		PersonEmail personEmailTest = personService.personEmails("Culver");
+		List<String> personEmailTest = personService.personEmails("Culver");
 
 		assertThat(personEmailTest).isEqualTo(expectedPersonEmailResult);
 	}
@@ -174,18 +171,16 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnListOfChildrenForGivenAddress() {
 		// GIVEN
-		List<PersonResponse> persons = Arrays.asList(johnDoe, janeDoe);
+		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe);
 		List<Child> expectedChildrenResult = Arrays.asList(new Child("John", "Doe", "1509 Culver St", "841-874-6512", 10));
 
 		// WHEN
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
-		when(medicalRecordService.getAge(johnDoe)).thenReturn(10);
-		when(medicalRecordService.getAge(janeDoe)).thenReturn(24);
-		when(medicalRecordService.getMedicalRecordByFullName(johnDoe.fullName())).thenReturn(johnDoeMedicalRecordResponse);
-		when(medicalRecordService.getMedicalRecordByFullName(janeDoe.fullName())).thenReturn(janeDoeMedicalRecordResponse);
+		when(medicalRecordService.getMedicalRecordByFullName(johnDoe.fullName())).thenReturn(johnDoeMedicalRecordRequest);
+		when(medicalRecordService.getMedicalRecordByFullName(janeDoe.fullName())).thenReturn(janeDoeMedicalRecordRequest);
 
 		// THEN
-		List<Child> childrenTest = personService.getchildsByAddress("1509 Culver St");
+		List<Child> childrenTest = personService.getChildsByAddress("1509 Culver St");
 
 		assertEquals(expectedChildrenResult.size(), childrenTest.size());
 		for (int i = 0; i < expectedChildrenResult.size(); i++) {
@@ -196,17 +191,15 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnListOfPersonsWithMatchingLastName() {
 		// GIVEN
-		List<PersonResponse> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
+		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
 		List<PersonsLastNameInfo> expectedPersonsResult = Arrays.asList(
 				new PersonsLastNameInfo("John", "Doe", "1509 Culver St", 10, "jaboyd@email.com", medications, allergies),
 				new PersonsLastNameInfo("Jane", "Doe", "1509 Culver St", 24, "jdoe@email.com", medications, allergies));
 
 		// WHEN
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
-		when(medicalRecordService.getMedicalRecordByFullName(johnDoe.fullName())).thenReturn(johnDoeMedicalRecordResponse);
-		when(medicalRecordService.getMedicalRecordByFullName(janeDoe.fullName())).thenReturn(janeDoeMedicalRecordResponse);
-		when(medicalRecordService.getAge(johnDoe)).thenReturn(10);
-		when(medicalRecordService.getAge(janeDoe)).thenReturn(24);
+		when(medicalRecordService.getMedicalRecordByFullName(johnDoe.fullName())).thenReturn(johnDoeMedicalRecordRequest);
+		when(medicalRecordService.getMedicalRecordByFullName(janeDoe.fullName())).thenReturn(janeDoeMedicalRecordRequest);
 
 		// THEN
 		List<PersonsLastNameInfo> personsTest = personService.listOfPersonsByLastName("Doe");
@@ -218,14 +211,14 @@ class PersonServiceTest {
 	}
 
 	@Test
-	void floodInfoTest() {
+	void shouldReturnCorrectPersonFloodInfoForGivenStationNumbers() {
 		// GIVEN
-		List<PersonResponse> persons = Arrays.asList(johnDoe, jackDin);
+		List<PersonDTO> persons = Arrays.asList(johnDoe, jackDin);
 
 		MedicalRecordInfo johnDoeMedicalRecord = new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies);
 		MedicalRecordInfo jackDinMedicalRecord = new MedicalRecordInfo("Jack", "Din", "841-874-6515", 24, medications, allergies);
 
-		List<FirestationResponse> firestationsResult = Arrays.asList(firestationsN1.get(0), new FirestationResponse("4345 Culver St", 2));
+		List<FirestationDTO> firestationsResult = Arrays.asList(firestationsN1.get(0), new FirestationDTO("4345 Culver St", 2));
 
 		List<Integer> stationNumbers = Arrays.asList(1, 2);
 
@@ -237,10 +230,8 @@ class PersonServiceTest {
 		// WHEN
 		when(firestationService.getFirestationByListStationNumber(anyList())).thenReturn(firestationsResult);
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1)));
-		when(medicalRecordService.getMedicalRecordByFullName(johnDoe.fullName())).thenReturn(johnDoeMedicalRecordResponse);
-		when(medicalRecordService.getMedicalRecordByFullName(jackDin.fullName())).thenReturn(jackDinMedicalRecordResponse);
-		when(medicalRecordService.getAge(johnDoe)).thenReturn(10);
-		when(medicalRecordService.getAge(janeDoe)).thenReturn(24);
+		when(medicalRecordService.getMedicalRecordByFullName(johnDoe.fullName())).thenReturn(johnDoeMedicalRecordRequest);
+		when(medicalRecordService.getMedicalRecordByFullName(jackDin.fullName())).thenReturn(jackDinMedicalRecordRequest);
 
 		// THEN
 		PersonFloodInfo personFloodInfoTest = personService.floodInfo(stationNumbers);

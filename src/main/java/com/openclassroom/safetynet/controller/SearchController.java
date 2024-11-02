@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.model.Child;
 import com.openclassroom.safetynet.model.PersonCoveredByStation;
-import com.openclassroom.safetynet.model.PersonEmail;
 import com.openclassroom.safetynet.model.PersonFloodInfo;
 import com.openclassroom.safetynet.model.PersonsAndStationInfo;
 import com.openclassroom.safetynet.model.PersonsLastNameInfo;
@@ -47,7 +46,7 @@ public class SearchController {
 	public ResponseEntity<List<Child>> getAllChild(@RequestParam String address) {
 		log.info("Search for children by address : {} ", address);
 		try {
-			List<Child> childs = personService.getchildsByAddress(address);
+			List<Child> childs = personService.getChildsByAddress(address);
 			log.info("Successful retrieval of the children's list : {}", childs);
 			return ResponseEntity.ok(childs);
 		} catch (Exception e) {
@@ -112,10 +111,10 @@ public class SearchController {
 	}
 
 	@GetMapping("/communityEmail")
-	public ResponseEntity<PersonEmail> getMailByCity(@RequestParam String city) {
+	public ResponseEntity<List<String>> getMailByCity(@RequestParam String city) {
 		log.info("Search for residents' e-mail addresses by city : {}", city);
 		try {
-			PersonEmail communityEmail = personService.personEmails(city);
+			List<String> communityEmail = personService.personEmails(city);
 			log.info("Successful retrieval of the list of Email for city : {} = {}", city, communityEmail);
 			return ResponseEntity.ok(communityEmail);
 		} catch (Exception e) {

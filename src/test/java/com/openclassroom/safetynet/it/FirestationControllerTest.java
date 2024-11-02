@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.openclassroom.safetynet.constants.JsonFilePath;
-import com.openclassroom.safetynet.model.FirestationRequest;
+import com.openclassroom.safetynet.model.FirestationDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,13 +39,14 @@ public class FirestationControllerTest {
 
 	@BeforeAll
 	static void setup() throws IOException {
-		Files.copy(new File(JsonFilePath.JSONFILEPATH).toPath(), new File(JsonFilePath.JSONTESTFILEPATH).toPath(), StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(new File(JsonFilePath.JSONFILEPATH).toPath(), new File(JsonFilePath.JSONTESTFILEPATH).toPath(),
+				StandardCopyOption.REPLACE_EXISTING);
 		System.setProperty("test.mode", "true");
 	}
 
 	@Test
 	void postFirestationTest() throws Exception {
-		FirestationRequest firestation = new FirestationRequest("1510 Culver St", 10);
+		FirestationDTO firestation = new FirestationDTO("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -56,7 +57,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void postFirestationErrorTest() throws Exception {
-		FirestationRequest firestation = new FirestationRequest(null, 10);
+		FirestationDTO firestation = new FirestationDTO(null, 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -66,7 +67,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void putFirestationTest() throws Exception {
-		FirestationRequest firestation = new FirestationRequest("1510 Culver St", 10);
+		FirestationDTO firestation = new FirestationDTO("1510 Culver St", 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -76,7 +77,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void putFirestationErrorTest() {
-		FirestationRequest firestation = new FirestationRequest(null, 10);
+		FirestationDTO firestation = new FirestationDTO(null, 10);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();

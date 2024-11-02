@@ -14,8 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.model.MedicalRecordResponse;
-import com.openclassroom.safetynet.model.PersonResponse;
+import com.openclassroom.safetynet.model.MedicalRecordDTO;
+import com.openclassroom.safetynet.model.PersonDTO;
 import com.openclassroom.safetynet.repository.JsonRepository;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
@@ -33,13 +33,13 @@ class MedicalRecordServiceTest {
 
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		List<MedicalRecordResponse> medicalRecords = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
-				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<MedicalRecordDTO> medicalRecords = Arrays.asList(new MedicalRecordDTO("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecordDTO("Jane", "Doe", "01/01/2000", medications, allergies));
 
-		MedicalRecordResponse medicalRecord = new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies);
+		MedicalRecordDTO medicalRecord = new MedicalRecordDTO("John", "Doe", "01/01/2014", medications, allergies);
 
 		when(repository.loadTypeOfData(TypeOfData.MEDICALRECORDS)).thenReturn(Arrays.asList(medicalRecords.get(0), medicalRecords.get(1)));
-		MedicalRecordResponse testMedicalRecord = medicalRecordService.getMedicalRecordByFullName("John Doe");
+		MedicalRecordDTO testMedicalRecord = medicalRecordService.getMedicalRecordByFullName("John Doe");
 
 		assertThat(testMedicalRecord).isEqualTo(medicalRecord);
 	}
@@ -49,13 +49,14 @@ class MedicalRecordServiceTest {
 
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		List<PersonResponse> persons = Arrays.asList(new PersonResponse("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
-				new PersonResponse("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
-		List<MedicalRecordResponse> medicalRecords = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
-				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
+		List<PersonDTO> persons = Arrays.asList(
+				new PersonDTO("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
+				new PersonDTO("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
+		List<MedicalRecordDTO> medicalRecords = Arrays.asList(new MedicalRecordDTO("John", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecordDTO("Jane", "Doe", "01/01/2000", medications, allergies));
 
 		when(repository.loadTypeOfData(TypeOfData.MEDICALRECORDS)).thenReturn(Arrays.asList(medicalRecords.get(0), medicalRecords.get(1)));
-		List<MedicalRecordResponse> testMedicalRecord = medicalRecordService.getPersonMedicalRecords(persons);
+		List<MedicalRecordDTO> testMedicalRecord = medicalRecordService.getPersonMedicalRecords(persons);
 
 		assertThat(testMedicalRecord).isEqualTo(medicalRecords);
 
@@ -63,18 +64,17 @@ class MedicalRecordServiceTest {
 
 	@Test
 	void testGetPersonAge() {
-		PersonResponse person = new PersonResponse("John", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 
 		LocalDate birthDate = LocalDate.now().minusYears(34);
 		String birthDateString = birthDate.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
 
-		List<MedicalRecordResponse> medicalRecord = Arrays.asList(new MedicalRecordResponse("John", "Boyd", birthDateString, medications, allergies));
+		List<MedicalRecordDTO> medicalRecord = Arrays.asList(new MedicalRecordDTO("John", "Boyd", birthDateString, medications, allergies));
 
 		when(repository.loadTypeOfData(TypeOfData.MEDICALRECORDS)).thenReturn((Arrays.asList(medicalRecord.get(0))));
 
-		int age = medicalRecordService.getAge(person);
+		int age = medicalRecord.get(0).getAge();
 
 		assertThat(age).isEqualTo(34);
 	}
