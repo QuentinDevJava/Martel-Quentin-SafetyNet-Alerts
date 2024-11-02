@@ -1,9 +1,5 @@
 package com.openclassroom.safetynet.model;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-
 /**
  * Represents a child with their basic information.
  *
@@ -13,10 +9,9 @@ import jakarta.validation.constraints.Pattern;
  * @param phone     The phone number of the child in the format "XXX-XXX-XXXX".
  * @param age       The age of the child.
  */
-public record Child(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String address,
-		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @Min(0) int age) {
+public record Child(String firstName, String lastName, String address, String phone, int age) {
 
-	public Child(Person person, MedicalRecordResponse medicalRecord) {
+	public Child(PersonResponse person, MedicalRecordResponse medicalRecord) {
 		this(person.firstName(), person.lastName(), person.address(), person.phone(), medicalRecord.getAge());
 	}
 

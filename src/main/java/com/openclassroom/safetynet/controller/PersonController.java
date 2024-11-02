@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.PersonRequest;
+import com.openclassroom.safetynet.model.PersonResponse;
 import com.openclassroom.safetynet.service.PersonService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,26 +38,29 @@ public class PersonController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Person> createPerson(@Validated @RequestBody Person person) {
-		log.info("POST request received for /person, adding person: {}", person);
+	public ResponseEntity<PersonResponse> createPerson(@Validated @RequestBody PersonRequest personRequest) {
+		log.info("POST request received for /person, adding person: {}", personRequest);
 		try {
-			personService.createPerson(person);
-			log.info("Person successfully created: {}", person);
+			PersonResponse personResponse = personService.personRequestToPersonResponse(personRequest);
+			personService.createPerson(personResponse);
+			log.info("Person successfully created: {}", personResponse);
 			URI uri = new URI("/person");
-			return ResponseEntity.created(uri).body(person);
+			return ResponseEntity.created(uri).body(personResponse);
 		} catch (Exception e) {
-			log.error("Error creating person: {}", person, e);
+			log.error("Error creating person: {}", personRequest, e);
 			return ResponseEntity.internalServerError().build();
 		}
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
-	public ResponseEntity<Person> updatePerson(@PathVariable String firstName, @PathVariable String lastName, @Validated @RequestBody Person person) {
-		log.info("PUT request received for /person/{}/{}", firstName, lastName);
+	public ResponseEntity<PersonResponse> updatePerson(@PathVariable String firstName, @PathVariable String lastName,
+			@Validated @RequestBody PersonRequest personRequest) {
+		log.info("PUT request received for /person/{}/{} updating person : {}", firstName, lastName, personRequest);
 		try {
-			personService.updatePerson(firstName, lastName, person);
-			log.info("Person successfully updated: {}", person);
-			return ResponseEntity.ok(person);
+			PersonResponse personResponse = personService.personRequestToPersonResponse(personRequest);
+			personService.updatePerson(firstName, lastName, personResponse);
+			log.info("Person successfully updated: {}", personResponse);
+			return ResponseEntity.ok(personResponse);
 		} catch (NoSuchElementException e) {
 			log.error("Error the people with full name : {} {} cannot be found.", firstName, lastName, e);
 			return ResponseEntity.notFound().build();

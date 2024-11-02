@@ -13,7 +13,7 @@ import java.util.List;
  */
 public record PersonCoveredByStation(List<PersonInfo> personInfos, int adultCounts, int childCounts) {
 
-	public PersonCoveredByStation(List<Person> persons, List<MedicalRecordResponse> medicalRecords) {
+	public PersonCoveredByStation(List<PersonResponse> persons, List<MedicalRecordResponse> medicalRecords) {
 		this(persons.stream().map(PersonInfo::new).toList(), (int) medicalRecords.stream().filter(MedicalRecordResponse::isAdult).count(),
 				(int) medicalRecords.stream().filter(MedicalRecordResponse::isChild).count());
 	}

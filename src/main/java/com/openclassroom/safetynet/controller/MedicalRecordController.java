@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassroom.safetynet.model.CreateMedicalRecordRequest;
+import com.openclassroom.safetynet.model.MedicalRecordRequest;
 import com.openclassroom.safetynet.model.MedicalRecordResponse;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
@@ -34,7 +34,7 @@ public class MedicalRecordController {
 	private final MedicalRecordService medicalRecordService;
 
 	@PostMapping
-	public ResponseEntity<MedicalRecordResponse> createMedicalRecord(@Validated @RequestBody CreateMedicalRecordRequest medicalRecordRequest) {
+	public ResponseEntity<MedicalRecordResponse> createMedicalRecord(@Validated @RequestBody MedicalRecordRequest medicalRecordRequest) {
 		log.info("POST request received for /medicalrecord, adding medical record: {}", medicalRecordRequest);
 		try {
 			MedicalRecordResponse medicalRecordResponse = medicalRecordService.medicalRecordRequestToMedicalRecordResponse(medicalRecordRequest);
@@ -51,7 +51,7 @@ public class MedicalRecordController {
 
 	@PutMapping("/{firstName}/{lastName}")
 	public ResponseEntity<MedicalRecordResponse> updateMedicalRecord(@PathVariable String firstName, @PathVariable String lastName,
-			@Validated @RequestBody CreateMedicalRecordRequest medicalRecordRequest) {
+			@Validated @RequestBody MedicalRecordRequest medicalRecordRequest) {
 		log.info("PUT request received for /medicalrecord/{}/{} updating medical record: {}", firstName, lastName, medicalRecordRequest);
 		try {
 			MedicalRecordResponse medicalRecordResponse = medicalRecordService.medicalRecordRequestToMedicalRecordResponse(medicalRecordRequest);

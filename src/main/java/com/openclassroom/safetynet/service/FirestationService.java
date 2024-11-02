@@ -34,8 +34,8 @@ public class FirestationService {
 	/**
 	 * Creates a new fire station.
 	 *
-	 * @param firestation The fire station to create {@link FirestationRequest}.
-	 * @return The created fire station {@link FirestationRequest}.
+	 * @param firestation The fire station to create {@link FirestationResponse}.
+	 * @return The created fire station {@link FirestationResponse}.
 	 */
 	public void createFirestation(FirestationResponse firestation) {
 		List<FirestationResponse> firestations = allFireStations();
@@ -48,8 +48,8 @@ public class FirestationService {
 	 * Updates an existing fire station.
 	 *
 	 * @param address     The address of the station to update.
-	 * @param firestation The updated fire station {@link FirestationRequest}.
-	 * @return The updated fire station {@link FirestationRequest}.
+	 * @param firestation The updated fire station {@link FirestationResponse}.
+	 * @return The updated fire station {@link FirestationResponse}.
 	 */
 	public void updateFirestation(String address, FirestationResponse firestation) {
 		FirestationResponse existingFirestation = getFirestationByAddress(address);
@@ -91,7 +91,7 @@ public class FirestationService {
 	 * Returns the list of fire stations corresponding to the given station numbers.
 	 *
 	 * @param stationNumbers The station numbers.
-	 * @return The corresponding fire stations {@link FirestationRequest}.
+	 * @return The corresponding fire stations {@link FirestationResponse}.
 	 */
 	public List<FirestationResponse> findFireStationByStationNumber(int stationNumber) {
 		return allFireStations().stream().filter(f -> f.station() == stationNumber).toList();
@@ -101,7 +101,7 @@ public class FirestationService {
 	 * Returns the list of fire stations corresponding to the given station numbers.
 	 *
 	 * @param stationNumbers The list of station numbers.
-	 * @return The list of corresponding fire stations {@link FirestationRequest}.
+	 * @return The list of corresponding fire stations {@link FirestationResponse}.
 	 */
 	public List<FirestationResponse> getFirestationByListStationNumber(List<Integer> stationNumbers) {
 		return allFireStations().stream().filter(firestation -> stationNumbers.contains(firestation.station())).toList();
@@ -111,7 +111,7 @@ public class FirestationService {
 	 * Returns the fire station corresponding to the given address.
 	 *
 	 * @param address The address of the station.
-	 * @return The corresponding fire station {@link FirestationRequest}.
+	 * @return The corresponding fire station {@link FirestationResponse}.
 	 */
 	public FirestationResponse getFirestationByAddress(String address) {
 		return allFireStations().stream().filter(firestation -> firestation.address().contains(address)).findFirst().orElse(null);

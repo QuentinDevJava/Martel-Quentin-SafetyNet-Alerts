@@ -1,6 +1,5 @@
 package com.openclassroom.safetynet.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
@@ -9,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * @param address The address of the fire station.
  * @param station The station number of the fire station.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "address", "station" })
 public record FirestationResponse(String address, int station) {
 }

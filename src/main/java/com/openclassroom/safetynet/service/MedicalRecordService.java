@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.model.CreateMedicalRecordRequest;
+import com.openclassroom.safetynet.model.MedicalRecordRequest;
 import com.openclassroom.safetynet.model.MedicalRecordResponse;
-import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.PersonResponse;
 import com.openclassroom.safetynet.repository.JsonRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -106,21 +106,21 @@ public class MedicalRecordService {
 	/**
 	 * Retrieves medical records for a list of persons.
 	 *
-	 * @param persons The list of persons {@link Person}.
+	 * @param persons The list of persons {@link PersonResponse}.
 	 * @return A list of medical records for the specified persons
 	 *         {@link MedicalRecordResponse}.
 	 */
-	public List<MedicalRecordResponse> getPersonMedicalRecords(List<Person> persons) {
+	public List<MedicalRecordResponse> getPersonMedicalRecords(List<PersonResponse> persons) {
 		return persons.stream().map(p -> getMedicalRecordByFullName(p.fullName())).filter(Objects::nonNull).toList();
 	}
 
 	/**
 	 * Calculates the age of a person based on their birthdate.
 	 *
-	 * @param person The person to calculate the age for {@link Person}.
+	 * @param person The person to calculate the age for {@link PersonResponse}.
 	 * @return The age of the person.
 	 */
-	public int getAge(Person person) {
+	public int getAge(PersonResponse person) {
 		MedicalRecordResponse medicalRecord = getMedicalRecordByFullName(person.fullName());
 		if (medicalRecord != null) {
 			return medicalRecord.getAge();
@@ -128,7 +128,7 @@ public class MedicalRecordService {
 		return -1;
 	}
 
-	public MedicalRecordResponse medicalRecordRequestToMedicalRecordResponse(CreateMedicalRecordRequest request) {
+	public MedicalRecordResponse medicalRecordRequestToMedicalRecordResponse(MedicalRecordRequest request) {
 		return new MedicalRecordResponse(request.firstName(), request.lastName(), request.birthdate(), request.medications(), request.allergies());
 	}
 

@@ -15,7 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.model.MedicalRecordResponse;
-import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.PersonResponse;
 import com.openclassroom.safetynet.repository.JsonRepository;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
@@ -49,8 +49,8 @@ class MedicalRecordServiceTest {
 
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		List<Person> persons = Arrays.asList(new Person("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
-				new Person("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
+		List<PersonResponse> persons = Arrays.asList(new PersonResponse("John", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com"),
+				new PersonResponse("Jane", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6513", "jdoe@email.com"));
 		List<MedicalRecordResponse> medicalRecords = Arrays.asList(new MedicalRecordResponse("John", "Doe", "01/01/2014", medications, allergies),
 				new MedicalRecordResponse("Jane", "Doe", "01/01/2000", medications, allergies));
 
@@ -63,7 +63,7 @@ class MedicalRecordServiceTest {
 
 	@Test
 	void testGetPersonAge() {
-		Person person = new Person("John", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+		PersonResponse person = new PersonResponse("John", "Boyd", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
 

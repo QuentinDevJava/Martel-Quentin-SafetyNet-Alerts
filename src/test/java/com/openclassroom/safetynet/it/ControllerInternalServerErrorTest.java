@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.openclassroom.safetynet.constants.JsonFilePath;
 import com.openclassroom.safetynet.model.FirestationRequest;
 import com.openclassroom.safetynet.model.MedicalRecordResponse;
-import com.openclassroom.safetynet.model.Person;
+import com.openclassroom.safetynet.model.PersonResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -105,7 +105,7 @@ public class ControllerInternalServerErrorTest {
 
 	@Test
 	void postPersonErrorTest() throws Exception {
-		Person persons = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+		PersonResponse persons = new PersonResponse("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -116,7 +116,7 @@ public class ControllerInternalServerErrorTest {
 
 	@Test
 	void putPersonErrorTest() throws Exception {
-		Person persons = new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
+		PersonResponse persons = new PersonResponse("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
