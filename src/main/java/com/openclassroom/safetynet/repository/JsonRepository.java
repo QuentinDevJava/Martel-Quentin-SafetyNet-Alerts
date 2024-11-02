@@ -27,7 +27,7 @@ public class JsonRepository {
 		Map<String, List<Object>> jsonData = loadJsonAllData();
 		jsonData.put(typeOfData.getJsonKey(), data);
 		try {
-			objectMapper.writeValue(new File(getJsonFilePath()), jsonData);
+			objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(getJsonFilePath()), jsonData);
 		} catch (IOException e) {
 			throw new DataSavingException("Error saving data: " + e.getMessage());
 		}
