@@ -17,6 +17,7 @@ import com.openclassroom.safetynet.model.ApiResponse;
 import com.openclassroom.safetynet.model.FirestationDTO;
 import com.openclassroom.safetynet.service.FirestationService;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +40,8 @@ public class FirestationController {
 	}
 
 	@PutMapping("/{address}")
-	public ResponseEntity<ApiResponse> updateFirestation(@PathVariable String address, @Validated @RequestBody FirestationDTO firestationDTO) {
+	public ResponseEntity<ApiResponse> updateFirestation(@PathVariable @Validated @NotBlank String address,
+			@Validated @RequestBody FirestationDTO firestationDTO) {
 		log.info("PUT request received for /firestation/{} updating firestation: {}", address, firestationDTO);
 		firestationService.updateFirestation(address, firestationDTO);
 		log.info("Firestation successfully updated: {}", firestationDTO);
@@ -47,7 +49,7 @@ public class FirestationController {
 	}
 
 	@DeleteMapping("/{addressOrNum}")
-	public ResponseEntity<Void> deleteFirestation(@PathVariable String addressOrNum) {
+	public ResponseEntity<Void> deleteFirestation(@PathVariable @Validated @NotBlank String addressOrNum) {
 		log.info("DELETE request received for /firestation/{}", addressOrNum);
 		Boolean firestationsDeleted = firestationService.deleteFirestation(addressOrNum);
 		if (Boolean.TRUE.equals(firestationsDeleted)) {

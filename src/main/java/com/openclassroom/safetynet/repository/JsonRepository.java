@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassroom.safetynet.constants.JsonFilePath;
+import com.openclassroom.safetynet.constants.JsonDataFilePath;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.exceptions.DataLoadingException;
 import com.openclassroom.safetynet.exceptions.DataSavingException;
@@ -49,9 +49,9 @@ public class JsonRepository {
 
 	private String getJsonFilePath() {
 		if (System.getProperty("test.mode") != null && System.getProperty("test.mode").equals("true")) {
-			return JsonFilePath.JSONTESTFILEPATH;
+			return JsonDataFilePath.JSONTESTFILEPATH;
 		} else {
-			return JsonFilePath.JSONFILEPATH;
+			return JsonDataFilePath.JSONFILEPATH;
 		}
 	}
 }

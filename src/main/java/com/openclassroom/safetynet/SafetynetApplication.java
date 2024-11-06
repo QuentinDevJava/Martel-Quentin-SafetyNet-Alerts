@@ -17,12 +17,13 @@ public class SafetynetApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		ClassPathResource resource = new ClassPathResource("data.json");
-		if (resource.exists()) {
+		ClassPathResource jsonDataFileRessource = new ClassPathResource("data.json");
+		if (jsonDataFileRessource.exists()) {
 			log.debug("File 'data.json' found in the classpath. Starting the application.");
 		} else {
 			log.error("File 'data.json' not found in the classpath. Stopping the application.");
 			System.exit(1);
 		}
 	}
+
 }

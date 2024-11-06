@@ -53,6 +53,10 @@ public class MedicalRecordService {
 	public void updateMedicalRecord(String firstName, String lastName, MedicalRecordDTO medicalRecord) {
 		String fullName = firstName + " " + lastName;
 		MedicalRecordDTO existingMedicalRecord = getMedicalRecordByFullName(fullName);
+		if (existingMedicalRecord == null) {
+			log.error("Unknown person: {}", fullName);
+			throw new IllegalArgumentException("Unknown person: " + fullName);
+		}
 		log.debug("Found existing medical record for: {} = {}", fullName, existingMedicalRecord);
 		List<MedicalRecordDTO> medicalRecords = allMedicalRecords();
 		medicalRecords.set(medicalRecords.indexOf(existingMedicalRecord), medicalRecord);

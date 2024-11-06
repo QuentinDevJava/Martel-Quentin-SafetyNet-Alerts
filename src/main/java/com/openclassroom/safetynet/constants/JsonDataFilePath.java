@@ -1,8 +1,8 @@
 package com.openclassroom.safetynet.constants;
 
-public class JsonFilePath {
+public class JsonDataFilePath {
 
-	private JsonFilePath() {
+	private JsonDataFilePath() {
 		super();
 	}
 

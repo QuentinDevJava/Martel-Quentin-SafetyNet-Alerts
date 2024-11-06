@@ -17,6 +17,7 @@ import com.openclassroom.safetynet.model.ApiResponse;
 import com.openclassroom.safetynet.model.MedicalRecordDTO;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,8 +46,8 @@ public class MedicalRecordController {
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
-	public ResponseEntity<ApiResponse> updateMedicalRecord(@PathVariable String firstName, @PathVariable String lastName,
-			@Validated @RequestBody MedicalRecordDTO medicalRecordDTO) {
+	public ResponseEntity<ApiResponse> updateMedicalRecord(@PathVariable @Validated @NotBlank String firstName,
+			@PathVariable @Validated @NotBlank String lastName, @Validated @RequestBody MedicalRecordDTO medicalRecordDTO) {
 		log.info("PUT request received for /medicalrecord/{}/{} updating medical record: {}", firstName, lastName, medicalRecordDTO);
 		medicalRecordService.updateMedicalRecord(firstName, lastName, medicalRecordDTO);
 		log.info("Medical record successfully updated: {}", medicalRecordDTO);
@@ -54,7 +55,8 @@ public class MedicalRecordController {
 	}
 
 	@DeleteMapping("/{firstName}/{lastName}")
-	public ResponseEntity<Void> deleteMedicalRecord(@PathVariable String firstName, @PathVariable String lastName) {
+	public ResponseEntity<Void> deleteMedicalRecord(@PathVariable @Validated @NotBlank String firstName,
+			@PathVariable @Validated @NotBlank String lastName) {
 		log.info("DELETE request received for /medicalrecord/{}/{}", firstName, lastName);
 		Boolean medicalRecordDeleted = medicalRecordService.deleteMedicalRecord(firstName, lastName);
 		if (Boolean.TRUE.equals(medicalRecordDeleted)) {

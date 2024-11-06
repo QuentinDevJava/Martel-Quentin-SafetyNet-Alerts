@@ -6,10 +6,6 @@ public record ApiResponse(int status, String message) {
 		this(status, getStatusMessage(status));
 	}
 
-	public ApiResponse(String message) {
-		this(400, message);
-	}
-
 	private static String getStatusMessage(int status) {
 		return switch (status) {
 		case 200 -> "Successfully";

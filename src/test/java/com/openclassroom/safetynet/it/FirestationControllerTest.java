@@ -10,9 +10,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,8 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.openclassroom.safetynet.constants.JsonFilePath;
+import com.openclassroom.safetynet.constants.JsonDataFilePath;
 import com.openclassroom.safetynet.model.FirestationDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -34,12 +37,16 @@ public class FirestationControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
+
+	@Autowired
+	private ObjectMapper mapper;
+
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("utf8"));
 
 	@BeforeAll
 	static void setup() throws IOException {
-		Files.copy(new File(JsonFilePath.JSONFILEPATH).toPath(), new File(JsonFilePath.JSONTESTFILEPATH).toPath(),
+		Files.copy(new File(JsonDataFilePath.JSONFILEPATH).toPath(), new File(JsonDataFilePath.JSONTESTFILEPATH).toPath(),
 				StandardCopyOption.REPLACE_EXISTING);
 		System.setProperty("test.mode", "true");
 	}
@@ -47,19 +54,15 @@ public class FirestationControllerTest {
 	@Test
 	void postFirestationTest() throws Exception {
 		FirestationDTO firestation = new FirestationDTO("1510 Culver St", 10);
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(post("/firestation").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isCreated());
 
 	}
 
-	@Test
-	void postFirestationErrorTest() throws Exception {
-		FirestationDTO firestation = new FirestationDTO(null, 10);
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+	@ParameterizedTest
+	@MethodSource("provideInvalidFirestations")
+	void postFirestationErrorTest(FirestationDTO firestation) throws Exception {
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(post("/firestation").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
@@ -68,28 +71,31 @@ public class FirestationControllerTest {
 	@Test
 	void putFirestationTest() throws Exception {
 		FirestationDTO firestation = new FirestationDTO("1510 Culver St", 10);
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(put("/firestation/112 Steppes Pl").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isOk());
 	}
 
 	@Test
-	void putFirestationErrorTest() {
-		FirestationDTO firestation = new FirestationDTO(null, 10);
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+	void putFirestationNoFoundTest() throws Exception {
+		FirestationDTO firestation = new FirestationDTO("1510 Culver St", 10);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson;
-		try {
-			requestJson = ow.writeValueAsString(firestation);
+		String requestJson = ow.writeValueAsString(firestation);
+		mockMvc.perform(put("/firestation/NoFound").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isNotFound());
+	}
 
-			mockMvc.perform(put("/firestation/112 Steppes Pl").contentType(APPLICATION_JSON_UTF8).content(requestJson))
-					.andExpect(status().isBadRequest());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	@ParameterizedTest
+	@MethodSource("provideInvalidFirestations")
+	void putFirestationErrorTest(FirestationDTO firestation) throws Exception {
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(firestation);
+		mockMvc.perform(put("/firestation/112 Steppes Pl").contentType(APPLICATION_JSON_UTF8).content(requestJson))
+				.andExpect(status().isBadRequest());
+	}
+
+	static List<FirestationDTO> provideInvalidFirestations() {
+		return Arrays.asList(new FirestationDTO(null, 10), new FirestationDTO("112 Steppes Pl", 0), new FirestationDTO(" ", 10));
+
 	}
 
 	@Test
@@ -106,5 +112,4 @@ public class FirestationControllerTest {
 	void deleteFirestationNoFoundTest() throws Exception {
 		mockMvc.perform(delete("/firestation/Nofound")).andExpect(status().isNotFound());
 	}
-
 }

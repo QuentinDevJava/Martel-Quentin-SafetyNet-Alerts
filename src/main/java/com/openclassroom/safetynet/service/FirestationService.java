@@ -49,6 +49,10 @@ public class FirestationService {
 	public void updateFirestation(String address, FirestationDTO firestation) {
 		FirestationDTO existingFirestation = getFirestationByAddress(address);
 		log.debug("Found existing firestation: {}", existingFirestation);
+		if (existingFirestation == null) {
+			log.error("Unknown address: {}", address);
+			throw new IllegalArgumentException("Unknown address: " + address);
+		}
 		List<FirestationDTO> firestations = allFireStations();
 		firestations.set(firestations.indexOf(existingFirestation), firestation);
 		log.debug("Updated firestation list: {}", firestations);

@@ -4,6 +4,7 @@ package com.openclassroom.safetynet.controller;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import com.openclassroom.safetynet.model.ApiResponse;
 import com.openclassroom.safetynet.model.PersonDTO;
 import com.openclassroom.safetynet.service.PersonService;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,24 +48,28 @@ public class PersonController {
 	}
 
 	@PutMapping("/{firstName}/{lastName}")
-	public ResponseEntity<ApiResponse> updatePerson(@PathVariable String firstName, @PathVariable String lastName,
-			@Validated @RequestBody PersonDTO personDTO) {
+	public ResponseEntity<ApiResponse> updatePerson(@PathVariable @Validated @NotBlank String firstName,
+			@PathVariable @Validated @NotBlank String lastName, @RequestBody @Validated PersonDTO personDTO) {
 		log.info("PUT request received for /person/{}/{} updating person : {}", firstName, lastName, personDTO);
 		personService.updatePerson(firstName, lastName, personDTO);
 		log.info("Person successfully updated: {}", personDTO);
 		return ResponseEntity.ok(new ApiResponse(200));
+
 	}
 
 	@DeleteMapping("/{firstName}/{lastName}")
-	public ResponseEntity<Void> deletePerson(@PathVariable String firstName, @PathVariable String lastName) {
+	public ResponseEntity<ApiResponse> deletePerson(@PathVariable @Validated @NotBlank String firstName,
+			@PathVariable @Validated @NotBlank String lastName) {
 		log.info("DELETE request received for /person/{}/{}", firstName, lastName);
 		boolean personDeleted = personService.deletePerson(firstName, lastName);
 		if (Boolean.TRUE.equals(personDeleted)) {
 			log.info("Person successfully deleted: firstName: {}, lastName: {}", firstName, lastName);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.NO_CONTENT)
+					.body(new ApiResponse(204, "The person with firstName: " + firstName + " and lastName: " + lastName + " is delete"));
 		} else {
 			log.error("Person not found: firstName: {}, lastName: {}", firstName, lastName);
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new ApiResponse(404, "Person not found: firstName: " + firstName + ", lastName: " + lastName));
 		}
 	}
 }

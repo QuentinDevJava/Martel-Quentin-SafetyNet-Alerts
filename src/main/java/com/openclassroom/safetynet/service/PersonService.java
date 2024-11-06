@@ -60,6 +60,11 @@ public class PersonService {
 	public void updatePerson(String firstName, String lastName, PersonDTO person) {
 		String fullName = firstName + " " + lastName;
 		PersonDTO existingPerson = getPersonByFullName(fullName);
+		if (existingPerson == null) {
+			log.error("Unknown person: {}", fullName);
+			throw new IllegalArgumentException("Unknown person: " + fullName);
+		}
+
 		List<PersonDTO> persons = allPersons();
 		log.debug("Found existing person: {}", existingPerson);
 		persons.set(persons.indexOf(existingPerson), person);
@@ -96,6 +101,11 @@ public class PersonService {
 	public PersonCoveredByStation personCoveredByStation(int stationNumber) {
 		List<FirestationDTO> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {}", stationNumber, firestations);
+		// TODO appliquer pour les nofound
+		if (firestations.isEmpty()) {
+			log.error("Unknown station number: {}", stationNumber);
+			throw new IllegalArgumentException("Unknown station number: " + stationNumber);
+		}
 
 		List<PersonDTO> personByStation = getPersonsByStationAddress(firestations);
 		log.debug("Result of getPersonsByStationAddress for firestations found in findFireStationByStationNumber : {}", personByStation);
@@ -118,6 +128,10 @@ public class PersonService {
 	public PersonsAndStationInfo getPersonsAndStationInfoByAddress(String address) {
 		List<PersonDTO> persons = getPersonsByAddress(address);
 		log.debug("Result of getPersonsByAddress for address {} = {} ", address, persons);
+		if ((persons).isEmpty()) {
+			log.error("Unknown address: {}", address);
+			throw new IllegalArgumentException("Unknown address: " + address);
+		}
 		List<MedicalRecordInfo> medicalRecordInfos = persons.stream()
 				.map(p -> new MedicalRecordInfo(p, medicalRecordService.getMedicalRecordByFullName(p.fullName()))).toList();
 		log.debug("Result of getMedicalRecordInfosByPersons for persons found in getPersonsByAddress : {}", medicalRecordInfos);
@@ -135,7 +149,14 @@ public class PersonService {
 	 * @throws NoSuchElementException
 	 */
 	public List<String> personEmails(String city) {
-		return allPersons().stream().filter(person -> person.city().equals(city)).map(PersonDTO::email).toList();
+		List<PersonDTO> persons = allPersons();
+		List<PersonDTO> matchingPersons = persons.stream().filter(person -> person.city().equals(city)).toList();
+		log.debug("Result of matchingPersons for city {} = {} ", city, matchingPersons);
+		if (matchingPersons.isEmpty()) {
+			throw new IllegalArgumentException("Unknown city: " + city);
+		}
+
+		return matchingPersons.stream().map(PersonDTO::email).toList();
 	}
 
 	/**
@@ -149,6 +170,13 @@ public class PersonService {
 	 */
 	public List<Child> getChildsByAddress(String address) {
 		List<PersonDTO> personsByAddress = getPersonsByAddress(address);
+		// TODO log debug
+		log.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
+
+		if (personsByAddress.isEmpty()) {
+			log.error("Unknown address: {}", address);
+			throw new IllegalArgumentException("Unknown address: " + address);
+		}
 		return personsByAddress.stream().filter(person -> medicalRecordService.getMedicalRecordByFullName(person.fullName()).isChild())
 				.map(p -> new Child(p, medicalRecordService.getMedicalRecordByFullName(p.fullName()))).toList();
 	}
@@ -186,7 +214,14 @@ public class PersonService {
 	 */
 	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) {
 		List<PersonDTO> persons = allPersons();
-		return persons.stream().filter(person -> person.lastName().equals(lastName))
+		List<PersonDTO> matchingPersons = persons.stream().filter(person -> person.lastName().equals(lastName)).toList();
+		log.debug("Result of matchingPersons for  last name {} = {} ", lastName, matchingPersons);
+
+		if (matchingPersons.isEmpty()) {
+			throw new IllegalArgumentException("Unknown last name: " + lastName);
+		}
+
+		return matchingPersons.stream()
 				.map(person -> new PersonsLastNameInfo(person, medicalRecordService.getMedicalRecordByFullName(person.fullName()))).toList();
 	}
 
@@ -201,6 +236,11 @@ public class PersonService {
 	 */
 	public PersonFloodInfo floodInfo(List<Integer> stationNumber) {
 		List<FirestationDTO> firestations = firestationService.getFirestationByListStationNumber(stationNumber);
+		log.debug("Result of getFirestationByListStationNumber for station number {} = {} ", stationNumber, firestations);
+		if (firestations.isEmpty()) {
+			log.error("Unknown station number: {}", stationNumber);
+			throw new IllegalArgumentException("Unknown station number: " + stationNumber);
+		}
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = listOfPersonsByAddressByStationNumber(firestations);
 		return new PersonFloodInfo(medicalRecordsByAddress);
 	}
@@ -249,6 +289,11 @@ public class PersonService {
 
 	private List<PersonDTO> getPersonsByStation(int stationNumber) {
 		List<FirestationDTO> firestation = firestationService.findFireStationByStationNumber(stationNumber);
+		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {} ", stationNumber, firestation);
+		if (firestation.isEmpty()) {
+			log.error("Unknown station number : {}", stationNumber);
+			throw new IllegalArgumentException("Unknown station number: " + stationNumber);
+		}
 		return getPersonsByStationAddress(firestation);
 	}
 

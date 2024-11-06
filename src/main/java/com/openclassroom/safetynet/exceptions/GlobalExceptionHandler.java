@@ -1,26 +1,23 @@
 package com.openclassroom.safetynet.exceptions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.openclassroom.safetynet.model.ApiResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-		Map<String, String> errors = new HashMap<>();
-		ex.getBindingResult().getAllErrors().forEach(error -> {
-			String fieldName = ((FieldError) error).getField();
-			String errorMessage = error.getDefaultMessage();
-			errors.put(fieldName, errorMessage);
-		});
-		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+	public ResponseEntity<ApiResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(400, ex.getMessage()));
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ApiResponse> handleValidationExceptions(IllegalArgumentException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(404, ex.getMessage()));
 	}
 }
