@@ -31,7 +31,6 @@ public class MedicalRecordService {
 	 * Creates a new medical record.
 	 *
 	 * @param medicalRecord The medical record to create {@link MedicalRecordDTO}.
-	 * @return The created medical record {@link MedicalRecordDTO}.
 	 */
 	public void createMedicalRecord(MedicalRecordDTO medicalRecord) {
 		List<MedicalRecordDTO> medicalRecords = allMedicalRecords();
@@ -48,7 +47,6 @@ public class MedicalRecordService {
 	 * @param lastName      The last name of the person whose medical record to
 	 *                      update.
 	 * @param medicalRecord The updated medical record {@link MedicalRecordDTO}.
-	 * @return The updated medical record {@link MedicalRecordDTO}.
 	 */
 	public void updateMedicalRecord(String firstName, String lastName, MedicalRecordDTO medicalRecord) {
 		String fullName = firstName + " " + lastName;
@@ -85,8 +83,7 @@ public class MedicalRecordService {
 	/**
 	 * Retrieves a medical record by the full name of the person.
 	 *
-	 * @param firstName The first name of the person.
-	 * @param lastName  The last name of the person.
+	 * @param fullName The first name and the last name of the person.
 	 * @return The medical record for the specified person {@link MedicalRecordDTO}.
 	 */
 	public MedicalRecordDTO getMedicalRecordByFullName(String fullName) {
@@ -96,7 +93,7 @@ public class MedicalRecordService {
 	/**
 	 * Retrieves medical records for a list of persons.
 	 *
-	 * @param persons The list of persons {@link PersonResponse}.
+	 * @param persons The list of persons {@link PersonDTO}.
 	 * @return A list of medical records for the specified persons
 	 *         {@link MedicalRecordDTO}.
 	 */

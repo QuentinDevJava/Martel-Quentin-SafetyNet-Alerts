@@ -1,0 +1,8 @@
+com.openclassroom.safetynet
+com.openclassroom.safetynet.config
+com.openclassroom.safetynet.constants
+com.openclassroom.safetynet.controller
+com.openclassroom.safetynet.exceptions
+com.openclassroom.safetynet.model
+com.openclassroom.safetynet.repository
+com.openclassroom.safetynet.service

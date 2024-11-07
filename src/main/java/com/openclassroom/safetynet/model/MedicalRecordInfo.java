@@ -22,6 +22,21 @@ public record MedicalRecordInfo(@NotBlank String firstName, @NotBlank String las
 		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @Min(0) int age, @NotNull List<String> medications,
 		@NotNull List<String> allergies) {
 
+	/**
+	 * Constructs a {@link MedicalRecordInfo} from a {@link PersonDTO} and
+	 * {@link MedicalRecordDTO}.
+	 * 
+	 * This constructor initializes the fields of {@link MedicalRecordInfo} using
+	 * the corresponding fields from a {@link PersonDTO} (for personal information)
+	 * and a {@link MedicalRecordDTO} (for medical information like age,
+	 * medications, and allergies).
+	 * 
+	 *
+	 * @param person        The {@link PersonDTO} object containing personal
+	 *                      information.
+	 * @param medicalRecord The {@link MedicalRecordDTO} object containing medical
+	 *                      information.
+	 */
 	public MedicalRecordInfo(PersonDTO person, MedicalRecordDTO medicalRecord) {
 		this(person.firstName(), person.lastName(), person.phone(), medicalRecord.getAge(), medicalRecord.medications(), medicalRecord.allergies());
 	}

@@ -17,12 +17,27 @@ import com.openclassroom.safetynet.exceptions.DataSavingException;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Repository for managing JSON data.
+ *
+ * This class provides methods for saving, loading, and retrieving data from a
+ * JSON file.
+ */
 @Repository
 @RequiredArgsConstructor
 public class JsonRepository {
 
 	private final ObjectMapper objectMapper;
 
+	/**
+	 * Saves data to the JSON file.
+	 *
+	 * @param typeOfData The type of data to save. This is used to determine the
+	 *                   correct key in the JSON file.
+	 * @param data       The list of data objects to save.
+	 * @throws DataSavingException If an error occurs while saving the data to the
+	 *                             JSON file.
+	 */
 	public void saveData(TypeOfData typeOfData, List<Object> data) {
 		Map<String, List<Object>> jsonData = loadJsonAllData();
 		jsonData.put(typeOfData.getJsonKey(), data);
@@ -33,6 +48,13 @@ public class JsonRepository {
 		}
 	}
 
+	/**
+	 * Loads all data from the JSON file.
+	 *
+	 * @return A map containing all data from the JSON file.
+	 * @throws DataLoadingException If an error occurs while loading the data from
+	 *                              the JSON file.
+	 */
 	public Map<String, List<Object>> loadJsonAllData() {
 		try {
 			return objectMapper.readValue(new File(getJsonFilePath()), new TypeReference<Map<String, List<Object>>>() {
@@ -42,6 +64,16 @@ public class JsonRepository {
 		}
 	}
 
+	/**
+	 * Returns the path to the JSON file.
+	 *
+	 * The path is determined based on whether the "test.mode" system property is
+	 * set to "true". If it is, the test file path is used; otherwise, the regular
+	 * file path is used.
+	 * 
+	 * @param typeOfData The type of data to load.
+	 * @return The path to the JSON file.
+	 */
 	public List<Object> loadTypeOfData(TypeOfData typeOfData) {
 		Map<String, List<Object>> data = loadJsonAllData();
 		return data.getOrDefault(typeOfData.getJsonKey(), new ArrayList<>());

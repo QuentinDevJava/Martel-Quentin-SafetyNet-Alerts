@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -64,7 +63,6 @@ public class PersonService {
 			log.error("Unknown person: {}", fullName);
 			throw new IllegalArgumentException("Unknown person: " + fullName);
 		}
-
 		List<PersonDTO> persons = allPersons();
 		log.debug("Found existing person: {}", existingPerson);
 		persons.set(persons.indexOf(existingPerson), person);
@@ -96,17 +94,14 @@ public class PersonService {
 	 * @param stationNumber The fire station number.
 	 * @return A list of {@link PersonCoveredByStation} representing the people
 	 *         covered by the station.
-	 * @throws NoSuchElementException
 	 */
 	public PersonCoveredByStation personCoveredByStation(int stationNumber) {
 		List<FirestationDTO> firestations = firestationService.findFireStationByStationNumber(stationNumber);
 		log.debug("Result of findFireStationByStationNumber for stationNumber {} = {}", stationNumber, firestations);
-		// TODO appliquer pour les nofound
 		if (firestations.isEmpty()) {
 			log.error("Unknown station number: {}", stationNumber);
 			throw new IllegalArgumentException("Unknown station number: " + stationNumber);
 		}
-
 		List<PersonDTO> personByStation = getPersonsByStationAddress(firestations);
 		log.debug("Result of getPersonsByStationAddress for firestations found in findFireStationByStationNumber : {}", personByStation);
 
@@ -120,10 +115,13 @@ public class PersonService {
 	 * Returns information about the people and fire station associated with a given
 	 * address.
 	 *
-	 * @param address The address to search for.
+	 * @param address The address to search for. The address is used to query both
+	 *                the list of persons and the fire station.
 	 * @return A {@link PersonsAndStationInfo} object containing information about
-	 *         the people and the station.
-	 * @throws NoSuchElementException
+	 *         the people at the given address and the fire station responsible for
+	 *         that address.
+	 * @throws IllegalArgumentException If no persons are found at the given
+	 *                                  address, an exception is thrown.
 	 */
 	public PersonsAndStationInfo getPersonsAndStationInfoByAddress(String address) {
 		List<PersonDTO> persons = getPersonsByAddress(address);
@@ -144,9 +142,9 @@ public class PersonService {
 	 * Retrieves email addresses of persons residing in a specific city.
 	 *
 	 * @param city The city to retrieve email addresses for .
-	 * @return A list of PersonEmail objects containing the extracted email
-	 *         addresses {@link PersonEmail}.
-	 * @throws NoSuchElementException
+	 * @return A list of String containing the extracted email addresses.
+	 * @throws IllegalArgumentException If no persons are found at the given city,
+	 *                                  an exception is thrown.
 	 */
 	public List<String> personEmails(String city) {
 		List<PersonDTO> persons = allPersons();
@@ -155,24 +153,22 @@ public class PersonService {
 		if (matchingPersons.isEmpty()) {
 			throw new IllegalArgumentException("Unknown city: " + city);
 		}
-
 		return matchingPersons.stream().map(PersonDTO::email).toList();
 	}
 
 	/**
 	 * Retrieves a list of Child objects from a list of persons.
 	 *
-	 * @param personsByAddress The list of persons to extract child information from
-	 *                         {@link PersonDTO}.
+	 * @param address The list of persons to extract child information from
+	 *                {@link PersonDTO}.
 	 * @return A list of Child objects containing the extracted child information
 	 *         {@link Child}.
-	 * @throws NoSuchElementException
+	 * @throws IllegalArgumentException If no persons are found at the given
+	 *                                  address, an exception is thrown.
 	 */
 	public List<Child> getChildsByAddress(String address) {
 		List<PersonDTO> personsByAddress = getPersonsByAddress(address);
-		// TODO log debug
 		log.debug("Result of getPersonsByAddress for address {} = {} ", address, personsByAddress);
-
 		if (personsByAddress.isEmpty()) {
 			log.error("Unknown address: {}", address);
 			throw new IllegalArgumentException("Unknown address: " + address);
@@ -197,7 +193,6 @@ public class PersonService {
 	 *
 	 * @param stationNumber The station number to retrieve phone numbers for.
 	 * @return A list of phone numbers of persons covered by the specified station.
-	 * @throws NoSuchElementException
 	 */
 	public List<String> getPhoneNumbersByStation(int stationNumber) {
 		return getPersonsByStation(stationNumber).stream().map(PersonDTO::phone).toList();
@@ -210,17 +205,16 @@ public class PersonService {
 	 * @param lastName The last name of the persons to retrieve.
 	 * @return A list of PersonsLastNameInfo objects containing the extracted
 	 *         information {@link PersonsLastNameInfo}.
-	 * @throws NoSuchElementException
+	 * @throws IllegalArgumentException If no persons are found at the given
+	 *                                  lastName, an exception is thrown.
 	 */
 	public List<PersonsLastNameInfo> listOfPersonsByLastName(String lastName) {
 		List<PersonDTO> persons = allPersons();
 		List<PersonDTO> matchingPersons = persons.stream().filter(person -> person.lastName().equals(lastName)).toList();
 		log.debug("Result of matchingPersons for  last name {} = {} ", lastName, matchingPersons);
-
 		if (matchingPersons.isEmpty()) {
 			throw new IllegalArgumentException("Unknown last name: " + lastName);
 		}
-
 		return matchingPersons.stream()
 				.map(person -> new PersonsLastNameInfo(person, medicalRecordService.getMedicalRecordByFullName(person.fullName()))).toList();
 	}
@@ -232,7 +226,8 @@ public class PersonService {
 	 * @param stationNumber A list of fire station numbers.
 	 * @return A {@link PersonFloodInfo} object containing information about the
 	 *         people affected by the flood.
-	 * @throws NoSuchElementException
+	 * @throws IllegalArgumentException If no firestations are found at the given
+	 *                                  stationNumber list, an exception is thrown.
 	 */
 	public PersonFloodInfo floodInfo(List<Integer> stationNumber) {
 		List<FirestationDTO> firestations = firestationService.getFirestationByListStationNumber(stationNumber);

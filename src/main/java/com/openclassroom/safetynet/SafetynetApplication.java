@@ -7,14 +7,38 @@ import org.springframework.core.io.ClassPathResource;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Main application class for the Safetynet application.
+ * 
+ * This class is responsible for starting the Spring Boot application and
+ * checking for the presence of the "data.json" file in the classpath. If the
+ * file is found, the application starts normally. If the file is not found, an
+ * error message is logged and the application exits.
+ */
+
 @SpringBootApplication
 @Slf4j
 public class SafetynetApplication implements CommandLineRunner {
 
+	/**
+	 * Main method to start the Spring Boot application.
+	 * 
+	 * @param args Command line arguments.
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(SafetynetApplication.class, args);
 	}
 
+	/**
+	 * Runs a command after the application has started.
+	 * 
+	 * This method checks for the presence of the "data.json" file in the
+	 * {@link ClassPathResource} . If the file is found, a debug message is logged.
+	 * If the file is not found, an error message is logged and the application
+	 * exits.
+	 * 
+	 * @param args Command line arguments.
+	 */
 	@Override
 	public void run(String... args) {
 		ClassPathResource jsonDataFileRessource = new ClassPathResource("data.json");

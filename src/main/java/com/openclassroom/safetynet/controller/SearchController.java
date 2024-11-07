@@ -23,7 +23,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Endpoints, which enables searches
+ * Endpoints, which enables searches This controller provides various endpoints
+ * to retrieve information about persons, their medical records, fire stations,
+ * and community-related data.
  *
  */
 
@@ -34,6 +36,14 @@ public class SearchController {
 
 	private final PersonService personService;
 
+	/**
+	 * Retrieves all persons covered by a given fire station number.
+	 *
+	 * @param stationNumber The station number to search for.
+	 * @return A {@link ResponseEntity} containing a {@link PersonCoveredByStation}
+	 *         object, which includes the list of persons covered by the specified
+	 *         fire station.
+	 */
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonCoveredByStation> getPersonsByStationNumber(@RequestParam @Validated @Positive int stationNumber) {
 		log.info("Search for people covered by the fire station N° {}.", stationNumber);
@@ -42,6 +52,13 @@ public class SearchController {
 		return ResponseEntity.ok(personsCovered);
 	}
 
+	/**
+	 * Retrieves a list of children living at a specific address.
+	 *
+	 * @param address The address to search for children.
+	 * @return A {@link ResponseEntity} containing a list of {@link Child} objects
+	 *         representing the children living at the specified address.
+	 */
 	@GetMapping("/childAlert")
 	public ResponseEntity<List<Child>> getAllChild(@RequestParam @Validated @NotBlank String address) {
 		log.info("Search for children by address : {} ", address);
@@ -50,6 +67,14 @@ public class SearchController {
 		return ResponseEntity.ok(childs);
 	}
 
+	/**
+	 * Retrieves a list of phone numbers of persons covered by a specific fire
+	 * station number.
+	 *
+	 * @param stationNumber The fire station number to search for.
+	 * @return A {@link ResponseEntity} containing a list of phone numbers of
+	 *         persons covered by the specified fire station.
+	 */
 	@GetMapping("/phoneAlert")
 	public ResponseEntity<List<String>> getPersonsPhoneNumbersByStationNumber(
 			@RequestParam("firestation") @Validated @NotNull @Min(1) int stationNumber) {
@@ -59,6 +84,15 @@ public class SearchController {
 		return ResponseEntity.ok(phoneNumbers);
 	}
 
+	/**
+	 * Retrieves resident information and the fire station number associated with a
+	 * given address.
+	 *
+	 * @param address The address to search for.
+	 * @return A {@link ResponseEntity} containing a {@link PersonsAndStationInfo}
+	 *         object, which includes both the persons' information and the
+	 *         associated fire station number.
+	 */
 	@GetMapping("/fire")
 	public ResponseEntity<PersonsAndStationInfo> getListOfPersonsInfoAndStationNumberByAddress(@RequestParam @Validated @NotBlank String address) {
 		log.info("Search for resident information and fire station number by address : {}", address);
@@ -68,6 +102,15 @@ public class SearchController {
 		return ResponseEntity.ok(personsAndStationInfo);
 	}
 
+	/**
+	 * Retrieves resident information for multiple fire stations based on a list of
+	 * station numbers.
+	 *
+	 * @param stationNumber The list of fire station numbers to search for.
+	 * @return A {@link ResponseEntity} containing a {@link PersonFloodInfo} object,
+	 *         which includes the list of persons and their medical records for the
+	 *         given stations.
+	 */
 	@GetMapping("/flood/stations")
 	public ResponseEntity<PersonFloodInfo> getListOfPersonsInfoAndStationNumberByStationNumber(
 			@RequestParam("stations") @Validated List<@Positive Integer> stationNumber) {
@@ -78,6 +121,14 @@ public class SearchController {
 		return ResponseEntity.ok(floodInfo);
 	}
 
+	/**
+	 * Retrieves full resident information by last name.
+	 *
+	 * @param lastName The last name of the resident(s) to search for.
+	 * @return A {@link ResponseEntity} containing a list of
+	 *         {@link PersonsLastNameInfo} objects, which includes full information
+	 *         and medical records for residents with the specified last name.
+	 */
 	@GetMapping("/personInfolastName")
 	public ResponseEntity<List<PersonsLastNameInfo>> getPersonsFullInfoWithLastName(@RequestParam @Validated @NotBlank String lastName) {
 		log.info("Search for resident information by last name : {}.", lastName);
@@ -86,6 +137,14 @@ public class SearchController {
 		return ResponseEntity.ok(personsLastNameInfos);
 	}
 
+	/**
+	 * Retrieves a list of community email addresses for residents of a specific
+	 * city.
+	 *
+	 * @param city The city to search for.
+	 * @return A {@link ResponseEntity} containing a list of email addresses of the
+	 *         residents in the specified city.
+	 */
 	@GetMapping("/communityEmail")
 	public ResponseEntity<List<String>> getMailByCity(@RequestParam @Validated @NotBlank String city) {
 		log.info("Search for residents' e-mail addresses by city : {}", city);

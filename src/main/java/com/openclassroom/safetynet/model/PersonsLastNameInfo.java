@@ -3,7 +3,7 @@ package com.openclassroom.safetynet.model;
 import java.util.List;
 
 /**
- * Represents information about a person.
+ * Represents a person with their basic information.
  *
  * @param firstName   The first name of the person.
  * @param lastName    The last name of the person.
@@ -16,9 +16,18 @@ import java.util.List;
 public record PersonsLastNameInfo(String firstName, String lastName, String address, int age, String email, List<String> medications,
 		List<String> allergies) {
 
-	public PersonsLastNameInfo(PersonDTO person, MedicalRecordDTO medicalRecord) {
-		this(person.firstName(), person.lastName(), person.address(), medicalRecord.getAge(), person.email(), medicalRecord.medications(),
-				medicalRecord.allergies());
+	/**
+	 * Constructs a {@link PersonsLastNameInfo} instance using the provided
+	 * {@link PersonDTO} and {@link MedicalRecordDTO}.
+	 * 
+	 * @param personDto        The {@link PersonDTO} object containing the person's
+	 *                         basic information.
+	 * @param medicalRecordDto The {@link MedicalRecordDTO} object containing the
+	 *                         person's medical information.
+	 */
+	public PersonsLastNameInfo(PersonDTO personDto, MedicalRecordDTO medicalRecordDto) {
+		this(personDto.firstName(), personDto.lastName(), personDto.address(), medicalRecordDto.getAge(), personDto.email(),
+				medicalRecordDto.medications(), medicalRecordDto.allergies());
 
 	}
 

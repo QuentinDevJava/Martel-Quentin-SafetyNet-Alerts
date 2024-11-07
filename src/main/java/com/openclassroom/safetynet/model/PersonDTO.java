@@ -21,9 +21,16 @@ import jakarta.validation.constraints.Pattern;
  */
 @JsonIgnoreProperties(value = { "fullName" }, ignoreUnknown = false)
 @JsonPropertyOrder({ "firstName", "lastName", "address", "city", "zip", "phone", "email" })
-public record PersonDTO(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String address, @NotBlank String city,
-		@NotBlank String zip, @NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @NotNull @Email String email) {
+public record PersonDTO(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String address, @NotBlank String city, @NotBlank String zip,
+		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone, @NotNull @Email String email) {
 
+	/**
+	 * Returns the full name of the person by combining the first name and last
+	 * name.
+	 *
+	 * @return A string representing the full name of the person, combining the
+	 *         first and last names.
+	 */
 	public String fullName() {
 		return firstName + " " + lastName;
 	}

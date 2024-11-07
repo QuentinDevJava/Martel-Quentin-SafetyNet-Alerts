@@ -35,6 +35,21 @@ public class MedicalRecordController {
 
 	private final MedicalRecordService medicalRecordService;
 
+	/**
+	 * Creates a new medical record.
+	 * 
+	 * This method processes the incoming POST request to add a new medical record
+	 * to the system. It validates the provided {@link MedicalRecordDTO} and calls
+	 * the service layer to persist the medical record. Upon successful creation, it
+	 * returns a response with a 201 status and the location of the new resource.
+	 *
+	 * @param medicalRecordDTO The {@link MedicalRecordDTO} containing the details
+	 *                         of the medical record to be created.
+	 * @return A {@link ResponseEntity} with a status of 201 (Created) and the URI
+	 *         of the newly created medical record.
+	 * @throws URISyntaxException If the URI for the created resource cannot be
+	 *                            constructed.
+	 */
 	@PostMapping
 	public ResponseEntity<ApiResponse> createMedicalRecord(@Validated @RequestBody MedicalRecordDTO medicalRecordDTO) throws URISyntaxException {
 		log.info("POST request received for /medicalrecord, adding medical record: {}", medicalRecordDTO);
@@ -45,6 +60,23 @@ public class MedicalRecordController {
 		return ResponseEntity.created(uri).body(new ApiResponse(201));
 	}
 
+	/**
+	 * Updates an existing medical record.
+	 * 
+	 * This method processes the incoming PUT request to update an existing medical
+	 * record based on the provided firstName and lastName. It validates the
+	 * provided {@link MedicalRecordDTO} and calls the service layer to update the
+	 * medical record details. Upon successful update, it returns a response with a
+	 * 200 status indicating the medical record was updated successfully.
+	 * 
+	 *
+	 * @param firstName        The firstName of the person medical record to update.
+	 * @param lastName         The lastName of the person medical record to update.
+	 * @param medicalRecordDTO The {@link MedicalRecordDTO} containing the new
+	 *                         medical record details.
+	 * @return A {@link ResponseEntity} with a status of 200 (OK) indicating the
+	 *         medical record was updated.
+	 */
 	@PutMapping("/{firstName}/{lastName}")
 	public ResponseEntity<ApiResponse> updateMedicalRecord(@PathVariable @Validated @NotBlank String firstName,
 			@PathVariable @Validated @NotBlank String lastName, @Validated @RequestBody MedicalRecordDTO medicalRecordDTO) {
@@ -54,6 +86,21 @@ public class MedicalRecordController {
 		return ResponseEntity.ok(new ApiResponse(200));
 	}
 
+	/**
+	 * Deletes an existing medical record.
+	 * 
+	 * This method processes the incoming DELETE request to remove a medical record
+	 * from the system based on the provided firstName and lastName. It calls the
+	 * service layer to delete the medical record and returns a response indicating
+	 * whether the deletion was successful.
+	 * 
+	 *
+	 * @param firstName The firstName of the person medical record to delete.
+	 * @param lastName  The lastName of the person medical record to delete.
+	 * @return A {@link ResponseEntity} with either a 204 (No Content) status if the
+	 *         deletion was successful, or a 404 (Not Found) status if the medical
+	 *         record was not found.
+	 */
 	@DeleteMapping("/{firstName}/{lastName}")
 	public ResponseEntity<Void> deleteMedicalRecord(@PathVariable @Validated @NotBlank String firstName,
 			@PathVariable @Validated @NotBlank String lastName) {

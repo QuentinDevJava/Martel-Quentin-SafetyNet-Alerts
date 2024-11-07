@@ -30,7 +30,6 @@ public class FirestationService {
 	 * Creates a new fire station.
 	 *
 	 * @param firestation The fire station to create {@link FirestationDTO}.
-	 * @return The created fire station {@link FirestationDTO}.
 	 */
 	public void createFirestation(FirestationDTO firestation) {
 		List<FirestationDTO> firestations = allFireStations();
@@ -44,7 +43,6 @@ public class FirestationService {
 	 *
 	 * @param address     The address of the station to update.
 	 * @param firestation The updated fire station {@link FirestationDTO}.
-	 * @return The updated fire station {@link FirestationDTO}.
 	 */
 	public void updateFirestation(String address, FirestationDTO firestation) {
 		FirestationDTO existingFirestation = getFirestationByAddress(address);
@@ -84,7 +82,7 @@ public class FirestationService {
 	/**
 	 * Returns the list of fire stations corresponding to the given station numbers.
 	 *
-	 * @param stationNumbers The station numbers.
+	 * @param stationNumber The station numbers.
 	 * @return The corresponding fire stations {@link FirestationDTO}.
 	 */
 	public List<FirestationDTO> findFireStationByStationNumber(int stationNumber) {

@@ -37,6 +37,21 @@ public class PersonController {
 
 	private final PersonService personService;
 
+	/**
+	 * Creates a new person.
+	 * 
+	 * This method processes the incoming POST request to add a new person to the
+	 * system. It validates the provided {@link PersonDTO} and calls the service
+	 * layer to persist the person. Upon successful creation, it returns a response
+	 * with a 201 status and the location of the new resource.
+	 *
+	 * @param personDTO The {@link PersonDTO} containing the details of the person
+	 *                  to be created.
+	 * @return A {@link ResponseEntity} with a status of 201 (Created) and the URI
+	 *         of the newly created person.
+	 * @throws URISyntaxException If the URI for the created resource cannot be
+	 *                            constructed.
+	 */
 	@PostMapping
 	public ResponseEntity<ApiResponse> createPerson(@Validated @RequestBody PersonDTO personDTO) throws URISyntaxException {
 		log.info("POST request received for /person, adding person: {}", personDTO);
@@ -46,6 +61,23 @@ public class PersonController {
 		URI uri = new URI(str);
 		return ResponseEntity.created(uri).body(new ApiResponse(201));
 	}
+
+	/**
+	 * Updates an existing person.
+	 * 
+	 * This method processes the incoming PUT request to update an existing person
+	 * based on the provided firstName and lastName. It validates the provided
+	 * {@link PersonDTO} and calls the service layer to update the person details.
+	 * Upon successful update, it returns a response with a 200 status indicating
+	 * the person was updated successfully.
+	 * 
+	 *
+	 * @param firstName The firstName of the person to update.
+	 * @param lastName  The lastName of the person to update.
+	 * @param personDTO The {@link PersonDTO} containing the new person details.
+	 * @return A {@link ResponseEntity} with a status of 200 (OK) indicating the
+	 *         person was updated.
+	 */
 
 	@PutMapping("/{firstName}/{lastName}")
 	public ResponseEntity<ApiResponse> updatePerson(@PathVariable @Validated @NotBlank String firstName,
@@ -57,6 +89,21 @@ public class PersonController {
 
 	}
 
+	/**
+	 * Deletes an existing person.
+	 * 
+	 * This method processes the incoming DELETE request to remove a person from the
+	 * system based on the provided firstName and lastName. It calls the service
+	 * layer to delete the person and returns a response indicating whether the
+	 * deletion was successful.
+	 * 
+	 *
+	 * @param firstName The firstName of the person person to delete.
+	 * @param lastName  The lastName of the person person to delete.
+	 * @return A {@link ResponseEntity} with either a 204 (No Content) status if the
+	 *         deletion was successful, or a 404 (Not Found) status if the medical
+	 *         record was not found.
+	 */
 	@DeleteMapping("/{firstName}/{lastName}")
 	public ResponseEntity<ApiResponse> deletePerson(@PathVariable @Validated @NotBlank String firstName,
 			@PathVariable @Validated @NotBlank String lastName) {
