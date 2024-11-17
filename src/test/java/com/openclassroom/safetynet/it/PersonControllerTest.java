@@ -53,8 +53,6 @@ public class PersonControllerTest {
 	static void setup() throws IOException {
 		Files.copy(new File(JsonDataFilePath.JSONFILEPATH).toPath(), new File(JsonDataFilePath.JSONTESTFILEPATH).toPath(),
 				StandardCopyOption.REPLACE_EXISTING);
-
-		System.setProperty("test.mode", "true");
 	}
 
 	@Test

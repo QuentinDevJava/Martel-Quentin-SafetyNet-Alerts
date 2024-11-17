@@ -1,21 +1,21 @@
 package com.openclassroom.safetynet.repository;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.stereotype.Repository;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.JsonDataFilePath;
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.exceptions.DataLoadingException;
 import com.openclassroom.safetynet.exceptions.DataSavingException;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Repository;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Repository for managing JSON data.
@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class JsonRepository {
 
 	private final ObjectMapper objectMapper;
+	private final Environment environment;
 
 	/**
 	 * Saves data to the JSON file.
@@ -80,10 +81,10 @@ public class JsonRepository {
 	}
 
 	private String getJsonFilePath() {
-		if (System.getProperty("test.mode") != null && System.getProperty("test.mode").equals("true")) {
-			return JsonDataFilePath.JSONTESTFILEPATH;
+		if (Arrays.asList(environment.getActiveProfiles()).contains("test")) {
+			return JsonDataFilePath.JSONTESTFILEPATH.toString();
 		} else {
-			return JsonDataFilePath.JSONFILEPATH;
+			return JsonDataFilePath.JSONFILEPATH.toString();
 		}
 	}
 }
