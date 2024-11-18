@@ -6,6 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.ClassPathResource;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+
+import java.io.File;
 
 /**
  * Main application class for the Safetynet application.
@@ -41,8 +44,8 @@ public class SafetynetApplication implements CommandLineRunner {
 	 */
 	@Override
 	public void run(String... args) {
-		ClassPathResource jsonDataFileRessource = new ClassPathResource("data.json");
-		if (jsonDataFileRessource.exists()) {
+		Resource resource = new ClassPathResource("data.json");
+		if (resource.exists()) {
 			log.debug("File 'data.json' found in the classpath. Starting the application.");
 		} else {
 			log.error("File 'data.json' not found in the classpath. Stopping the application.");

@@ -6,7 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.openclassroom.safetynet.model.ApiResponse;
+import com.openclassroom.safetynet.dto.ApiResponse;
 
 /**
  * Global exception handler for REST controller methods.

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassroom.safetynet.model.ApiResponse;
+import com.openclassroom.safetynet.dto.ApiResponse;
 import com.openclassroom.safetynet.model.PersonDTO;
 import com.openclassroom.safetynet.service.PersonService;
 

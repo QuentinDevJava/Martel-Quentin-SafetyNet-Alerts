@@ -58,8 +58,8 @@ public class JsonRepository {
 	 */
 	public Map<String, List<Object>> loadJsonAllData() {
 		try {
-			return objectMapper.readValue(new File(getJsonFilePath()), new TypeReference<Map<String, List<Object>>>() {
-			});
+			return objectMapper.readValue(new File(getJsonFilePath()), new TypeReference<>() {
+            });
 		} catch (Exception e) {
 			throw new DataLoadingException("Error loading data: " + e.getMessage());
 		}

@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassroom.safetynet.model.Child;
-import com.openclassroom.safetynet.model.PersonCoveredByStation;
-import com.openclassroom.safetynet.model.PersonFloodInfo;
-import com.openclassroom.safetynet.model.PersonsAndStationInfo;
-import com.openclassroom.safetynet.model.PersonsLastNameInfo;
+import com.openclassroom.safetynet.dto.Child;
+import com.openclassroom.safetynet.dto.PersonCoveredByStation;
+import com.openclassroom.safetynet.dto.PersonFloodInfo;
+import com.openclassroom.safetynet.dto.PersonsAndStationInfo;
+import com.openclassroom.safetynet.dto.PersonsLastNameInfo;
 import com.openclassroom.safetynet.service.PersonService;
 
 import jakarta.validation.constraints.Min;

@@ -1,24 +1,21 @@
 package com.openclassroom.safetynet.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.model.Child;
+import com.openclassroom.safetynet.dto.Child;
 import com.openclassroom.safetynet.model.FirestationDTO;
 import com.openclassroom.safetynet.model.MedicalRecordDTO;
-import com.openclassroom.safetynet.model.MedicalRecordInfo;
-import com.openclassroom.safetynet.model.PersonCoveredByStation;
+import com.openclassroom.safetynet.dto.MedicalRecordInfo;
+import com.openclassroom.safetynet.dto.PersonCoveredByStation;
 import com.openclassroom.safetynet.model.PersonDTO;
-import com.openclassroom.safetynet.model.PersonFloodInfo;
-import com.openclassroom.safetynet.model.PersonsAndStationInfo;
-import com.openclassroom.safetynet.model.PersonsLastNameInfo;
+import com.openclassroom.safetynet.dto.PersonFloodInfo;
+import com.openclassroom.safetynet.dto.PersonsAndStationInfo;
+import com.openclassroom.safetynet.dto.PersonsLastNameInfo;
 import com.openclassroom.safetynet.repository.JsonRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -251,8 +248,7 @@ public class PersonService {
 	public Map<String, List<MedicalRecordInfo>> listOfPersonsByAddressByStationNumber(List<FirestationDTO> firestations) {
 		Map<String, List<MedicalRecordInfo>> medicalRecordsByAddress = new HashMap<>();
 		for (FirestationDTO firestation : firestations) {
-			List<PersonDTO> persons = new ArrayList<>();
-			persons.addAll(getPersonsByAddress(firestation.address()));
+            List<PersonDTO> persons = new ArrayList<>(getPersonsByAddress(firestation.address()));
 			List<MedicalRecordInfo> medicalRecordInfos = getMedicalRecordInfosByListPersons(persons);
 			medicalRecordsByAddress.put(firestation.address(), medicalRecordInfos);
 		}
@@ -261,7 +257,7 @@ public class PersonService {
 
 	private List<PersonDTO> allPersons() {
 		return repository.loadTypeOfData(TypeOfData.PERSONS).stream().map(p -> objectMapper.convertValue(p, PersonDTO.class))
-				.filter(PersonDTO.class::isInstance).map(PersonDTO.class::cast).collect((Collectors.toCollection(ArrayList::new)));
+				.filter(Objects::nonNull).map(PersonDTO.class::cast).collect((Collectors.toCollection(ArrayList::new)));
 	}
 
 	private void savePersons(List<PersonDTO> persons) {
