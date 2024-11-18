@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.openclassroom.safetynet.constants.JsonDataFilePath;
-import com.openclassroom.safetynet.model.FirestationDTO;
+import com.openclassroom.safetynet.model.Firestation;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,7 +52,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void postFirestationTest() throws Exception {
-		FirestationDTO firestation = new FirestationDTO("1510 Culver St", 10);
+		Firestation firestation = new Firestation("1510 Culver St", 10);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(post("/firestation").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isCreated());
@@ -61,7 +61,7 @@ public class FirestationControllerTest {
 
 	@ParameterizedTest
 	@MethodSource("provideInvalidFirestations")
-	void postFirestationErrorTest(FirestationDTO firestation) throws Exception {
+	void postFirestationErrorTest(Firestation firestation) throws Exception {
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(post("/firestation").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
@@ -69,7 +69,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void putFirestationTest() throws Exception {
-		FirestationDTO firestation = new FirestationDTO("1510 Culver St", 10);
+		Firestation firestation = new Firestation("1510 Culver St", 10);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(put("/firestation/112 Steppes Pl").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isOk());
@@ -77,7 +77,7 @@ public class FirestationControllerTest {
 
 	@Test
 	void putFirestationNoFoundTest() throws Exception {
-		FirestationDTO firestation = new FirestationDTO("1510 Culver St", 10);
+		Firestation firestation = new Firestation("1510 Culver St", 10);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(put("/firestation/NoFound").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isNotFound());
@@ -85,15 +85,15 @@ public class FirestationControllerTest {
 
 	@ParameterizedTest
 	@MethodSource("provideInvalidFirestations")
-	void putFirestationErrorTest(FirestationDTO firestation) throws Exception {
+	void putFirestationErrorTest(Firestation firestation) throws Exception {
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(put("/firestation/112 Steppes Pl").contentType(APPLICATION_JSON_UTF8).content(requestJson))
 				.andExpect(status().isBadRequest());
 	}
 
-	static List<FirestationDTO> provideInvalidFirestations() {
-		return Arrays.asList(new FirestationDTO(null, 10), new FirestationDTO("112 Steppes Pl", 0), new FirestationDTO(" ", 10));
+	static List<Firestation> provideInvalidFirestations() {
+		return Arrays.asList(new Firestation(null, 10), new Firestation("112 Steppes Pl", 0), new Firestation(" ", 10));
 
 	}
 

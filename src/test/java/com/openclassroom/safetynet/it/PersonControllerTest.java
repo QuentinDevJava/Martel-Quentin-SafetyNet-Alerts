@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.openclassroom.safetynet.constants.JsonDataFilePath;
-import com.openclassroom.safetynet.model.PersonDTO;
+import com.openclassroom.safetynet.model.Person;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,7 +58,7 @@ public class PersonControllerTest {
 	@Test
 	void postPersonTest() throws Exception {
 
-		PersonDTO person = new PersonDTO("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+		Person person = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(person);
 
@@ -83,7 +83,7 @@ public class PersonControllerTest {
 
 	@ParameterizedTest
 	@MethodSource("provideInvalidPersons")
-	void postPersonErrorTest(PersonDTO person) throws Exception {
+	void postPersonErrorTest(Person person) throws Exception {
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(person);
 		mockMvc.perform(post("/person").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
@@ -100,7 +100,7 @@ public class PersonControllerTest {
 		String foundCity = personNode.path("city").asText();
 		assertThat(foundCity).isEqualTo("Culver");
 
-		PersonDTO person = new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
+		Person person = new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(person);
 
@@ -113,35 +113,35 @@ public class PersonControllerTest {
 
 	@ParameterizedTest
 	@MethodSource("provideInvalidPersons")
-	void putPersonErrorTest(PersonDTO person) throws Exception {
+	void putPersonErrorTest(Person person) throws Exception {
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(person);
 		mockMvc.perform(put("/person/John/Boyd").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
 	}
 
-	static List<PersonDTO> provideInvalidPersons() {
-		return Arrays.asList(new PersonDTO(null, "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com"),
-				new PersonDTO("John", null, "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", null, "Paris", "97451", "841-874-6512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", null, "97451", "841-874-6512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", null, "841-874-6512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", null, "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", null),
-				new PersonDTO("John", "  ", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-65124", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-8744-6512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "8414-874-6512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "8418746512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-8746512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841874-6512", "jaboyd@email.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboydemail.com"),
-				new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboydemailcom"));
+	static List<Person> provideInvalidPersons() {
+		return Arrays.asList(new Person(null, "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com"),
+				new Person("John", null, "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com"),
+				new Person("John", "Boyd", null, "Paris", "97451", "841-874-6512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", null, "97451", "841-874-6512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", null, "841-874-6512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", null, "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", null),
+				new Person("John", "  ", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-65124", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-8744-6512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "8414-874-6512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "8418746512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-8746512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841874-6512", "jaboyd@email.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboydemail.com"),
+				new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboydemailcom"));
 
 	}
 
 	@Test
 	void putPersonNoFoundTest() throws Exception {
-		PersonDTO person = new PersonDTO("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
+		Person person = new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(person);
 		mockMvc.perform(put("/person/John/NoFound").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isNotFound());

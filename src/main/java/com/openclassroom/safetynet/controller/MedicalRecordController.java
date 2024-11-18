@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.dto.ApiResponse;
-import com.openclassroom.safetynet.model.MedicalRecordDTO;
+import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.service.MedicalRecordService;
 
 import jakarta.validation.constraints.NotBlank;
@@ -39,11 +39,11 @@ public class MedicalRecordController {
 	 * Creates a new medical record.
 	 * 
 	 * This method processes the incoming POST request to add a new medical record
-	 * to the system. It validates the provided {@link MedicalRecordDTO} and calls
+	 * to the system. It validates the provided {@link MedicalRecord} and calls
 	 * the service layer to persist the medical record. Upon successful creation, it
 	 * returns a response with a 201 status and the location of the new resource.
 	 *
-	 * @param medicalRecordDTO The {@link MedicalRecordDTO} containing the details
+	 * @param medicalRecordDTO The {@link MedicalRecord} containing the details
 	 *                         of the medical record to be created.
 	 * @return A {@link ResponseEntity} with a status of 201 (Created) and the URI
 	 *         of the newly created medical record.
@@ -51,7 +51,7 @@ public class MedicalRecordController {
 	 *                            constructed.
 	 */
 	@PostMapping
-	public ResponseEntity<ApiResponse> createMedicalRecord(@Validated @RequestBody MedicalRecordDTO medicalRecordDTO) throws URISyntaxException {
+	public ResponseEntity<ApiResponse> createMedicalRecord(@Validated @RequestBody MedicalRecord medicalRecordDTO) throws URISyntaxException {
 		log.info("POST request received for /medicalrecord, adding medical record: {}", medicalRecordDTO);
 		medicalRecordService.createMedicalRecord(medicalRecordDTO);
 		log.info("Medical record successfully created: {}", medicalRecordDTO);
@@ -65,21 +65,21 @@ public class MedicalRecordController {
 	 * 
 	 * This method processes the incoming PUT request to update an existing medical
 	 * record based on the provided firstName and lastName. It validates the
-	 * provided {@link MedicalRecordDTO} and calls the service layer to update the
+	 * provided {@link MedicalRecord} and calls the service layer to update the
 	 * medical record details. Upon successful update, it returns a response with a
 	 * 200 status indicating the medical record was updated successfully.
 	 * 
 	 *
 	 * @param firstName        The firstName of the person medical record to update.
 	 * @param lastName         The lastName of the person medical record to update.
-	 * @param medicalRecordDTO The {@link MedicalRecordDTO} containing the new
+	 * @param medicalRecordDTO The {@link MedicalRecord} containing the new
 	 *                         medical record details.
 	 * @return A {@link ResponseEntity} with a status of 200 (OK) indicating the
 	 *         medical record was updated.
 	 */
 	@PutMapping("/{firstName}/{lastName}")
 	public ResponseEntity<ApiResponse> updateMedicalRecord(@PathVariable @Validated @NotBlank String firstName,
-			@PathVariable @Validated @NotBlank String lastName, @Validated @RequestBody MedicalRecordDTO medicalRecordDTO) {
+			@PathVariable @Validated @NotBlank String lastName, @Validated @RequestBody MedicalRecord medicalRecordDTO) {
 		log.info("PUT request received for /medicalrecord/{}/{} updating medical record: {}", firstName, lastName, medicalRecordDTO);
 		medicalRecordService.updateMedicalRecord(firstName, lastName, medicalRecordDTO);
 		log.info("Medical record successfully updated: {}", medicalRecordDTO);

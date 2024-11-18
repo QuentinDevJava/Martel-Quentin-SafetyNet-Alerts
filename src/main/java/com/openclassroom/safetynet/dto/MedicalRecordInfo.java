@@ -2,8 +2,8 @@ package com.openclassroom.safetynet.dto;
 
 import java.util.List;
 
-import com.openclassroom.safetynet.model.MedicalRecordDTO;
-import com.openclassroom.safetynet.model.PersonDTO;
+import com.openclassroom.safetynet.model.MedicalRecord;
+import com.openclassroom.safetynet.model.Person;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,21 +25,21 @@ public record MedicalRecordInfo(@NotBlank String firstName, @NotBlank String las
 		@NotNull List<String> allergies) {
 
 	/**
-	 * Constructs a {@link MedicalRecordInfo} from a {@link PersonDTO} and
-	 * {@link MedicalRecordDTO}.
+	 * Constructs a {@link MedicalRecordInfo} from a {@link Person} and
+	 * {@link MedicalRecord}.
 	 * 
 	 * This constructor initializes the fields of {@link MedicalRecordInfo} using
-	 * the corresponding fields from a {@link PersonDTO} (for personal information)
-	 * and a {@link MedicalRecordDTO} (for medical information like age,
+	 * the corresponding fields from a {@link Person} (for personal information)
+	 * and a {@link MedicalRecord} (for medical information like age,
 	 * medications, and allergies).
 	 * 
 	 *
-	 * @param person        The {@link PersonDTO} object containing personal
+	 * @param person        The {@link Person} object containing personal
 	 *                      information.
-	 * @param medicalRecord The {@link MedicalRecordDTO} object containing medical
+	 * @param medicalRecord The {@link MedicalRecord} object containing medical
 	 *                      information.
 	 */
-	public MedicalRecordInfo(PersonDTO person, MedicalRecordDTO medicalRecord) {
+	public MedicalRecordInfo(Person person, MedicalRecord medicalRecord) {
 		this(person.firstName(), person.lastName(), person.phone(), medicalRecord.getAge(), medicalRecord.medications(), medicalRecord.allergies());
 	}
 

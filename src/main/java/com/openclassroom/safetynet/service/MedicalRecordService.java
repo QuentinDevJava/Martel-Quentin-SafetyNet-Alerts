@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.model.MedicalRecordDTO;
-import com.openclassroom.safetynet.model.PersonDTO;
+import com.openclassroom.safetynet.model.MedicalRecord;
+import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.repository.JsonRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -30,10 +30,10 @@ public class MedicalRecordService {
 	/**
 	 * Creates a new medical record.
 	 *
-	 * @param medicalRecord The medical record to create {@link MedicalRecordDTO}.
+	 * @param medicalRecord The medical record to create {@link MedicalRecord}.
 	 */
-	public void createMedicalRecord(MedicalRecordDTO medicalRecord) {
-		List<MedicalRecordDTO> medicalRecords = allMedicalRecords();
+	public void createMedicalRecord(MedicalRecord medicalRecord) {
+		List<MedicalRecord> medicalRecords = allMedicalRecords();
 		medicalRecords.add(medicalRecord);
 		saveMedicalRecords(medicalRecords);
 		log.debug("Add medicalRecord {} in allMedicalRecords() : {}", medicalRecord, medicalRecords);
@@ -46,17 +46,17 @@ public class MedicalRecordService {
 	 *                      update.
 	 * @param lastName      The last name of the person whose medical record to
 	 *                      update.
-	 * @param medicalRecord The updated medical record {@link MedicalRecordDTO}.
+	 * @param medicalRecord The updated medical record {@link MedicalRecord}.
 	 */
-	public void updateMedicalRecord(String firstName, String lastName, MedicalRecordDTO medicalRecord) {
+	public void updateMedicalRecord(String firstName, String lastName, MedicalRecord medicalRecord) {
 		String fullName = firstName + " " + lastName;
-		MedicalRecordDTO existingMedicalRecord = getMedicalRecordByFullName(fullName);
+		MedicalRecord existingMedicalRecord = getMedicalRecordByFullName(fullName);
 		if (existingMedicalRecord == null) {
 			log.error("Unknown person: {}", fullName);
 			throw new IllegalArgumentException("Unknown person: " + fullName);
 		}
 		log.debug("Found existing medical record for: {} = {}", fullName, existingMedicalRecord);
-		List<MedicalRecordDTO> medicalRecords = allMedicalRecords();
+		List<MedicalRecord> medicalRecords = allMedicalRecords();
 		medicalRecords.set(medicalRecords.indexOf(existingMedicalRecord), medicalRecord);
 		saveMedicalRecords(medicalRecords);
 		log.debug("Updated medical record list with {} = {}", medicalRecord, medicalRecords);
@@ -71,7 +71,7 @@ public class MedicalRecordService {
 	 */
 	public boolean deleteMedicalRecord(String firstName, String lastName) {
 		String fullName = firstName + " " + lastName;
-		List<MedicalRecordDTO> medicalRecords = allMedicalRecords();
+		List<MedicalRecord> medicalRecords = allMedicalRecords();
 		boolean medicalRecordDeleted = medicalRecords.removeIf(m -> m.fullName().equals(fullName));
 		if (medicalRecordDeleted) {
 			saveMedicalRecords(medicalRecords);
@@ -84,33 +84,33 @@ public class MedicalRecordService {
 	 * Retrieves a medical record by the full name of the person.
 	 *
 	 * @param fullName The first name and the last name of the person.
-	 * @return The medical record for the specified person {@link MedicalRecordDTO}.
+	 * @return The medical record for the specified person {@link MedicalRecord}.
 	 */
-	public MedicalRecordDTO getMedicalRecordByFullName(String fullName) {
+	public MedicalRecord getMedicalRecordByFullName(String fullName) {
 		return allMedicalRecords().stream().filter(medicalRecord -> medicalRecord.fullName().equals(fullName)).findFirst().orElse(null);
 	}
 
 	/**
 	 * Retrieves medical records for a list of persons.
 	 *
-	 * @param persons The list of persons {@link PersonDTO}.
+	 * @param persons The list of persons {@link Person}.
 	 * @return A list of medical records for the specified persons
-	 *         {@link MedicalRecordDTO}.
+	 *         {@link MedicalRecord}.
 	 */
-	public List<MedicalRecordDTO> getPersonMedicalRecords(List<PersonDTO> persons) {
+	public List<MedicalRecord> getPersonMedicalRecords(List<Person> persons) {
 		return persons.stream().map(p -> getMedicalRecordByFullName(p.fullName())).filter(Objects::nonNull).toList();
 	}
 
-	private List<MedicalRecordDTO> allMedicalRecords() {
+	private List<MedicalRecord> allMedicalRecords() {
 		return repository.loadTypeOfData(TypeOfData.MEDICALRECORDS).stream()
-				.map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecordDTO.class))
+				.map(medicalRecordObj -> objectMapper.convertValue(medicalRecordObj, MedicalRecord.class))
 				.collect((Collectors.toCollection(ArrayList::new)));
 	}
 
-	private void saveMedicalRecords(List<MedicalRecordDTO> medicalRecords) {
+	private void saveMedicalRecords(List<MedicalRecord> medicalRecords) {
 
 		repository.saveData(TypeOfData.MEDICALRECORDS, medicalRecords.stream()
-				.map(medicalRecordsObj -> objectMapper.convertValue(medicalRecordsObj, MedicalRecordDTO.class)).collect(Collectors.toList()));
+				.map(medicalRecordsObj -> objectMapper.convertValue(medicalRecordsObj, MedicalRecord.class)).collect(Collectors.toList()));
 	}
 
 }

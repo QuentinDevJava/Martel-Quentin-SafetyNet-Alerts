@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.openclassroom.safetynet.constants.JsonDataFilePath;
-import com.openclassroom.safetynet.model.MedicalRecordDTO;
+import com.openclassroom.safetynet.model.MedicalRecord;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,7 +53,7 @@ public class MedicalRecordControllerTest {
 	void postMedicalRecordnTest() throws Exception {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		MedicalRecordDTO medicalRecord = new MedicalRecordDTO("John", "Doe", "01/01/2014", medications, allergies);
+		MedicalRecord medicalRecord = new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(medicalRecord);
 		mockMvc.perform(post("/medicalrecord").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isCreated());
@@ -61,7 +61,7 @@ public class MedicalRecordControllerTest {
 
 	@ParameterizedTest
 	@MethodSource("provideInvalidMedicalRecord")
-	void postMedicalRecordErrorTest(MedicalRecordDTO medicalRecord) throws Exception {
+	void postMedicalRecordErrorTest(MedicalRecord medicalRecord) throws Exception {
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(medicalRecord);
 		mockMvc.perform(post("/medicalrecord").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
@@ -71,7 +71,7 @@ public class MedicalRecordControllerTest {
 	void putMedicalRecordTest() throws Exception {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		MedicalRecordDTO medicalRecord = new MedicalRecordDTO("Jacob", "Doe", "01/01/2014", medications, allergies);
+		MedicalRecord medicalRecord = new MedicalRecord("Jacob", "Doe", "01/01/2014", medications, allergies);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(medicalRecord);
 		mockMvc.perform(put("/medicalrecord/Jacob/Boyd").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isOk());
@@ -81,7 +81,7 @@ public class MedicalRecordControllerTest {
 	void putMedicalRecordNoFoundTest() throws Exception {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		MedicalRecordDTO medicalRecord = new MedicalRecordDTO("Jacob", "Doe", "01/01/2014", medications, allergies);
+		MedicalRecord medicalRecord = new MedicalRecord("Jacob", "Doe", "01/01/2014", medications, allergies);
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(medicalRecord);
 		mockMvc.perform(put("/medicalrecord/Jacob/NoFound").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isNotFound());
@@ -89,23 +89,23 @@ public class MedicalRecordControllerTest {
 
 	@ParameterizedTest
 	@MethodSource("provideInvalidMedicalRecord")
-	void putMedicalRecordErrorTest(MedicalRecordDTO medicalRecord) throws Exception {
+	void putMedicalRecordErrorTest(MedicalRecord medicalRecord) throws Exception {
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(medicalRecord);
 		mockMvc.perform(put("/medicalrecord/Jacob/Boyd").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isBadRequest());
 	}
 
-	static List<MedicalRecordDTO> provideInvalidMedicalRecord() {
+	static List<MedicalRecord> provideInvalidMedicalRecord() {
 		List<String> medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		List<String> allergies = Arrays.asList("nillacilan");
-		return Arrays.asList(new MedicalRecordDTO(null, "Doe", "01/01/2014", medications, allergies),
-				new MedicalRecordDTO("Jacob", null, "01/01/2014", medications, allergies),
-				new MedicalRecordDTO("Jacob", "Doe", null, medications, allergies),
-				new MedicalRecordDTO("Jacob", "Doe", "01/01/2014", null, allergies),
-				new MedicalRecordDTO("Jacob", "Doe", "01/01/2014", medications, null),
-				new MedicalRecordDTO(" ", "Doe", "01/01/2014", medications, allergies),
-				new MedicalRecordDTO("Jacob", "", "01/01/2014", medications, allergies),
-				new MedicalRecordDTO("Jacob", "Doe", " ", medications, allergies));
+		return Arrays.asList(new MedicalRecord(null, "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecord("Jacob", null, "01/01/2014", medications, allergies),
+				new MedicalRecord("Jacob", "Doe", null, medications, allergies),
+				new MedicalRecord("Jacob", "Doe", "01/01/2014", null, allergies),
+				new MedicalRecord("Jacob", "Doe", "01/01/2014", medications, null),
+				new MedicalRecord(" ", "Doe", "01/01/2014", medications, allergies),
+				new MedicalRecord("Jacob", "", "01/01/2014", medications, allergies),
+				new MedicalRecord("Jacob", "Doe", " ", medications, allergies));
 	}
 
 	@Test

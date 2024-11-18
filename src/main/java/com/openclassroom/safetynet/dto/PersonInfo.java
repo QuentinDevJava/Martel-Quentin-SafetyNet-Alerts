@@ -1,6 +1,6 @@
 package com.openclassroom.safetynet.dto;
 
-import com.openclassroom.safetynet.model.PersonDTO;
+import com.openclassroom.safetynet.model.Person;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -16,12 +16,12 @@ public record PersonInfo(@NotBlank String firstName, @NotBlank String lastName, 
 		@NotBlank @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$") String phone) {
 
 	/**
-	 * Constructs a {@link PersonInfo} from a {@link PersonDTO}.
+	 * Constructs a {@link PersonInfo} from a {@link Person}.
 	 *
-	 * @param personDto A list of {@link PersonDTO} representing people covered by
+	 * @param personDto A list of {@link Person} representing people covered by
 	 *                  the station.
 	 */
-	public PersonInfo(PersonDTO personDto) {
+	public PersonInfo(Person personDto) {
 		this(personDto.firstName(), personDto.lastName(), personDto.address(), personDto.phone());
 	}
 }

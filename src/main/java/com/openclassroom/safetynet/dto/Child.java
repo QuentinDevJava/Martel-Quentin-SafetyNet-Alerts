@@ -1,7 +1,7 @@
 package com.openclassroom.safetynet.dto;
 
-import com.openclassroom.safetynet.model.MedicalRecordDTO;
-import com.openclassroom.safetynet.model.PersonDTO;
+import com.openclassroom.safetynet.model.MedicalRecord;
+import com.openclassroom.safetynet.model.Person;
 
 /**
  * Represents a child with their basic information.
@@ -25,7 +25,7 @@ public record Child(String firstName, String lastName, String address, String ph
 	 * @param medicalRecord The {@code MedicalRecordDTO} object containing the
 	 *                      child's age.
 	 */
-	public Child(PersonDTO person, MedicalRecordDTO medicalRecord) {
+	public Child(Person person, MedicalRecord medicalRecord) {
 		this(person.firstName(), person.lastName(), person.address(), person.phone(), medicalRecord.getAge());
 	}
 

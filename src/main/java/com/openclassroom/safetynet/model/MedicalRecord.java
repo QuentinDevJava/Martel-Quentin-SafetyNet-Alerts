@@ -23,7 +23,7 @@ import jakarta.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(value = { "age", "child", "adult" }, ignoreUnknown = false)
 @JsonPropertyOrder({ "firstName", "lastName", "birthdate", "medications", "allergies" })
-public record MedicalRecordDTO(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String birthdate, @NotNull List<String> medications,
+public record MedicalRecord(@NotBlank String firstName, @NotBlank String lastName, @NotBlank String birthdate, @NotNull List<String> medications,
 		@NotNull List<String> allergies) {
 
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy");

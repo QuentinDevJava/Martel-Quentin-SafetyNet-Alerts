@@ -1,7 +1,7 @@
 package com.openclassroom.safetynet.dto;
 
-import com.openclassroom.safetynet.model.MedicalRecordDTO;
-import com.openclassroom.safetynet.model.PersonDTO;
+import com.openclassroom.safetynet.model.MedicalRecord;
+import com.openclassroom.safetynet.model.Person;
 
 import java.util.List;
 
@@ -21,14 +21,14 @@ public record PersonsLastNameInfo(String firstName, String lastName, String addr
 
 	/**
 	 * Constructs a {@link PersonsLastNameInfo} instance using the provided
-	 * {@link PersonDTO} and {@link MedicalRecordDTO}.
+	 * {@link Person} and {@link MedicalRecord}.
 	 * 
-	 * @param personDto        The {@link PersonDTO} object containing the person's
+	 * @param personDto        The {@link Person} object containing the person's
 	 *                         basic information.
-	 * @param medicalRecordDto The {@link MedicalRecordDTO} object containing the
+	 * @param medicalRecordDto The {@link MedicalRecord} object containing the
 	 *                         person's medical information.
 	 */
-	public PersonsLastNameInfo(PersonDTO personDto, MedicalRecordDTO medicalRecordDto) {
+	public PersonsLastNameInfo(Person personDto, MedicalRecord medicalRecordDto) {
 		this(personDto.firstName(), personDto.lastName(), personDto.address(), medicalRecordDto.getAge(), personDto.email(),
 				medicalRecordDto.medications(), medicalRecordDto.allergies());
 

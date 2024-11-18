@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.openclassroom.safetynet.constants.TypeOfData;
-import com.openclassroom.safetynet.model.FirestationDTO;
+import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.repository.JsonRepository;
 import com.openclassroom.safetynet.service.FirestationService;
 
@@ -29,11 +29,11 @@ class FirestationServiceTest {
 	@Test
 	void findAllByStationNumber() {
 
-		List<FirestationDTO> firestations = Arrays.asList(new FirestationDTO("1509 Culver St", 1),
-				new FirestationDTO("1650 Culver St", 1));
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1),
+				new Firestation("1650 Culver St", 1));
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
-		List<FirestationDTO> testFirestations = firestationService.findFireStationByStationNumber(1);
+		List<Firestation> testFirestations = firestationService.findFireStationByStationNumber(1);
 
 		assertThat(testFirestations).isEqualTo(firestations);
 
@@ -42,12 +42,12 @@ class FirestationServiceTest {
 	@Test
 	void getFirestationByListStationNumber() {
 
-		List<FirestationDTO> firestations = Arrays.asList(new FirestationDTO("1509 Culver St", 1),
-				new FirestationDTO("1650 Culver St", 2));
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1),
+				new Firestation("1650 Culver St", 2));
 		List<Integer> stationNumbers = Arrays.asList(1, 2);
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
-		List<FirestationDTO> testFirestations = firestationService.getFirestationByListStationNumber(stationNumbers);
+		List<Firestation> testFirestations = firestationService.getFirestationByListStationNumber(stationNumbers);
 
 		assertThat(testFirestations).isEqualTo(firestations);
 
@@ -56,12 +56,12 @@ class FirestationServiceTest {
 	@Test
 	void getFirestationByAddress() {
 
-		List<FirestationDTO> firestations = Arrays.asList(new FirestationDTO("1509 Culver St", 1),
-				new FirestationDTO("1650 Culver St", 2));
-		FirestationDTO firestationResult = new FirestationDTO("1509 Culver St", 1);
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1),
+				new Firestation("1650 Culver St", 2));
+		Firestation firestationResult = new Firestation("1509 Culver St", 1);
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
-		FirestationDTO testFirestations = firestationService.getFirestationByAddress("1509 Culver St");
+		Firestation testFirestations = firestationService.getFirestationByAddress("1509 Culver St");
 
 		assertThat(testFirestations).isEqualTo(firestationResult);
 

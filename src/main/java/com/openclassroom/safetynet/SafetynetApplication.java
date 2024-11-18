@@ -4,11 +4,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.ClassPathResource;
-
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Main application class for the Safetynet application.
@@ -36,9 +34,9 @@ public class SafetynetApplication implements CommandLineRunner {
 	 * Runs a command after the application has started.
 	 * 
 	 * This method checks for the presence of the "data.json" file in the
-	 * {@link ClassPathResource} . If the file is found, a debug message is logged.
-	 * If the file is not found, an error message is logged and the application
-	 * exits.
+	 * {@link ClassPathResource} . If the file is found, a debug message is logged
+	 * and the application start. If the file is not found, an error message is
+	 * logged and the application exits.
 	 * 
 	 * @param args Command line arguments.
 	 */

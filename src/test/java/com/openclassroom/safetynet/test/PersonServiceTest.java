@@ -18,12 +18,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.openclassroom.safetynet.constants.TypeOfData;
 import com.openclassroom.safetynet.dto.Child;
-import com.openclassroom.safetynet.model.FirestationDTO;
+import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.dto.MedicalRecordInfo;
-import com.openclassroom.safetynet.model.MedicalRecordDTO;
+import com.openclassroom.safetynet.model.MedicalRecord;
 import com.openclassroom.safetynet.dto.PersonCoveredByStation;
 import com.openclassroom.safetynet.dto.PersonFloodInfo;
-import com.openclassroom.safetynet.model.PersonDTO;
+import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.dto.PersonsAndStationInfo;
 import com.openclassroom.safetynet.dto.PersonsLastNameInfo;
 import com.openclassroom.safetynet.repository.JsonRepository;
@@ -47,49 +47,49 @@ class PersonServiceTest {
 
 	private String address;
 	private int stationNumber;
-	private List<FirestationDTO> firestationsN1;
+	private List<Firestation> firestationsN1;
 
-	private PersonDTO johnDoe;
-	private PersonDTO janeDoe;
-	private PersonDTO jackDin;
+	private Person johnDoe;
+	private Person janeDoe;
+	private Person jackDin;
 
 	private List<String> medications;
 	private List<String> allergies;
 
-	private MedicalRecordDTO johnDoeMedicalRecordRequest;
-	private MedicalRecordDTO janeDoeMedicalRecordRequest;
-	private MedicalRecordDTO jackDinMedicalRecordRequest;
+	private MedicalRecord johnDoeMedicalRecordRequest;
+	private MedicalRecord janeDoeMedicalRecordRequest;
+	private MedicalRecord jackDinMedicalRecordRequest;
 
 	@BeforeEach
 	void setup() {
 
 		stationNumber = 1;
 		address = "1509 Culver St";
-		firestationsN1 = Arrays.asList(new FirestationDTO(address, stationNumber));
+		firestationsN1 = Arrays.asList(new Firestation(address, stationNumber));
 
-		johnDoe = new PersonDTO("John", "Doe", address, "Culver", "97451", "841-874-6512", "jaboyd@email.com");
-		janeDoe = new PersonDTO("Jane", "Doe", address, "Culver", "97451", "841-874-6513", "jdoe@email.com");
-		jackDin = new PersonDTO("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com");
+		johnDoe = new Person("John", "Doe", address, "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+		janeDoe = new Person("Jane", "Doe", address, "Culver", "97451", "841-874-6513", "jdoe@email.com");
+		jackDin = new Person("Jack", "Din", "4345 Culver St", "Culver", "97451", "841-874-6515", "jdin@email.com");
 
 		medications = Arrays.asList("aznol:350mg", "hydrapermazol:100mg");
 		allergies = Arrays.asList("nillacilan");
 
-		johnDoeMedicalRecordRequest = new MedicalRecordDTO("John", "Doe", "01/01/2014", medications, allergies);
-		janeDoeMedicalRecordRequest = new MedicalRecordDTO("Jane", "Doe", "01/01/2000", medications, allergies);
-		jackDinMedicalRecordRequest = new MedicalRecordDTO("Jack", "Din", "01/01/2000", medications, allergies);
+		johnDoeMedicalRecordRequest = new MedicalRecord("John", "Doe", "01/01/2014", medications, allergies);
+		janeDoeMedicalRecordRequest = new MedicalRecord("Jane", "Doe", "01/01/2000", medications, allergies);
+		jackDinMedicalRecordRequest = new MedicalRecord("Jack", "Din", "01/01/2000", medications, allergies);
 	}
 
 	@Test
 	void shouldReturnPersonsMatchingGivenAddress() {
 		// GIVEN
-		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
-		List<PersonDTO> expectedPersons = Arrays.asList(johnDoe, janeDoe);
+		List<Person> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
+		List<Person> expectedPersons = Arrays.asList(johnDoe, janeDoe);
 
 		// WHEN
 		when(repository.loadTypeOfData(TypeOfData.PERSONS)).thenReturn(Arrays.asList(persons.get(0), persons.get(1), persons.get(2)));
 
 		// THEN
-		List<PersonDTO> personsTest = personService.getPersonsByAddress(address);
+		List<Person> personsTest = personService.getPersonsByAddress(address);
 
 		assertThat(expectedPersons).isEqualTo(personsTest);
 	}
@@ -97,7 +97,7 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnPhoneNumbersForPersonsInGivenStation() {
 		// GIVEN
-		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe);
+		List<Person> persons = Arrays.asList(johnDoe, janeDoe);
 		List<String> expectedPhoneNumbers = Arrays.asList("841-874-6512", "841-874-6513");
 
 		// WHEN
@@ -116,8 +116,8 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnPersonsAndMedicalRecordsForGivenStationNumber() {
 		// GIVEN
-		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe);
-		List<MedicalRecordDTO> medicalRecords = Arrays.asList(johnDoeMedicalRecordRequest, janeDoeMedicalRecordRequest);
+		List<Person> persons = Arrays.asList(johnDoe, janeDoe);
+		List<MedicalRecord> medicalRecords = Arrays.asList(johnDoeMedicalRecordRequest, janeDoeMedicalRecordRequest);
 		PersonCoveredByStation expectedPersonCoveredByStationResult = new PersonCoveredByStation(persons, medicalRecords);
 
 		// WHEN
@@ -135,8 +135,8 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnPersonsAndStationInfoForGivenAddress() {
 		// GIVEN
-		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe);
-		List<MedicalRecordDTO> medicalRecords = Arrays.asList(johnDoeMedicalRecordRequest, janeDoeMedicalRecordRequest);
+		List<Person> persons = Arrays.asList(johnDoe, janeDoe);
+		List<MedicalRecord> medicalRecords = Arrays.asList(johnDoeMedicalRecordRequest, janeDoeMedicalRecordRequest);
 		List<MedicalRecordInfo> expectedMedicalRecordInfos = Arrays.asList(
 				new MedicalRecordInfo(johnDoe.firstName(), johnDoe.lastName(), johnDoe.phone(), 10, medications, allergies),
 				new MedicalRecordInfo(janeDoe.firstName(), janeDoe.lastName(), janeDoe.phone(), 24, medications, allergies));
@@ -157,7 +157,7 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnListOfEmailsForPersonsInGivenCity() {
 		// GIVEN
-		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
+		List<Person> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
 		List<String> emails = Arrays.asList("jaboyd@email.com", "jdoe@email.com", "jdin@email.com");
 		List<String> expectedPersonEmailResult = emails;
 		// WHEN
@@ -171,7 +171,7 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnListOfChildrenForGivenAddress() {
 		// GIVEN
-		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe);
+		List<Person> persons = Arrays.asList(johnDoe, janeDoe);
 		List<Child> expectedChildrenResult = Arrays.asList(new Child("John", "Doe", "1509 Culver St", "841-874-6512", 10));
 
 		// WHEN
@@ -191,7 +191,7 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnListOfPersonsWithMatchingLastName() {
 		// GIVEN
-		List<PersonDTO> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
+		List<Person> persons = Arrays.asList(johnDoe, janeDoe, jackDin);
 		List<PersonsLastNameInfo> expectedPersonsResult = Arrays.asList(
 				new PersonsLastNameInfo("John", "Doe", "1509 Culver St", 10, "jaboyd@email.com", medications, allergies),
 				new PersonsLastNameInfo("Jane", "Doe", "1509 Culver St", 24, "jdoe@email.com", medications, allergies));
@@ -213,12 +213,12 @@ class PersonServiceTest {
 	@Test
 	void shouldReturnCorrectPersonFloodInfoForGivenStationNumbers() {
 		// GIVEN
-		List<PersonDTO> persons = Arrays.asList(johnDoe, jackDin);
+		List<Person> persons = Arrays.asList(johnDoe, jackDin);
 
 		MedicalRecordInfo johnDoeMedicalRecord = new MedicalRecordInfo("John", "Doe", "841-874-6512", 10, medications, allergies);
 		MedicalRecordInfo jackDinMedicalRecord = new MedicalRecordInfo("Jack", "Din", "841-874-6515", 24, medications, allergies);
 
-		List<FirestationDTO> firestationsResult = Arrays.asList(firestationsN1.get(0), new FirestationDTO("4345 Culver St", 2));
+		List<Firestation> firestationsResult = Arrays.asList(firestationsN1.get(0), new Firestation("4345 Culver St", 2));
 
 		List<Integer> stationNumbers = Arrays.asList(1, 2);
 

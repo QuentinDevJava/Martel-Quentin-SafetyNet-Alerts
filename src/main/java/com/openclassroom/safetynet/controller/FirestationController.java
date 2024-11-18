@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.dto.ApiResponse;
-import com.openclassroom.safetynet.model.FirestationDTO;
+import com.openclassroom.safetynet.model.Firestation;
 import com.openclassroom.safetynet.service.FirestationService;
 
 import jakarta.validation.constraints.NotBlank;
@@ -40,11 +40,11 @@ public class FirestationController {
 	 * Creates a new firestation.
 	 * 
 	 * This method processes the incoming POST request to add a new firestation to
-	 * the system. It validates the provided {@link FirestationDTO} and calls the
+	 * the system. It validates the provided {@link Firestation} and calls the
 	 * service layer to persist the firestation. Upon successful creation, it
 	 * returns a response with a 201 status and the location of the new resource.
 	 *
-	 * @param firestationDTO The {@link FirestationDTO} containing the details of
+	 * @param firestationDTO The {@link Firestation} containing the details of
 	 *                       the firestation to be created.
 	 * @return A {@link ResponseEntity} with a status of 201 (Created) and the URI
 	 *         of the newly created firestation.
@@ -52,7 +52,7 @@ public class FirestationController {
 	 *                            constructed.
 	 */
 	@PostMapping()
-	public ResponseEntity<ApiResponse> createFirestation(@Validated @RequestBody FirestationDTO firestationDTO) throws URISyntaxException {
+	public ResponseEntity<ApiResponse> createFirestation(@Validated @RequestBody Firestation firestationDTO) throws URISyntaxException {
 		log.info("POST request received for /firestation, adding firestation: {}", firestationDTO);
 		firestationService.createFirestation(firestationDTO);
 		log.info("Firestation successfully created: {}", firestationDTO);
@@ -66,20 +66,20 @@ public class FirestationController {
 	 * 
 	 * This method processes the incoming PUT request to update an existing
 	 * firestation based on the provided address. It validates the provided
-	 * {@link FirestationDTO} and calls the service layer to update the firestation
+	 * {@link Firestation} and calls the service layer to update the firestation
 	 * details. Upon successful update, it returns a response with a 200 status
 	 * indicating the firestation was updated successfully.
 	 * 
 	 *
 	 * @param address        The address of the firestation to update.
-	 * @param firestationDTO The {@link FirestationDTO} containing the new
+	 * @param firestationDTO The {@link Firestation} containing the new
 	 *                       firestation details.
 	 * @return A {@link ResponseEntity} with a status of 200 (OK) indicating the
 	 *         firestation was updated.
 	 */
 	@PutMapping("/{address}")
 	public ResponseEntity<ApiResponse> updateFirestation(@PathVariable @Validated @NotBlank String address,
-			@Validated @RequestBody FirestationDTO firestationDTO) {
+			@Validated @RequestBody Firestation firestationDTO) {
 		log.info("PUT request received for /firestation/{} updating firestation: {}", address, firestationDTO);
 		firestationService.updateFirestation(address, firestationDTO);
 		log.info("Firestation successfully updated: {}", firestationDTO);

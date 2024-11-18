@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassroom.safetynet.dto.ApiResponse;
-import com.openclassroom.safetynet.model.PersonDTO;
+import com.openclassroom.safetynet.model.Person;
 import com.openclassroom.safetynet.service.PersonService;
 
 import jakarta.validation.constraints.NotBlank;
@@ -41,11 +41,11 @@ public class PersonController {
 	 * Creates a new person.
 	 * 
 	 * This method processes the incoming POST request to add a new person to the
-	 * system. It validates the provided {@link PersonDTO} and calls the service
+	 * system. It validates the provided {@link Person} and calls the service
 	 * layer to persist the person. Upon successful creation, it returns a response
 	 * with a 201 status and the location of the new resource.
 	 *
-	 * @param personDTO The {@link PersonDTO} containing the details of the person
+	 * @param personDTO The {@link Person} containing the details of the person
 	 *                  to be created.
 	 * @return A {@link ResponseEntity} with a status of 201 (Created) and the URI
 	 *         of the newly created person.
@@ -53,7 +53,7 @@ public class PersonController {
 	 *                            constructed.
 	 */
 	@PostMapping
-	public ResponseEntity<ApiResponse> createPerson(@Validated @RequestBody PersonDTO personDTO) throws URISyntaxException {
+	public ResponseEntity<ApiResponse> createPerson(@Validated @RequestBody Person personDTO) throws URISyntaxException {
 		log.info("POST request received for /person, adding person: {}", personDTO);
 		personService.createPerson(personDTO);
 		log.info("Person successfully created: {}", personDTO);
@@ -67,21 +67,21 @@ public class PersonController {
 	 * 
 	 * This method processes the incoming PUT request to update an existing person
 	 * based on the provided firstName and lastName. It validates the provided
-	 * {@link PersonDTO} and calls the service layer to update the person details.
+	 * {@link Person} and calls the service layer to update the person details.
 	 * Upon successful update, it returns a response with a 200 status indicating
 	 * the person was updated successfully.
 	 * 
 	 *
 	 * @param firstName The firstName of the person to update.
 	 * @param lastName  The lastName of the person to update.
-	 * @param personDTO The {@link PersonDTO} containing the new person details.
+	 * @param personDTO The {@link Person} containing the new person details.
 	 * @return A {@link ResponseEntity} with a status of 200 (OK) indicating the
 	 *         person was updated.
 	 */
 
 	@PutMapping("/{firstName}/{lastName}")
 	public ResponseEntity<ApiResponse> updatePerson(@PathVariable @Validated @NotBlank String firstName,
-			@PathVariable @Validated @NotBlank String lastName, @RequestBody @Validated PersonDTO personDTO) {
+			@PathVariable @Validated @NotBlank String lastName, @RequestBody @Validated Person personDTO) {
 		log.info("PUT request received for /person/{}/{} updating person : {}", firstName, lastName, personDTO);
 		personService.updatePerson(firstName, lastName, personDTO);
 		log.info("Person successfully updated: {}", personDTO);
