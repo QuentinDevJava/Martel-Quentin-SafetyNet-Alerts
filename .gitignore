@@ -35,3 +35,4 @@ build/
 .metadata/
 .sonarlint/
 doc/
+logs/
