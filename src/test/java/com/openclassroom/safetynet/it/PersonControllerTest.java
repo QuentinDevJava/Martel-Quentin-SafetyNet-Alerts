@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -49,36 +50,47 @@ public class PersonControllerTest {
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(),
 			Charset.forName("utf8"));
 
+	private Person johnBoyd;
+	private Person johnDoe;
+	private String address;
+
 	@BeforeAll
-	static void setup() throws IOException {
+	static void setupBeforeAll() throws IOException {
 		Files.copy(new File(JsonDataFilePath.JSONFILEPATH).toPath(), new File(JsonDataFilePath.JSONTESTFILEPATH).toPath(),
 				StandardCopyOption.REPLACE_EXISTING);
+	}
+
+	@BeforeEach
+	void setup() {
+		address = "1509 Culver St";
+		johnDoe = new Person("John", "Doe", address, "Culver", "97451", "841-874-6512", "jaboyd@email.com");
+		johnBoyd = new Person("John", "Boyd", address, "Paris", "97451", "841-874-6512", "jaboyd@email.com");
+
 	}
 
 	@Test
 	void postPersonTest() throws Exception {
 
-		Person person = new Person("Johny", "Doe", "1509 Culver St", "Culver", "97451", "841-874-6512", "jaboyd@email.com");
-		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(person);
+		JsonNode personNode = searchPersonInDataJson(johnDoe.firstName(), johnDoe.lastName());
+		assertThat(personNode).isNull();
 
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(johnDoe);
 		this.mockMvc.perform(post("/person").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isCreated());
 
-		String firstName = "Johny";
-		String lastName = "Doe";
-		JsonNode personNode = searchPersonInDataJson(firstName, lastName);
+		JsonNode johnDoeNode = searchPersonInDataJson(johnDoe.firstName(), johnDoe.lastName());
 
-		String foundAddress = personNode.path("address").asText();
-		String foundCity = personNode.path("city").asText();
-		String foundZip = personNode.path("zip").asText();
-		String foundPhone = personNode.path("phone").asText();
-		String foundEmail = personNode.path("email").asText();
+		String foundAddress = johnDoeNode.path("address").asText();
+		String foundCity = johnDoeNode.path("city").asText();
+		String foundZip = johnDoeNode.path("zip").asText();
+		String foundPhone = johnDoeNode.path("phone").asText();
+		String foundEmail = johnDoeNode.path("email").asText();
 
-		assertThat(foundAddress).isEqualTo("1509 Culver St");
-		assertThat(foundCity).isEqualTo("Culver");
-		assertThat(foundZip).isEqualTo("97451");
-		assertThat(foundPhone).isEqualTo("841-874-6512");
-		assertThat(foundEmail).isEqualTo("jaboyd@email.com");
+		assertThat(foundAddress).isEqualTo(johnDoe.address());
+		assertThat(foundCity).isEqualTo(johnDoe.city());
+		assertThat(foundZip).isEqualTo(johnDoe.zip());
+		assertThat(foundPhone).isEqualTo(johnDoe.phone());
+		assertThat(foundEmail).isEqualTo(johnDoe.email());
 	}
 
 	@ParameterizedTest
@@ -93,20 +105,16 @@ public class PersonControllerTest {
 	@Test
 	void putPersonTest() throws Exception {
 
-		String firstName = "John";
-		String lastName = "Boyd";
-		JsonNode personNode = searchPersonInDataJson(firstName, lastName);
-
+		JsonNode personNode = searchPersonInDataJson(johnBoyd.firstName(), johnBoyd.lastName());
 		String foundCity = personNode.path("city").asText();
 		assertThat(foundCity).isEqualTo("Culver");
 
-		Person person = new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(person);
+		String requestJson = ow.writeValueAsString(johnBoyd);
 
 		mockMvc.perform(put("/person/John/Boyd").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isOk());
 
-		personNode = searchPersonInDataJson(firstName, lastName);
+		personNode = searchPersonInDataJson(johnBoyd.firstName(), johnBoyd.lastName());
 		foundCity = personNode.path("city").asText();
 		assertThat(foundCity).isEqualTo("Paris");
 	}
@@ -141,9 +149,8 @@ public class PersonControllerTest {
 
 	@Test
 	void putPersonNoFoundTest() throws Exception {
-		Person person = new Person("John", "Boyd", "1509 Culver St", "Paris", "97451", "841-874-6512", "jaboyd@email.com");
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		String requestJson = ow.writeValueAsString(person);
+		String requestJson = ow.writeValueAsString(johnBoyd);
 		mockMvc.perform(put("/person/John/NoFound").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isNotFound());
 	}
 
@@ -176,6 +183,7 @@ public class PersonControllerTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		JsonNode rootNode = mapper.readTree(jsonString.toString());
 
 		JsonNode personNode = null;

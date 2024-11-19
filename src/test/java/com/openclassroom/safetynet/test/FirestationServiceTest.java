@@ -28,43 +28,45 @@ class FirestationServiceTest {
 
 	@Test
 	void findAllByStationNumber() {
-
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1),
-				new Firestation("1650 Culver St", 1));
+		// GIVEN
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 1));
+		// WHEN
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
+		// THEN
 		List<Firestation> testFirestations = firestationService.findFireStationByStationNumber(1);
 
 		assertThat(testFirestations).isEqualTo(firestations);
-
 	}
 
 	@Test
 	void getFirestationByListStationNumber() {
-
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1),
-				new Firestation("1650 Culver St", 2));
+		// GIVEN
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 2));
 		List<Integer> stationNumbers = Arrays.asList(1, 2);
+
+		// WHEN
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
+		// THEN
 		List<Firestation> testFirestations = firestationService.getFirestationByListStationNumber(stationNumbers);
 
 		assertThat(testFirestations).isEqualTo(firestations);
-
 	}
 
 	@Test
 	void getFirestationByAddress() {
-
-		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1),
-				new Firestation("1650 Culver St", 2));
+		// GIVEN
+		List<Firestation> firestations = Arrays.asList(new Firestation("1509 Culver St", 1), new Firestation("1650 Culver St", 2));
 		Firestation firestationResult = new Firestation("1509 Culver St", 1);
+
+		// WHEN
 		when(repository.loadTypeOfData(TypeOfData.FIRESTATIONS)).thenReturn(Arrays.asList(firestations.get(0), firestations.get(1)));
 
+		// THEN
 		Firestation testFirestations = firestationService.getFirestationByAddress("1509 Culver St");
 
 		assertThat(testFirestations).isEqualTo(firestationResult);
-
 	}
 
 }

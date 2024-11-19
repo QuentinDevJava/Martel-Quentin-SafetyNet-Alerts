@@ -56,7 +56,6 @@ public class FirestationControllerTest {
 		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
 		String requestJson = ow.writeValueAsString(firestation);
 		mockMvc.perform(post("/firestation").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isCreated());
-
 	}
 
 	@ParameterizedTest
