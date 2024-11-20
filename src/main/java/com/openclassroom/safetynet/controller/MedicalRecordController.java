@@ -3,6 +3,7 @@ package com.openclassroom.safetynet.controller;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,12 +40,12 @@ public class MedicalRecordController {
 	 * Creates a new medical record.
 	 * 
 	 * This method processes the incoming POST request to add a new medical record
-	 * to the system. It validates the provided {@link MedicalRecord} and calls
-	 * the service layer to persist the medical record. Upon successful creation, it
+	 * to the system. It validates the provided {@link MedicalRecord} and calls the
+	 * service layer to persist the medical record. Upon successful creation, it
 	 * returns a response with a 201 status and the location of the new resource.
 	 *
-	 * @param medicalRecordDTO The {@link MedicalRecord} containing the details
-	 *                         of the medical record to be created.
+	 * @param medicalRecordDTO The {@link MedicalRecord} containing the details of
+	 *                         the medical record to be created.
 	 * @return A {@link ResponseEntity} with a status of 201 (Created) and the URI
 	 *         of the newly created medical record.
 	 * @throws URISyntaxException If the URI for the created resource cannot be
@@ -72,8 +73,8 @@ public class MedicalRecordController {
 	 *
 	 * @param firstName        The firstName of the person medical record to update.
 	 * @param lastName         The lastName of the person medical record to update.
-	 * @param medicalRecordDTO The {@link MedicalRecord} containing the new
-	 *                         medical record details.
+	 * @param medicalRecordDTO The {@link MedicalRecord} containing the new medical
+	 *                         record details.
 	 * @return A {@link ResponseEntity} with a status of 200 (OK) indicating the
 	 *         medical record was updated.
 	 */
@@ -102,16 +103,18 @@ public class MedicalRecordController {
 	 *         record was not found.
 	 */
 	@DeleteMapping("/{firstName}/{lastName}")
-	public ResponseEntity<Void> deleteMedicalRecord(@PathVariable @Validated @NotBlank String firstName,
+	public ResponseEntity<ApiResponse> deleteMedicalRecord(@PathVariable @Validated @NotBlank String firstName,
 			@PathVariable @Validated @NotBlank String lastName) {
 		log.info("DELETE request received for /medicalrecord/{}/{}", firstName, lastName);
 		Boolean medicalRecordDeleted = medicalRecordService.deleteMedicalRecord(firstName, lastName);
 		if (Boolean.TRUE.equals(medicalRecordDeleted)) {
 			log.info("Medical record successfully deleted: {} {}", firstName, lastName);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.NO_CONTENT)
+					.body(new ApiResponse(204, "The medical record with firstName: " + firstName + " and lastName: " + lastName + " is delete"));
 		} else {
 			log.error("Medical record not found: firstName: {}, lastName: {}", firstName, lastName);
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new ApiResponse(404, "medical record not found: firstName: " + firstName + ", lastName: " + lastName));
 		}
 	}
 }

@@ -3,6 +3,7 @@ package com.openclassroom.safetynet.controller;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,8 +45,8 @@ public class FirestationController {
 	 * service layer to persist the firestation. Upon successful creation, it
 	 * returns a response with a 201 status and the location of the new resource.
 	 *
-	 * @param firestationDTO The {@link Firestation} containing the details of
-	 *                       the firestation to be created.
+	 * @param firestationDTO The {@link Firestation} containing the details of the
+	 *                       firestation to be created.
 	 * @return A {@link ResponseEntity} with a status of 201 (Created) and the URI
 	 *         of the newly created firestation.
 	 * @throws URISyntaxException If the URI for the created resource cannot be
@@ -72,8 +73,8 @@ public class FirestationController {
 	 * 
 	 *
 	 * @param address        The address of the firestation to update.
-	 * @param firestationDTO The {@link Firestation} containing the new
-	 *                       firestation details.
+	 * @param firestationDTO The {@link Firestation} containing the new firestation
+	 *                       details.
 	 * @return A {@link ResponseEntity} with a status of 200 (OK) indicating the
 	 *         firestation was updated.
 	 */
@@ -102,15 +103,15 @@ public class FirestationController {
 	 *         firestation was not found.
 	 */
 	@DeleteMapping("/{addressOrNum}")
-	public ResponseEntity<Void> deleteFirestation(@PathVariable @Validated @NotBlank String addressOrNum) {
+	public ResponseEntity<ApiResponse> deleteFirestation(@PathVariable @Validated @NotBlank String addressOrNum) {
 		log.info("DELETE request received for /firestation/{}", addressOrNum);
 		Boolean firestationsDeleted = firestationService.deleteFirestation(addressOrNum);
 		if (Boolean.TRUE.equals(firestationsDeleted)) {
 			log.info("Firestation successfully deleted: {}", addressOrNum);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse(204, "Firestation: " + addressOrNum + " is delete"));
 		} else {
 			log.error("Firestation not found: address: {}", addressOrNum);
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(404, "Firestation: " + addressOrNum + " not found"));
 		}
 
 	}

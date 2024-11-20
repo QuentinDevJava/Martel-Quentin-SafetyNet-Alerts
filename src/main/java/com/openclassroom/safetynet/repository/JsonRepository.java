@@ -52,22 +52,6 @@ public class JsonRepository {
 	}
 
 	/**
-	 * Loads all data from the JSON file.
-	 *
-	 * @return A map containing all data from the JSON file.
-	 * @throws DataLoadingException If an error occurs while loading the data from
-	 *                              the JSON file.
-	 */
-	public Map<String, List<Object>> loadJsonAllData() {
-		try {
-			return objectMapper.readValue(new File(getJsonFilePath()), new TypeReference<>() {
-			});
-		} catch (Exception e) {
-			throw new DataLoadingException("Error loading data: " + e.getMessage());
-		}
-	}
-
-	/**
 	 * Returns the path to the JSON file.
 	 *
 	 * The path is determined based on whether the "test.mode" system property is
@@ -80,6 +64,15 @@ public class JsonRepository {
 	public List<Object> loadTypeOfData(TypeOfData typeOfData) {
 		Map<String, List<Object>> data = loadJsonAllData();
 		return data.getOrDefault(typeOfData.getJsonKey(), new ArrayList<>());
+	}
+
+	private Map<String, List<Object>> loadJsonAllData() {
+		try {
+			return objectMapper.readValue(new File(getJsonFilePath()), new TypeReference<>() {
+			});
+		} catch (Exception e) {
+			throw new DataLoadingException("Error loading data: " + e.getMessage());
+		}
 	}
 
 	private String getJsonFilePath() {
